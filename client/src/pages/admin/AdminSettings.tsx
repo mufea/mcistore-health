@@ -27,6 +27,7 @@ export default function AdminSettings() {
   const [internationalCost, setInternationalCost] = useState("");
 
   // Midtrans
+  const [midtransMerchantId, setMidtransMerchantId] = useState("");
   const [midtransServerKey, setMidtransServerKey] = useState("");
   const [midtransClientKey, setMidtransClientKey] = useState("");
   const [midtransIsProduction, setMidtransIsProduction] = useState(false);
@@ -40,6 +41,7 @@ export default function AdminSettings() {
       setBeneficiary(rawSettings["bank_transfer_beneficiary"] ?? "");
       setNationalCost(rawSettings["shipping_national_cost"] ?? "50000");
       setInternationalCost(rawSettings["shipping_international_cost"] ?? "250000");
+      setMidtransMerchantId(rawSettings["midtrans_merchant_id"] ?? "");
       setMidtransServerKey(rawSettings["midtrans_server_key"] ?? "");
       setMidtransClientKey(rawSettings["midtrans_client_key"] ?? "");
       setMidtransIsProduction(rawSettings["midtrans_is_production"] === "true");
@@ -61,6 +63,7 @@ export default function AdminSettings() {
         bank_transfer_beneficiary: beneficiary,
         shipping_national_cost: nationalCost,
         shipping_international_cost: internationalCost,
+        midtrans_merchant_id: midtransMerchantId,
         midtrans_server_key: midtransServerKey,
         midtrans_client_key: midtransClientKey,
         midtrans_is_production: String(midtransIsProduction),
@@ -164,6 +167,15 @@ export default function AdminSettings() {
             <h2 className="font-semibold text-foreground">Midtrans Payment Gateway</h2>
           </div>
           <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Merchant ID</Label>
+              <Input
+                value={midtransMerchantId}
+                onChange={(e) => setMidtransMerchantId(e.target.value)}
+                placeholder="e.g. G123456789"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Your Midtrans Merchant ID found in the Midtrans Dashboard.</p>
+            </div>
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Server Key</Label>
               <Input
