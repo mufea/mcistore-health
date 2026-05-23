@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { getChangePasswordUrl, getLoginUrl, getPasswordResetUrl } from "@/const";
+import { getChangePasswordUrl, getLoginUrl, getPasswordResetUrl, getSignUpUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   DropdownMenu,
@@ -122,14 +122,24 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex flex-col items-end gap-0.5">
-              <Button
-                size="sm"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={() => (window.location.href = getLoginUrl())}
-              >
-                Sign In
-              </Button>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-primary/40 text-primary hover:bg-primary/5 hover:border-primary"
+                  onClick={() => (window.location.href = getSignUpUrl())}
+                >
+                  Sign Up
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={() => (window.location.href = getLoginUrl())}
+                >
+                  Sign In
+                </Button>
+              </div>
               <button
                 type="button"
                 onClick={() => (window.location.href = getPasswordResetUrl())}
