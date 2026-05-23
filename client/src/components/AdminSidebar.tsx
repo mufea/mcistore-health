@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link, useLocation } from "wouter";
+import { useCallback } from "react";
 import {
   BarChart3,
   Brain,
@@ -28,7 +29,12 @@ const NAV_ITEMS = [
 
 export default function AdminSidebar() {
   const { logout } = useAuth();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    navigate("/");
+  }, [logout, navigate]);
 
   return (
     <aside className="w-56 flex-shrink-0 bg-card border-r border-border/60 flex flex-col min-h-screen">
@@ -75,7 +81,7 @@ export default function AdminSidebar() {
           </a>
         </Link>
         <button
-          onClick={() => logout()}
+          onClick={handleLogout}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" /> Log Out

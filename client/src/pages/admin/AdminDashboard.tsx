@@ -18,6 +18,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useCallback } from "react";
 import BackToHome from "@/components/BackToHome";
 
 const navItems = [
@@ -34,7 +35,12 @@ const navItems = [
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, logout } = useAuth();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    navigate("/");
+  }, [logout, navigate]);
 
   if (!isAuthenticated || user?.role !== "admin") {
     return (
@@ -111,7 +117,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </div>
           </Link>
           <button
-            onClick={() => logout()}
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all"
           >
             <LogOut className="h-4 w-4" />

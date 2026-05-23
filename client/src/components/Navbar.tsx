@@ -12,13 +12,19 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Home, LogOut, Package, Settings, ShoppingBag } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useCallback } from "react";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const { data: settings } = trpc.settings.getPublic.useQuery();
 
   const isAdmin = user?.role === "admin";
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    navigate("/");
+  }, [logout, navigate]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-md">
@@ -27,10 +33,10 @@ export default function Navbar() {
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-xs font-bold">V</span>
+              <span className="text-primary-foreground text-xs font-bold tracking-tight">MC</span>
             </div>
             <span className="font-serif text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-              {settings?.siteName ?? "VitaWell"}
+              {settings?.siteName ?? "MCI Store"}
             </span>
           </div>
         </Link>
@@ -90,7 +96,7 @@ export default function Navbar() {
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/admin">
+                      <Link href="/mufea21">
                         <Settings className="mr-2 h-4 w-4" />
                         Admin Dashboard
                       </Link>
@@ -98,7 +104,7 @@ export default function Navbar() {
                   </>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>
