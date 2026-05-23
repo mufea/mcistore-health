@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
-import { ArrowLeft, Building2, CreditCard, Loader2, MapPin, Package, ShoppingBag, User } from "lucide-react";
+import { ArrowLeft, Building2, CheckCircle, CreditCard, Loader2, MapPin, Package, ShoppingBag, User } from "lucide-react";
 import { useSearch, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
@@ -35,6 +35,10 @@ export default function Checkout() {
 
   const { user, isAuthenticated } = useAuth();
   const { data: settings } = trpc.settings.getPublic.useQuery();
+  const { data: profile } = trpc.userProfile.get.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+  const [profileAddressApplied, setProfileAddressApplied] = useState(false);
 
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
@@ -51,23 +55,34 @@ export default function Checkout() {
 
   const selectedProducts = (allProducts ?? []).filter((p) => productIds.includes(p.id));
 
+  // Pre-fill personal info from session user
   useEffect(() => {
     if (user) {
       setName(user.name ?? "");
       setEmail(user.email ?? "");
-      setPhone(user.phone ?? "");
-      if (user.streetAddress) {
-        setUserAddress({
-          street: user.streetAddress ?? "",
-          apt: user.aptNumber ?? "",
-          city: user.city ?? "",
-          province: user.province ?? "",
-          postalCode: user.postalCode ?? "",
-          country: user.country ?? "",
-        });
-      }
+      setPhone((user as any).phone ?? "");
     }
   }, [user]);
+
+  // Pre-fill billing address from saved profile (richer than session token)
+  useEffect(() => {
+    if (profile && !profileAddressApplied) {
+      if (profile.phone && !(user as any)?.phone) {
+        setPhone(profile.phone ?? "");
+      }
+      if (profile.streetAddress) {
+        setUserAddress({
+          street: profile.streetAddress ?? "",
+          apt: profile.aptNumber ?? "",
+          city: profile.city ?? "",
+          province: profile.province ?? "",
+          postalCode: profile.postalCode ?? "",
+          country: profile.country ?? "",
+        });
+        setProfileAddressApplied(true);
+      }
+    }
+  }, [profile, profileAddressApplied]);
 
   useEffect(() => {
     const qty: Record<number, number> = {};
@@ -294,10 +309,43 @@ export default function Checkout() {
 
               {/* User Address */}
               <div className="bg-card rounded-xl border border-border/60 p-6">
-                <div className="flex items-center gap-2 mb-5">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <h2 className="font-semibold text-foreground">Billing Address</h2>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <h2 className="font-semibold text-foreground">Billing Address</h2>
+                  </div>
+                  {profile?.streetAddress && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserAddress({
+                          street: profile.streetAddress ?? "",
+                          apt: profile.aptNumber ?? "",
+                          city: profile.city ?? "",
+                          province: profile.province ?? "",
+                          postalCode: profile.postalCode ?? "",
+                          country: profile.country ?? "",
+                        });
+                      }}
+                      className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+                    >
+                      <CheckCircle className="h-3.5 w-3.5" />
+                      Use saved address
+                    </button>
+                  )}
                 </div>
+
+                {/* Saved address banner */}
+                {profile?.streetAddress && profileAddressApplied && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20 mb-4">
+                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">Pre-filled from your saved profile address.</span>{" "}
+                      You can edit the fields below if needed.
+                    </div>
+                  </div>
+                )}
+
                 <AddressFields addr={userAddress} onChange={updateUserAddr} prefix="user" />
               </div>
 
