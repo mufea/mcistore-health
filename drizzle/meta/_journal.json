@@ -15,6 +15,13 @@
       "when": 1779513970679,
       "tag": "0001_illegal_gwen_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1779531503775,
+      "tag": "0002_silky_triathlon",
+      "breakpoints": true
     }
   ]
 }

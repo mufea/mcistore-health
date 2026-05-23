@@ -4,10 +4,13 @@ import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import {
   BarChart3,
+  Brain,
+  Calendar,
   ClipboardList,
   DollarSign,
   Home,
   Loader2,
+  MessageCircle,
   Package,
   Settings,
   ShoppingBag,
@@ -21,6 +24,9 @@ const navItems = [
   { href: "/admin/survey", label: "Survey Manager", icon: ClipboardList },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/knowledge", label: "Knowledge Base", icon: Brain },
+  { href: "/admin/meetings", label: "Meetings", icon: Calendar },
+  { href: "/admin/chatbot", label: "Conversations", icon: MessageCircle },
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/users", label: "Users", icon: Users },
 ];

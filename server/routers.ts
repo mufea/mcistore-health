@@ -10,6 +10,7 @@ import { settingsRouter } from "./routers/settings";
 import { adminRouter } from "./routers/admin";
 import { paymentRouter } from "./routers/payment";
 import { userProfileRouter } from "./routers/userProfile";
+import { chatbotRouter } from "./routers/chatbot";
 
 export const appRouter = router({
   system: systemRouter,
@@ -28,6 +29,7 @@ export const appRouter = router({
   admin: adminRouter,
   payment: paymentRouter,
   userProfile: userProfileRouter,
+  chatbot: chatbotRouter,
 });
 
 export type AppRouter = typeof appRouter;

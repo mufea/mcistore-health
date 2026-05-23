@@ -172,3 +172,75 @@ export const settings = mysqlTable("settings", {
 });
 
 export type Setting = typeof settings.$inferSelect;
+
+// ─── Chatbot ──────────────────────────────────────────────────────────────────
+
+export const chatbotConversations = mysqlTable("chatbot_conversations", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: varchar("sessionId", { length: 128 }).notNull(),
+  userId: int("userId"),
+  // Summary of what was discussed
+  summary: text("summary"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ChatbotConversation = typeof chatbotConversations.$inferSelect;
+
+export const chatbotMessages = mysqlTable("chatbot_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  conversationId: int("conversationId").notNull(),
+  role: mysqlEnum("role", ["user", "assistant"]).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ChatbotMessage = typeof chatbotMessages.$inferSelect;
+
+// ─── Chatbot Knowledge Base ───────────────────────────────────────────────────
+
+export const chatbotKnowledge = mysqlTable("chatbot_knowledge", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  category: varchar("category", { length: 128 }).default("general").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ChatbotKnowledge = typeof chatbotKnowledge.$inferSelect;
+
+// ─── Meeting Slots & Bookings ─────────────────────────────────────────────────
+
+export const meetingSlots = mysqlTable("meeting_slots", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  date: varchar("date", { length: 16 }).notNull(), // YYYY-MM-DD
+  startTime: varchar("startTime", { length: 8 }).notNull(), // HH:MM
+  endTime: varchar("endTime", { length: 8 }).notNull(),
+  maxBookings: int("maxBookings").default(1).notNull(),
+  currentBookings: int("currentBookings").default(0).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  meetingLink: text("meetingLink"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MeetingSlot = typeof meetingSlots.$inferSelect;
+
+export const meetingBookings = mysqlTable("meeting_bookings", {
+  id: int("id").autoincrement().primaryKey(),
+  slotId: int("slotId").notNull(),
+  userId: int("userId"),
+  customerName: varchar("customerName", { length: 255 }).notNull(),
+  customerEmail: varchar("customerEmail", { length: 320 }).notNull(),
+  customerPhone: varchar("customerPhone", { length: 32 }),
+  notes: text("notes"),
+  status: mysqlEnum("status", ["confirmed", "cancelled", "completed"]).default("confirmed").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MeetingBooking = typeof meetingBookings.$inferSelect;

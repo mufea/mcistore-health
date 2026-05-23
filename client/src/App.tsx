@@ -23,6 +23,12 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminKnowledge from "./pages/admin/AdminKnowledge";
+import AdminMeetings from "./pages/admin/AdminMeetings";
+import AdminChatbot from "./pages/admin/AdminChatbot";
+
+// Chatbot
+import ChatbotWidget from "./components/ChatbotWidget";
 
 function Router() {
   return (
@@ -45,6 +51,20 @@ function Router() {
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path="/admin/settings" component={AdminSettings} />
       <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/knowledge" component={AdminKnowledge} />
+      <Route path="/admin/meetings" component={AdminMeetings} />
+      <Route path="/admin/chatbot" component={AdminChatbot} />
+
+      {/* Legacy /mufea21 admin routes (canonical) */}
+      <Route path="/mufea21" component={AdminDashboard} />
+      <Route path="/mufea21/survey" component={AdminSurvey} />
+      <Route path="/mufea21/products" component={AdminProducts} />
+      <Route path="/mufea21/orders" component={AdminOrders} />
+      <Route path="/mufea21/settings" component={AdminSettings} />
+      <Route path="/mufea21/users" component={AdminUsers} />
+      <Route path="/mufea21/knowledge" component={AdminKnowledge} />
+      <Route path="/mufea21/meetings" component={AdminMeetings} />
+      <Route path="/mufea21/chatbot" component={AdminChatbot} />
 
       {/* 404 */}
       <Route path="/404" component={NotFound} />
@@ -60,6 +80,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <ChatbotWidget />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

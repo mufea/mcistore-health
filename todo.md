@@ -59,3 +59,14 @@
 - [x] CSS @import order fix
 - [x] TypeScript errors resolved
 - [x] Save checkpoint and deliver to user
+
+## Chatbot Feature
+- [x] Extend DB schema: chatbot_conversations, chatbot_messages, chatbot_knowledge, meeting_slots, meeting_bookings
+- [x] Backend router: chatbot (AI chat with LLM, order lookup, meeting booking)
+- [x] Backend router: knowledge base CRUD (admin)
+- [x] Backend router: meeting slots CRUD (admin) and booking (customer)
+- [x] Customer floating chatbot widget (order management + meeting booking + product Q&A)
+- [x] Admin: Knowledge Base editor page
+- [x] Admin: Meeting Slots management page
+- [x] Admin: Chatbot Conversations history page
+- [x] Wire new routes into App.tsx and admin sidebar
