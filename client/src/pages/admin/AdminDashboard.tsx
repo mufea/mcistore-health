@@ -10,6 +10,7 @@ import {
   DollarSign,
   Home,
   Loader2,
+  LogOut,
   MessageCircle,
   Package,
   Settings,
@@ -20,19 +21,19 @@ import { Link, useLocation } from "wouter";
 import BackToHome from "@/components/BackToHome";
 
 const navItems = [
-  { href: "/admin", label: "Overview", icon: BarChart3 },
-  { href: "/admin/survey", label: "Survey Manager", icon: ClipboardList },
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-  { href: "/admin/knowledge", label: "Knowledge Base", icon: Brain },
-  { href: "/admin/meetings", label: "Meetings", icon: Calendar },
-  { href: "/admin/chatbot", label: "Conversations", icon: MessageCircle },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
-  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/mufea21", label: "Overview", icon: BarChart3 },
+  { href: "/mufea21/survey", label: "Survey Manager", icon: ClipboardList },
+  { href: "/mufea21/products", label: "Products", icon: Package },
+  { href: "/mufea21/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/mufea21/knowledge", label: "Knowledge Base", icon: Brain },
+  { href: "/mufea21/meetings", label: "Meetings", icon: Calendar },
+  { href: "/mufea21/chatbot", label: "Conversations", icon: MessageCircle },
+  { href: "/mufea21/settings", label: "Settings", icon: Settings },
+  { href: "/mufea21/users", label: "Users", icon: Users },
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const [location] = useLocation();
 
   if (!isAuthenticated || user?.role !== "admin") {
@@ -68,13 +69,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="p-5 border-b border-sidebar-border">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
-              <div className="w-7 h-7 rounded-full bg-sidebar-primary flex items-center justify-center">
-                <span className="text-sidebar-primary-foreground text-xs font-bold">V</span>
+              <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center shadow-sm">
+                <span className="text-sidebar-primary-foreground text-sm font-bold tracking-tight">MC</span>
               </div>
-              <span className="font-serif text-base font-semibold text-sidebar-foreground">VitaWell</span>
+              <div>
+                <span className="font-bold text-sm text-sidebar-foreground tracking-tight">MCI Store</span>
+                <p className="text-[10px] text-sidebar-foreground/50 leading-none mt-0.5">Admin Dashboard</p>
+              </div>
             </div>
           </Link>
-          <p className="text-xs text-sidebar-foreground/50 mt-1 ml-9">Admin Dashboard</p>
         </div>
 
         {/* Nav */}
@@ -99,14 +102,21 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        {/* Back to Home */}
-        <div className="p-3 border-t border-sidebar-border">
+        {/* Bottom: Back to Website + Log Out */}
+        <div className="p-3 border-t border-sidebar-border space-y-0.5">
           <Link href="/">
             <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all">
               <Home className="h-4 w-4" />
               Back to Website
             </div>
           </Link>
+          <button
+            onClick={() => logout()}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all"
+          >
+            <LogOut className="h-4 w-4" />
+            Log Out
+          </button>
         </div>
       </aside>
 

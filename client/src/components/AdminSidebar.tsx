@@ -6,6 +6,7 @@ import {
   Calendar,
   ClipboardList,
   Home,
+  LogOut,
   MessageCircle,
   Package,
   Settings,
@@ -33,9 +34,16 @@ export default function AdminSidebar() {
     <aside className="w-56 flex-shrink-0 bg-card border-r border-border/60 flex flex-col min-h-screen">
       <div className="p-5 border-b border-border/60">
         <Link href="/">
-          <span className="text-lg font-bold text-primary tracking-tight cursor-pointer">MCI Store</span>
+          <div className="flex items-center gap-2 cursor-pointer">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
+              <span className="text-primary-foreground text-xs font-bold tracking-tight">MC</span>
+            </div>
+            <div>
+              <span className="font-bold text-sm text-foreground tracking-tight">MCI Store</span>
+              <p className="text-[10px] text-muted-foreground leading-none mt-0.5">Admin Panel</p>
+            </div>
+          </div>
         </Link>
-        <p className="text-xs text-muted-foreground mt-0.5">Admin Panel</p>
       </div>
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
         {NAV_ITEMS.map((item) => {
@@ -60,17 +68,17 @@ export default function AdminSidebar() {
           );
         })}
       </nav>
-      <div className="p-3 border-t border-border/60 space-y-1">
+      <div className="p-3 border-t border-border/60 space-y-0.5">
         <Link href="/">
-          <a className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-            <Home className="h-4 w-4" /> Back to Website
+          <a className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <Home className="h-4 w-4 flex-shrink-0" /> Back to Website
           </a>
         </Link>
         <button
           onClick={() => logout()}
-          className="w-full text-left px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
-          Sign Out
+          <LogOut className="h-4 w-4 flex-shrink-0" /> Log Out
         </button>
       </div>
     </aside>
