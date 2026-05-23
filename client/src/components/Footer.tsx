@@ -12,9 +12,9 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-xs font-bold">V</span>
+                <span className="text-primary-foreground text-xs font-bold">M</span>
               </div>
-              <span className="font-serif text-lg font-semibold">{settings?.siteName ?? "VitaWell Health"}</span>
+              <span className="font-serif text-lg font-semibold">{settings?.siteName ?? "MCI Store"}</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               {settings?.siteTagline ?? "Your journey to optimal health starts here. Discover personalized health products tailored to your unique needs."}
@@ -62,7 +62,7 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} {settings?.siteName ?? "VitaWell Health"}. All rights reserved.
+            © {new Date().getFullYear()} MCI Store - Trusted Health Partner. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
             Premium health products for a better life.
