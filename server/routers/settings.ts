@@ -7,8 +7,8 @@ export const settingsRouter = router({
   getPublic: publicProcedure.query(async () => {
     const all = await getAllSettings();
     return {
-      siteName: all["site_name"] ?? "MCI Store",
-      siteTagline: all["site_tagline"] ?? "Trusted Health Partner",
+      siteName: all["site_name"] ?? "VitaWell Health",
+      siteTagline: all["site_tagline"] ?? "Your Journey to Optimal Health Starts Here",
       shippingNationalCost: parseFloat(all["shipping_national_cost"] ?? "50000"),
       shippingInternationalCost: parseFloat(all["shipping_international_cost"] ?? "250000"),
       bankTransferBankName: all["bank_transfer_bank_name"] ?? "BCA",

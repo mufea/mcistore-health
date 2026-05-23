@@ -33,7 +33,7 @@ export default function AdminSettings() {
 
   useEffect(() => {
     if (rawSettings) {
-      setSiteName(rawSettings["site_name"] ?? "MCI Store");
+      setSiteName(rawSettings["site_name"] ?? "VitaWell Health");
       setSiteTagline(rawSettings["site_tagline"] ?? "");
       setBankName(rawSettings["bank_transfer_bank_name"] ?? "");
       setAccountNumber(rawSettings["bank_transfer_account_number"] ?? "");
@@ -105,7 +105,7 @@ export default function AdminSettings() {
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Site Name</Label>
-              <Input value={siteName} onChange={(e) => setSiteName(e.target.value)} placeholder="MCI Store" />
+              <Input value={siteName} onChange={(e) => setSiteName(e.target.value)} placeholder="VitaWell Health" />
             </div>
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Site Tagline</Label>
@@ -131,7 +131,7 @@ export default function AdminSettings() {
             </div>
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Beneficiary Name</Label>
-              <Input value={beneficiary} onChange={(e) => setBeneficiary(e.target.value)} placeholder="e.g. PT MCI Indonesia" />
+              <Input value={beneficiary} onChange={(e) => setBeneficiary(e.target.value)} placeholder="e.g. PT VitaWell Indonesia" />
             </div>
           </div>
         </div>

@@ -45,7 +45,7 @@ const testimonials = [
   {
     name: "Priya K.",
     role: "Fitness Coach",
-    text: "I recommend MCI Store to all my clients. The personalized approach makes all the difference.",
+    text: "I recommend VitaWell to all my clients. The personalized approach makes all the difference.",
     rating: 5,
   },
 ];
@@ -128,7 +128,7 @@ export default function Home() {
           <div className="text-center mb-14">
             <div className="gold-line mx-auto mb-4" />
             <h2 className="font-serif text-3xl lg:text-4xl font-light text-foreground mb-3">
-              Why Choose MCI Store
+              Why Choose VitaWell
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto">
               We combine science, nature, and personalization to deliver exceptional health outcomes.
@@ -295,7 +295,7 @@ export default function Home() {
             Ready to Transform Your Health?
           </h2>
           <p className="text-muted-foreground mb-8 leading-relaxed">
-            Join thousands of customers who have discovered their perfect wellness routine with MCI Store.
+            Join thousands of customers who have discovered their perfect wellness routine with VitaWell.
           </p>
           <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-10">
             <Link href="/survey">

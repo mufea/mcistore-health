@@ -17,12 +17,12 @@ import { Link, useLocation } from "wouter";
 import BackToHome from "@/components/BackToHome";
 
 const navItems = [
-  { href: "/mufea21", label: "Overview", icon: BarChart3 },
-  { href: "/mufea21/survey", label: "Survey Manager", icon: ClipboardList },
-  { href: "/mufea21/products", label: "Products", icon: Package },
-  { href: "/mufea21/orders", label: "Orders", icon: ShoppingBag },
-  { href: "/mufea21/settings", label: "Settings", icon: Settings },
-  { href: "/mufea21/users", label: "Users", icon: Users },
+  { href: "/admin", label: "Overview", icon: BarChart3 },
+  { href: "/admin/survey", label: "Survey Manager", icon: ClipboardList },
+  { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/users", label: "Users", icon: Users },
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -63,9 +63,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
               <div className="w-7 h-7 rounded-full bg-sidebar-primary flex items-center justify-center">
-                <span className="text-sidebar-primary-foreground text-xs font-bold">M</span>
+                <span className="text-sidebar-primary-foreground text-xs font-bold">V</span>
               </div>
-              <span className="font-serif text-base font-semibold text-sidebar-foreground">MCI Store</span>
+              <span className="font-serif text-base font-semibold text-sidebar-foreground">VitaWell</span>
             </div>
           </Link>
           <p className="text-xs text-sidebar-foreground/50 mt-1 ml-9">Admin Dashboard</p>
@@ -179,11 +179,11 @@ export default function AdminDashboard() {
       {/* Quick Links */}
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
-          { href: "/mufea21/survey", label: "Manage Survey", desc: "Add/edit health survey questions and pages", icon: ClipboardList },
-          { href: "/mufea21/products", label: "Manage Products", desc: "Add/edit products, set segments and pricing", icon: Package },
-          { href: "/mufea21/orders", label: "View Orders", desc: "Review and update order statuses", icon: ShoppingBag },
-          { href: "/mufea21/settings", label: "Payment Settings", desc: "Configure bank transfer and shipping rates", icon: Settings },
-          { href: "/mufea21/users", label: "Manage Users", desc: "Update user segments and roles", icon: Users },
+          { href: "/admin/survey", label: "Manage Survey", desc: "Add/edit health survey questions and pages", icon: ClipboardList },
+          { href: "/admin/products", label: "Manage Products", desc: "Add/edit products, set segments and pricing", icon: Package },
+          { href: "/admin/orders", label: "View Orders", desc: "Review and update order statuses", icon: ShoppingBag },
+          { href: "/admin/settings", label: "Payment Settings", desc: "Configure bank transfer and shipping rates", icon: Settings },
+          { href: "/admin/users", label: "Manage Users", desc: "Update user segments and roles", icon: Users },
         ].map((item) => {
           const Icon = item.icon;
           return (
