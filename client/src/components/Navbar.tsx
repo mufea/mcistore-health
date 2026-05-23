@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Home, LogOut, Package, Settings, ShoppingBag } from "lucide-react";
+import { Home, LogOut, Package, Settings, ShoppingBag, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useCallback } from "react";
 
@@ -86,6 +86,12 @@ export default function Navbar() {
                   <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    My Profile
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/my-orders">
                     <ShoppingBag className="mr-2 h-4 w-4" />
