@@ -2,12 +2,15 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import crypto from "crypto";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { getOrderByNumber, getSetting, updateOrderByMidtransId, updateOrderStatus } from "../db";
+import { notifyOwner } from "./notification";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -31,11 +34,94 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+
+  // ─── Midtrans Webhook ──────────────────────────────────────────────────────
+  app.post("/api/midtrans/webhook", async (req, res) => {
+    try {
+      const notification = req.body as {
+        order_id: string;
+        status_code: string;
+        gross_amount: string;
+        signature_key: string;
+        transaction_status: string;
+        fraud_status?: string;
+        payment_type?: string;
+      };
+
+      const serverKey = await getSetting("midtrans_server_key");
+      if (!serverKey) {
+        console.error("Midtrans server key not configured");
+        res.status(500).json({ error: "Not configured" });
+        return;
+      }
+
+      // Verify signature
+      const expectedSignature = crypto
+        .createHash("sha512")
+        .update(`${notification.order_id}${notification.status_code}${notification.gross_amount}${serverKey}`)
+        .digest("hex");
+
+      if (expectedSignature !== notification.signature_key) {
+        console.error("Invalid Midtrans signature");
+        res.status(403).json({ error: "Invalid signature" });
+        return;
+      }
+
+      const { transaction_status, fraud_status, order_id, payment_type } = notification;
+
+      let paymentStatus: "pending" | "paid" | "failed" | "refunded" = "pending";
+      let orderStatus: "pending" | "processing" | "shipped" | "delivered" | "cancelled" | undefined;
+
+      if (transaction_status === "capture") {
+        if (fraud_status === "accept") {
+          paymentStatus = "paid";
+          orderStatus = "processing";
+        } else if (fraud_status === "challenge") {
+          paymentStatus = "pending";
+        }
+      } else if (transaction_status === "settlement") {
+        paymentStatus = "paid";
+        orderStatus = "processing";
+      } else if (["cancel", "deny", "expire"].includes(transaction_status)) {
+        paymentStatus = "failed";
+        orderStatus = "cancelled";
+      } else if (transaction_status === "refund") {
+        paymentStatus = "refunded";
+      }
+
+      await updateOrderByMidtransId(order_id, {
+        paymentStatus,
+        ...(orderStatus ? { status: orderStatus } : {}),
+        midtransPaymentType: payment_type,
+      });
+
+      // Notify admin on successful payment
+      if (paymentStatus === "paid") {
+        const order = await getOrderByNumber(order_id);
+        if (order) {
+          try {
+            await notifyOwner({
+              title: `Payment Confirmed: ${order_id}`,
+              content: `Payment confirmed for order ${order_id} via ${payment_type}. Amount: IDR ${notification.gross_amount}.`,
+            });
+          } catch (e) {
+            console.warn("Failed to notify owner:", e);
+          }
+        }
+      }
+
+      res.status(200).json({ status: "ok" });
+    } catch (error) {
+      console.error("Midtrans webhook error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",
@@ -44,7 +130,7 @@ async function startServer() {
       createContext,
     })
   );
-  // development mode uses Vite, production mode uses static files
+
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {

@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
-import { AlertTriangle, RotateCcw } from "lucide-react";
-import { Component, ReactNode } from "react";
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -8,48 +8,60 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  error: Error | null;
+  error?: Error;
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+  public state: State = { hasError: false };
 
-  static getDerivedStateFromError(error: Error): State {
+  public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  render() {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Uncaught error:", error, errorInfo);
+  }
+
+  public render() {
     if (this.state.hasError) {
       return (
-        <div className="flex items-center justify-center min-h-screen p-8 bg-background">
-          <div className="flex flex-col items-center w-full max-w-2xl p-8">
-            <AlertTriangle
-              size={48}
-              className="text-destructive mb-6 flex-shrink-0"
-            />
-
-            <h2 className="text-xl mb-4">An unexpected error occurred.</h2>
-
-            <div className="p-4 w-full rounded bg-muted overflow-auto mb-6">
-              <pre className="text-sm text-muted-foreground whitespace-break-spaces">
-                {this.state.error?.stack}
-              </pre>
+        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+          <div className="max-w-md w-full text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+              <AlertTriangle className="h-8 w-8 text-destructive" />
             </div>
-
-            <button
-              onClick={() => window.location.reload()}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg",
-                "bg-primary text-primary-foreground",
-                "hover:opacity-90 cursor-pointer"
+            <div>
+              <h1 className="font-serif text-2xl font-semibold text-foreground mb-2">
+                Something went wrong
+              </h1>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                An unexpected error occurred. Please try refreshing the page or return to the home page.
+              </p>
+              {this.state.error && (
+                <p className="mt-3 text-xs text-muted-foreground/70 font-mono bg-muted rounded-md p-3 text-left">
+                  {this.state.error.message}
+                </p>
               )}
-            >
-              <RotateCcw size={16} />
-              Reload Page
-            </button>
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => this.setState({ hasError: false })}
+                className="gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Try Again
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => (window.location.href = "/")}
+                className="gap-2 bg-primary text-primary-foreground"
+              >
+                <Home className="h-4 w-4" />
+                Back to Home
+              </Button>
+            </div>
           </div>
         </div>
       );

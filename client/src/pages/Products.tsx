@@ -1,0 +1,132 @@
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { trpc } from "@/lib/trpc";
+import { Crown, Leaf, Loader2, Search } from "lucide-react";
+import { useState } from "react";
+import { Link } from "wouter";
+import MainLayout from "@/components/MainLayout";
+import BackToHome from "@/components/BackToHome";
+
+export default function Products() {
+  const { user, isAuthenticated } = useAuth();
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+
+  const { data: products, isLoading } = trpc.products.list.useQuery({
+    segment: isAuthenticated ? (user?.segment ?? "standard") : "standard",
+  });
+
+  const categories = ["all", ...Array.from(new Set((products ?? []).map((p) => p.category)))];
+
+  const filtered = (products ?? []).filter((p) => {
+    const matchSearch =
+      !search ||
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      (p.description ?? "").toLowerCase().includes(search.toLowerCase());
+    const matchCategory = category === "all" || p.category === category;
+    return matchSearch && matchCategory;
+  });
+
+  return (
+    <MainLayout>
+      <div className="py-12">
+        <div className="container">
+          <BackToHome className="mb-8" />
+
+          {/* Header */}
+          <div className="mb-10">
+            <div className="gold-line mb-4" />
+            <h1 className="font-serif text-4xl font-light text-foreground mb-3">Our Products</h1>
+            <p className="text-muted-foreground max-w-lg">
+              Discover our curated collection of premium health and wellness products.
+            </p>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-8">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat === "all" ? "All Categories" : cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">No products found matching your criteria.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {filtered.map((product, i) => (
+                <Link href={`/products/${product.id}`} key={product.id}>
+                  <div
+                    className="group bg-card rounded-xl border border-border/60 overflow-hidden card-hover cursor-pointer animate-slide-up"
+                    style={{ animationDelay: `${i * 40}ms` }}
+                  >
+                    <div className="aspect-square bg-muted/30 flex items-center justify-center overflow-hidden relative">
+                      {product.imageUrl ? (
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Leaf className="h-7 w-7 text-primary/40" />
+                        </div>
+                      )}
+                      {product.targetSegment !== "all" && (
+                        <div className="absolute top-2 right-2">
+                          <Badge className="text-xs bg-amber-500 text-white border-0">
+                            <Crown className="h-3 w-3 mr-1" />
+                            {product.targetSegment}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <Badge variant="outline" className="text-xs mb-2">{product.category}</Badge>
+                      <h3 className="font-semibold text-foreground text-sm mb-1 line-clamp-1">{product.name}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
+                        {product.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-foreground text-sm">
+                          IDR {Number(product.price).toLocaleString("id-ID")}
+                        </span>
+                        <span className="text-xs text-primary font-medium">View →</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </MainLayout>
+  );
+}
