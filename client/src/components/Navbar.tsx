@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
+import { getChangePasswordUrl, getLoginUrl, getPasswordResetUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   DropdownMenu,
@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Home, LogOut, Package, Settings, ShoppingBag, User } from "lucide-react";
+import { Home, KeyRound, LogOut, Package, Settings, ShoppingBag, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useCallback } from "react";
 
@@ -110,6 +110,11 @@ export default function Navbar() {
                   </>
                 )}
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => (window.location.href = getChangePasswordUrl())}>
+                  <KeyRound className="mr-2 h-4 w-4" />
+                  Change Password
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
@@ -117,13 +122,22 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button
-              size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-              onClick={() => (window.location.href = getLoginUrl())}
-            >
-              Sign In
-            </Button>
+            <div className="flex flex-col items-end gap-0.5">
+              <Button
+                size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={() => (window.location.href = getLoginUrl())}
+              >
+                Sign In
+              </Button>
+              <button
+                type="button"
+                onClick={() => (window.location.href = getPasswordResetUrl())}
+                className="text-[11px] text-muted-foreground hover:text-primary transition-colors underline-offset-2 hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
           )}
         </div>
       </div>

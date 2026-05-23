@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
+import { getChangePasswordUrl, getLoginUrl } from "@/const";
 import {
   CheckCircle,
   ChevronRight,
   Edit2,
+  ExternalLink,
+  KeyRound,
   Loader2,
   MapPin,
   Package,
@@ -437,6 +439,36 @@ function AddressSection() {
   );
 }
 
+// ─── Change Password section ─────────────────────────────────────────────────
+
+function ChangePasswordSection() {
+  return (
+    <SectionCard title="Password & Security" icon={KeyRound}>
+      <div className="space-y-4">
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Your password is managed securely through the MCI Store authentication portal. Click the button below
+          to update your password. You will be redirected back to your profile once the change is complete.
+        </p>
+        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/40 border border-border/40">
+          <KeyRound className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            For your security, you may be asked to verify your current password before setting a new one.
+          </p>
+        </div>
+        <Button
+          onClick={() => (window.location.href = getChangePasswordUrl())}
+          variant="outline"
+          className="gap-2 border-primary/30 text-primary hover:bg-primary/5 hover:border-primary"
+        >
+          <KeyRound className="h-4 w-4" />
+          Change Password
+          <ExternalLink className="h-3.5 w-3.5 ml-1 opacity-60" />
+        </Button>
+      </div>
+    </SectionCard>
+  );
+}
+
 // ─── Orders section ───────────────────────────────────────────────────────────
 
 function OrdersSection() {
@@ -570,6 +602,7 @@ export default function Profile() {
             {[
               { label: "Profile", href: "#profile" },
               { label: "Address", href: "#address" },
+              { label: "Security", href: "#security" },
               { label: "Orders", href: "#orders" },
             ].map((tab) => (
               <a
@@ -589,6 +622,9 @@ export default function Profile() {
             </div>
             <div id="address">
               <AddressSection />
+            </div>
+            <div id="security">
+              <ChangePasswordSection />
             </div>
             <div id="orders">
               <OrdersSection />
