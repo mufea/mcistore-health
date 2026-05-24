@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,12 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { trpc } from "@/lib/trpc";
-import { Edit, Leaf, Loader2, Plus, Search, Trash2 } from "lucide-react";
+import { Edit, ImagePlus, Leaf, Loader2, Plus, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Herbal Tea", "Vitamin", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 
 export default function AdminProducts() {
   const utils = trpc.useUtils();
@@ -32,8 +33,14 @@ export default function AdminProducts() {
   const [targetSegment, setTargetSegment] = useState("all");
   const [stock, setStock] = useState("100");
   const [imageUrl, setImageUrl] = useState("");
+  const [imageKey, setImageKey] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadImageMutation = trpc.products.uploadImage.useMutation();
 
   const createMutation = trpc.products.create.useMutation({
     onSuccess: () => { utils.products.adminList.invalidate(); setDialog(false); toast.success("Product created"); },
@@ -48,10 +55,18 @@ export default function AdminProducts() {
     onError: (e) => toast.error(e.message),
   });
 
+  const resetImageState = () => {
+    setImageUrl("");
+    setImageKey("");
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const openNew = () => {
     setEditing(null);
     setName(""); setDescription(""); setPrice(""); setCategory("Supplement");
-    setTargetSegment("all"); setStock("100"); setImageUrl(""); setIsFeatured(false); setIsActive(true);
+    setTargetSegment("all"); setStock("100"); setIsFeatured(false); setIsActive(true);
+    resetImageState();
     setDialog(true);
   };
 
@@ -59,15 +74,68 @@ export default function AdminProducts() {
     setEditing(p);
     setName(p.name); setDescription(p.description ?? ""); setPrice(String(p.price));
     setCategory(p.category); setTargetSegment(p.targetSegment); setStock(String(p.stock));
-    setImageUrl(p.imageUrl ?? ""); setIsFeatured(p.isFeatured); setIsActive(p.isActive);
+    setImageUrl(p.imageUrl ?? ""); setImageKey(p.imageKey ?? "");
+    setImagePreview(p.imageUrl ?? null);
+    setIsFeatured(p.isFeatured); setIsActive(p.isActive);
     setDialog(true);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Image must be smaller than 4 MB");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    // Show local preview immediately
+    const reader = new FileReader();
+    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+
+    // Upload to S3
+    setIsUploading(true);
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => {
+          const result = r.result as string;
+          // Strip the data:image/...;base64, prefix
+          resolve(result.split(",")[1]);
+        };
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+
+      const result = await uploadImageMutation.mutateAsync({
+        base64,
+        filename: file.name,
+        mimeType: file.type,
+      });
+
+      setImageUrl(result.url);
+      setImageKey(result.key);
+      toast.success("Image uploaded successfully");
+    } catch (err: any) {
+      toast.error("Upload failed: " + (err?.message ?? "Unknown error"));
+      resetImageState();
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const save = () => {
     if (!name.trim() || !price) return toast.error("Name and price are required");
     const data = {
-      name, description, price: price, category,
-      targetSegment: targetSegment as any, stock: parseInt(stock), imageUrl: imageUrl || undefined,
+      name, description, price, category,
+      targetSegment: targetSegment as any, stock: parseInt(stock),
+      imageUrl: imageUrl || undefined,
+      imageKey: imageKey || undefined,
       isFeatured, isActive,
     };
     if (editing) {
@@ -87,6 +155,8 @@ export default function AdminProducts() {
     premium: "bg-amber-100 text-amber-700",
     vip: "bg-purple-100 text-purple-700",
   };
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
     <AdminLayout>
@@ -195,7 +265,7 @@ export default function AdminProducts() {
       )}
 
       {/* Product Dialog */}
-      <Dialog open={dialog} onOpenChange={setDialog}>
+      <Dialog open={dialog} onOpenChange={(open) => { if (!open) { setDialog(false); } else { setDialog(true); } }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Product" : "New Product"}</DialogTitle>
@@ -239,10 +309,74 @@ export default function AdminProducts() {
                 </Select>
               </div>
             </div>
+
+            {/* Image Upload */}
             <div>
-              <Label className="text-sm font-medium mb-1.5 block">Image URL</Label>
-              <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
+              <Label className="text-sm font-medium mb-1.5 block">Product Image</Label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              {imagePreview ? (
+                <div className="relative group">
+                  <div className="w-full h-40 rounded-lg overflow-hidden border border-border/60 bg-muted/30">
+                    <img src={imagePreview} alt="Product preview" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                    >
+                      {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <ImagePlus className="h-3.5 w-3.5 mr-1" />}
+                      Change
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={resetImageState}
+                      disabled={isUploading}
+                    >
+                      <X className="h-3.5 w-3.5 mr-1" />
+                      Remove
+                    </Button>
+                  </div>
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-background/70 rounded-lg flex items-center justify-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="text-xs text-muted-foreground">Uploading...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="w-full h-32 rounded-lg border-2 border-dashed border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-colors flex flex-col items-center justify-center gap-2 text-muted-foreground cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      <span className="text-xs">Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus className="h-6 w-6" />
+                      <span className="text-sm font-medium">Click to upload image</span>
+                      <span className="text-xs">PNG, JPG, WEBP up to 4 MB</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
+
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Featured Product</Label>
               <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
@@ -257,14 +391,15 @@ export default function AdminProducts() {
             <Button
               className="bg-primary text-primary-foreground"
               onClick={save}
-              disabled={createMutation.isPending || updateMutation.isPending}
+              disabled={isSaving || isUploading}
             >
-              {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {editing ? "Save Changes" : "Create Product"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
         <AlertDialogContent>

@@ -8,6 +8,7 @@ import {
   updateProduct,
 } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
+import { storagePut } from "../storage";
 
 export const productsRouter = router({
   // Public: list products filtered by user segment
@@ -105,5 +106,24 @@ export const productsRouter = router({
     .mutation(async ({ input }) => {
       await deleteProduct(input.id);
       return { success: true };
+    }),
+
+  // Admin: upload product image to S3
+  uploadImage: adminProcedure
+    .input(
+      z.object({
+        // Base64-encoded file content
+        base64: z.string(),
+        // Original filename for extension detection
+        filename: z.string(),
+        mimeType: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const ext = input.filename.split(".").pop()?.toLowerCase() ?? "jpg";
+      const key = `products/img_${Date.now()}.${ext}`;
+      const buffer = Buffer.from(input.base64, "base64");
+      const { key: savedKey, url } = await storagePut(key, buffer, input.mimeType);
+      return { key: savedKey, url };
     }),
 });
