@@ -182,6 +182,45 @@ export const translations = {
     completeAssessment:{ en: "Complete Assessment",       ar: "إكمال التقييم",             zh: "完成评估",              es: "Completar Evaluación",         hi: "मूल्यांकन पूर्ण करें" },
     stepOf:            { en: "Step",                      ar: "خطوة",                     zh: "步骤",                  es: "Paso",                         hi: "चरण" },
   },
+
+  // ── Recommendations Page ──
+  recommendationsPage: {
+    yourProfile:      { en: "Your Profile",                   ar: "ملفك الشخصي",                zh: "您的档案",              es: "Tu Perfil",                    hi: "आपकी प्रोफ़ाइल" },
+    personalizedTitle:{ en: "Your Personalized Recommendations", ar: "توصياتك المخصصة",          zh: "您的个性化推荐",        es: "Tus Recomendaciones Personalizadas", hi: "आपकी व्यक्तिगत सिफारिशें" },
+    signInPrompt:     { en: "Sign in to unlock premium products", ar: "سجّل دخولك للوصول إلى المنتجات المتميزة", zh: "登录以解锁高级产品", es: "Inicia sesión para desbloquear productos premium", hi: "प्रीमियम उत्पाद अनलॉक करने के लिए साइन इन करें" },
+    signInSub:        { en: "Create an account to access your full personalized catalog and save your cart.", ar: "أنشئ حساباً للوصول إلى كتالوجك الكامل وحفظ سلة التسوق.", zh: "创建账户以访问您的完整个性化目录并保存购物车。", es: "Crea una cuenta para acceder a tu catálogo personalizado completo y guardar tu carrito.", hi: "अपने पूर्ण व्यक्तिगत कैटलॉग तक पहुंचने और कार्ट सहेजने के लिए खाता बनाएं।" },
+    signIn:           { en: "Sign In",                         ar: "تسجيل الدخول",               zh: "登录",                  es: "Iniciar Sesión",               hi: "साइन इन" },
+    noProducts:       { en: "No products available yet",       ar: "لا توجد منتجات متاحة بعد",  zh: "暂无可用产品",          es: "No hay productos disponibles aún", hi: "अभी कोई उत्पाद उपलब्ध नहीं" },
+    noProductsSub:    { en: "Products are being curated for your profile. Check back soon.", ar: "يتم اختيار المنتجات لملفك الشخصي. تحقق قريباً.", zh: "正在为您的档案精选产品，请稍后再来。", es: "Se están seleccionando productos para tu perfil. Vuelve pronto.", hi: "आपकी प्रोफ़ाइल के लिए उत्पाद तैयार किए जा रहे हैं। जल्द वापस देखें।" },
+    productsCount:    { en: "products recommended for you",   ar: "منتجات موصى بها لك",        zh: "款推荐产品",            es: "productos recomendados para ti", hi: "उत्पाद आपके लिए अनुशंसित" },
+    productCount1:    { en: "product recommended for you",    ar: "منتج موصى به لك",           zh: "款推荐产品",            es: "producto recomendado para ti", hi: "उत्पाद आपके लिए अनुशंसित" },
+    checkout:         { en: "Checkout",                        ar: "الدفع",                     zh: "结账",                  es: "Pagar",                        hi: "चेकआउट" },
+    addToCart:        { en: "Add to Cart",                     ar: "أضف إلى السلة",             zh: "加入购物车",            es: "Agregar al Carrito",           hi: "कार्ट में जोड़ें" },
+    addedToCart:      { en: "Added to Cart",                   ar: "تمت الإضافة إلى السلة",     zh: "已加入购物车",          es: "Agregado al Carrito",          hi: "कार्ट में जोड़ा गया" },
+    inStock:          { en: "In Stock",                        ar: "متوفر",                     zh: "有货",                  es: "En Stock",                     hi: "स्टॉक में" },
+    outOfStock:       { en: "Out of Stock",                    ar: "نفذ المخزون",               zh: "缺货",                  es: "Agotado",                      hi: "स्टॉक से बाहर" },
+    featured:         { en: "Featured",                        ar: "مميز",                      zh: "精选",                  es: "Destacado",                    hi: "विशेष" },
+    itemsSelected:    { en: "items selected",                  ar: "عناصر محددة",               zh: "件已选",                es: "artículos seleccionados",      hi: "आइटम चुने गए" },
+    itemSelected:     { en: "item selected",                   ar: "عنصر محدد",                 zh: "件已选",                es: "artículo seleccionado",        hi: "आइटम चुना गया" },
+    proceedToCheckout:{ en: "Proceed to Checkout",             ar: "المتابعة للدفع",             zh: "前往结账",              es: "Proceder al Pago",             hi: "चेकआउट पर जाएं" },
+    segmentStandard:  { en: "Wellness Starter",                ar: "مبتدئ الصحة",               zh: "健康入门",              es: "Inicio de Bienestar",          hi: "वेलनेस स्टार्टर" },
+    segmentPremium:   { en: "Premium Wellness",                ar: "صحة متميزة",                zh: "高级健康",              es: "Bienestar Premium",            hi: "प्रीमियम वेलनेस" },
+    segmentVip:       { en: "Elite Health",                    ar: "صحة النخبة",                zh: "精英健康",              es: "Salud Elite",                  hi: "एलीट हेल्थ" },
+    segmentStandardDesc: { en: "Essential health products to begin your wellness journey.", ar: "منتجات صحية أساسية لبدء رحلتك الصحية.", zh: "开始您健康之旅的基本健康产品。", es: "Productos de salud esenciales para comenzar tu viaje de bienestar.", hi: "आपकी वेलनेस यात्रा शुरू करने के लिए आवश्यक स्वास्थ्य उत्पाद।" },
+    segmentPremiumDesc:  { en: "Advanced health solutions for those seeking superior results.", ar: "حلول صحية متقدمة لمن يسعى إلى نتائج متفوقة.", zh: "为追求卓越效果的人提供先进的健康解决方案。", es: "Soluciones de salud avanzadas para quienes buscan resultados superiores.", hi: "बेहतर परिणाम चाहने वालों के लिए उन्नत स्वास्थ्य समाधान।" },
+    segmentVipDesc:      { en: "Exclusive, top-tier products for the most discerning health enthusiasts.", ar: "منتجات حصرية من الدرجة الأولى لأكثر المهتمين بالصحة تمييزاً.", zh: "为最挑剔的健康爱好者提供独家顶级产品。", es: "Productos exclusivos de primer nivel para los entusiastas de la salud más exigentes.", hi: "सबसे विवेकशील स्वास्थ्य उत्साही लोगों के लिए विशेष, शीर्ष स्तरीय उत्पाद।" },
+  },
+
+  // ── My Orders Page ──
+  myOrdersPage: {
+    signInRequired:   { en: "Sign In Required",               ar: "تسجيل الدخول مطلوب",        zh: "需要登录",              es: "Inicio de Sesión Requerido",   hi: "साइन इन आवश्यक" },
+    signInDesc:       { en: "Please sign in to view your orders.", ar: "يرجى تسجيل الدخول لعرض طلباتك.", zh: "请登录以查看您的订单。", es: "Por favor inicia sesión para ver tus pedidos.", hi: "अपने ऑर्डर देखने के लिए कृपया साइन इन करें।" },
+    signIn:           { en: "Sign In",                         ar: "تسجيل الدخول",               zh: "登录",                  es: "Iniciar Sesión",               hi: "साइन इन" },
+    title:            { en: "My Orders",                       ar: "طلباتي",                    zh: "我的订单",              es: "Mis Pedidos",                  hi: "मेरे ऑर्डर" },
+    noOrders:         { en: "No orders yet",                   ar: "لا توجد طلبات بعد",          zh: "暂无订单",              es: "Sin pedidos aún",              hi: "अभी कोई ऑर्डर नहीं" },
+    noOrdersSub:      { en: "Start your wellness journey today.", ar: "ابدأ رحلتك الصحية اليوم.", zh: "今天开始您的健康之旅。", es: "Comienza tu viaje de bienestar hoy.", hi: "आज अपनी वेलनेस यात्रा शुरू करें।" },
+    takeHealthSurvey: { en: "Take Health Survey",              ar: "ابدأ الاستبيان الصحي",       zh: "参加健康调查",          es: "Realizar Encuesta de Salud",   hi: "स्वास्थ्य सर्वेक्षण लें" },
+  },
 } as const;
 
 // ─── Helper to get a translation ─────────────────────────────────────────────

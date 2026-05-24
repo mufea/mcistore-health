@@ -15,11 +15,32 @@ const LanguageContext = createContext<LanguageContextValue>({
 
 const STORAGE_KEY = "mci_language";
 
+// Detect the best matching language from the browser's preferred languages
+function detectBrowserLanguage(): Language {
+  const supported = LANGUAGES.map((l) => l.code);
+  const browserLangs = navigator.languages ?? [navigator.language];
+  for (const bl of browserLangs) {
+    // Try exact match first (e.g. "zh"), then prefix match (e.g. "zh-CN" → "zh")
+    const exact = bl.toLowerCase() as Language;
+    if (supported.includes(exact)) return exact;
+    const prefix = bl.split("-")[0]?.toLowerCase() as Language;
+    if (prefix && supported.includes(prefix)) return prefix;
+    // Map common locale variants
+    if (bl.startsWith("ar")) return "ar";
+    if (bl.startsWith("zh")) return "zh";
+    if (bl.startsWith("es")) return "es";
+    if (bl.startsWith("hi")) return "hi";
+  }
+  return "en";
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Language>(() => {
+    // 1. Respect explicit user choice stored in localStorage
     const stored = localStorage.getItem(STORAGE_KEY) as Language | null;
     if (stored && LANGUAGES.find((l) => l.code === stored)) return stored;
-    return "en";
+    // 2. Fall back to browser language detection
+    return detectBrowserLanguage();
   });
 
   const dir = LANGUAGES.find((l) => l.code === lang)?.dir ?? "ltr";
