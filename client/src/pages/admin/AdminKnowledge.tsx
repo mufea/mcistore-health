@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
-import AdminSidebar from "@/components/AdminSidebar";
+import { AdminLayout } from "./AdminDashboard";
 
 // ─── Knowledge categories ─────────────────────────────────────────────────────
 
@@ -146,10 +146,8 @@ export default function AdminKnowledge() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-
-      <main className="flex-1 p-8 overflow-auto">
+    <AdminLayout>
+      <div>
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -275,7 +273,7 @@ export default function AdminKnowledge() {
             ))}
           </div>
         )}
-      </main>
+      </div>
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={(o) => { if (!o) resetForm(); }}>
@@ -346,6 +344,6 @@ export default function AdminKnowledge() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   );
 }

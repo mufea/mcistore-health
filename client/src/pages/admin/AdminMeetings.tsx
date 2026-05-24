@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
-import AdminSidebar from "@/components/AdminSidebar";
+import { AdminLayout } from "./AdminDashboard";
 
 const STATUS_COLORS: Record<string, string> = {
   confirmed: "bg-green-100 text-green-700 border-green-200",
@@ -131,9 +131,8 @@ export default function AdminMeetings() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-      <main className="flex-1 p-8 overflow-auto">
+    <AdminLayout>
+      <div>
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -272,7 +271,7 @@ export default function AdminMeetings() {
             )}
           </TabsContent>
         </Tabs>
-      </main>
+      </div>
 
       {/* Slot Form Dialog */}
       <Dialog open={showSlotForm} onOpenChange={(o) => { if (!o) resetSlotForm(); }}>
@@ -325,6 +324,6 @@ export default function AdminMeetings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   );
 }

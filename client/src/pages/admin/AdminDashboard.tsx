@@ -36,7 +36,7 @@ const navItems = [
   { href: "/admin/users", label: "Users", icon: Users },
 ];
 
-export function AdminLayout({ children }: { children: React.ReactNode }) {
+export function AdminLayout({ children, noPadding }: { children: React.ReactNode; noPadding?: boolean }) {
   const { user, isAuthenticated, logout } = useAuth();
   const [location, navigate] = useLocation();
   const [collapsed, setCollapsed] = useState(false);
@@ -193,7 +193,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <main className="flex-1 overflow-auto min-w-0">
-        <div className="p-8">{children}</div>
+        {noPadding ? children : <div className="p-8">{children}</div>}
       </main>
     </div>
   );

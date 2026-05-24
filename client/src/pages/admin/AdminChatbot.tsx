@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { useLocation } from "wouter";
-import AdminSidebar from "@/components/AdminSidebar";
+import { AdminLayout } from "./AdminDashboard";
 
 export default function AdminChatbot() {
   const { user, isAuthenticated } = useAuth();
@@ -39,9 +39,8 @@ export default function AdminChatbot() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-      <main className="flex-1 flex overflow-hidden">
+    <AdminLayout noPadding>
+      <div className="flex h-full overflow-hidden">
         {/* Conversation list */}
         <div className="w-80 border-r border-border/60 flex flex-col">
           <div className="p-5 border-b border-border/60">
@@ -137,7 +136,7 @@ export default function AdminChatbot() {
             </>
           )}
         </div>
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
