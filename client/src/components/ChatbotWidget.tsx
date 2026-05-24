@@ -3,7 +3,6 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   MessageCircle,
@@ -21,6 +20,9 @@ import {
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
 import { Streamdown } from "streamdown";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -39,20 +41,13 @@ interface BookingForm {
   notes: string;
 }
 
-// ─── Quick action chips ───────────────────────────────────────────────────────
-
-const QUICK_ACTIONS = [
-  { label: "Track my order", icon: Package, message: "I want to track my order" },
-  { label: "Book a meeting", icon: Calendar, message: "I'd like to book a consultation meeting" },
-  { label: "Product info", icon: Sparkles, message: "Tell me about your health products" },
-];
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const SESSION_KEY = "mci_chat_session_id";
 
 export default function ChatbotWidget() {
   const { user } = useAuth();
+  const { lang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -78,6 +73,13 @@ export default function ChatbotWidget() {
   const [hasUnread, setHasUnread] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Quick actions derived from current language
+  const QUICK_ACTIONS = [
+    { label: t(translations.chatbot.quickTrackOrder, lang), icon: Package,  message: translations.chatbot.quickTrackMsg[lang] },
+    { label: t(translations.chatbot.quickBookMeeting, lang), icon: Calendar, message: translations.chatbot.quickBookMsg[lang] },
+    { label: t(translations.chatbot.quickProductInfo, lang), icon: Sparkles, message: translations.chatbot.quickProductMsg[lang] },
+  ];
 
   const sendMessageMutation = trpc.chatbot.sendMessage.useMutation({
     onSuccess: (data) => {
@@ -155,15 +157,16 @@ export default function ChatbotWidget() {
   // Welcome message only if no history was restored
   useEffect(() => {
     if (isOpen && historyLoaded && messages.length === 0) {
+      const welcomeFn = translations.chatbot.welcomeMsg[lang];
       const welcome: Message = {
         id: nanoid(),
         role: "assistant",
-        content: `Hello${user?.name ? ` ${user.name}` : ""}! 👋 I'm your MCI Store health advisor assistant.\n\nI can help you with:\n- 📦 **Tracking your orders**\n- 📅 **Booking a consultation meeting**\n- 💊 **Product recommendations & info**\n\nHow can I assist you today?`,
+        content: welcomeFn(user?.name ?? undefined),
         timestamp: new Date(),
       };
       setMessages([welcome]);
     }
-  }, [isOpen, historyLoaded]);
+  }, [isOpen, historyLoaded, lang]);
 
   const sendMessage = useCallback(
     (text: string) => {
@@ -236,11 +239,16 @@ export default function ChatbotWidget() {
                   <Bot className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold leading-none">MCI Health Advisor</p>
-                  <p className="text-xs text-primary-foreground/70 mt-0.5">Online · AI-powered</p>
+                  <p className="text-sm font-semibold leading-none">{t(translations.chatbot.headerTitle, lang)}</p>
+                  <p className="text-xs text-primary-foreground/70 mt-0.5">{t(translations.chatbot.headerStatus, lang)}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
+                {/* Language switcher — compact icon-only, styled for dark header */}
+                <LanguageSwitcher
+                  compact
+                  className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                />
                 <button
                   onClick={() => setIsMinimized(!isMinimized)}
                   className="p-1.5 rounded-lg hover:bg-primary-foreground/10 transition-colors"
@@ -343,12 +351,12 @@ export default function ChatbotWidget() {
                   <div className="mx-4 mb-3 p-3 bg-muted/50 rounded-xl border border-border/60">
                     <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1">
                       <Calendar className="h-3.5 w-3.5 text-primary" />
-                      Book a Consultation
+                      {t(translations.chatbot.bookMeeting, lang)}
                     </p>
 
                     {/* Slot selection */}
                     <div className="space-y-1.5 mb-3">
-                      <p className="text-xs text-muted-foreground">Select a time slot:</p>
+                      <p className="text-xs text-muted-foreground">{t(translations.chatbot.selectSlot, lang)}</p>
                       {availableSlots.map((slot) => (
                         <button
                           key={slot.id}
@@ -366,25 +374,24 @@ export default function ChatbotWidget() {
                         </button>
                       ))}
                     </div>
-
                     {selectedSlot && (
                       <div className="space-y-1.5">
                         <Input
                           className="h-7 text-xs"
-                          placeholder="Your name"
+                          placeholder={t(translations.chatbot.yourName, lang)}
                           value={bookingForm.customerName}
                           onChange={(e) => setBookingForm((f) => ({ ...f, customerName: e.target.value }))}
                         />
                         <Input
                           className="h-7 text-xs"
-                          placeholder="Email address"
+                          placeholder={t(translations.chatbot.emailAddress, lang)}
                           type="email"
                           value={bookingForm.customerEmail}
                           onChange={(e) => setBookingForm((f) => ({ ...f, customerEmail: e.target.value }))}
                         />
                         <Input
                           className="h-7 text-xs"
-                          placeholder="Phone (optional)"
+                          placeholder={t(translations.chatbot.phoneOptional, lang)}
                           value={bookingForm.customerPhone}
                           onChange={(e) => setBookingForm((f) => ({ ...f, customerPhone: e.target.value }))}
                         />
@@ -398,7 +405,7 @@ export default function ChatbotWidget() {
                             {bookMeetingMutation.isPending ? (
                               <Loader2 className="h-3 w-3 animate-spin" />
                             ) : (
-                              "Confirm Booking"
+                              t(translations.chatbot.confirmBooking, lang)
                             )}
                           </Button>
                           <Button
@@ -407,14 +414,13 @@ export default function ChatbotWidget() {
                             className="h-7 text-xs"
                             onClick={() => setShowBookingForm(false)}
                           >
-                            Cancel
+                            {t(translations.chatbot.cancel, lang)}
                           </Button>
                         </div>
                       </div>
                     )}
                   </div>
                 )}
-
                 {/* Available slots shortcut */}
                 {!showBookingForm && availableSlots && availableSlots.length > 0 && messages.length > 1 && (
                   <div className="px-4 pb-2">
@@ -423,20 +429,18 @@ export default function ChatbotWidget() {
                       className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs text-primary border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors"
                     >
                       <Calendar className="h-3.5 w-3.5" />
-                      {availableSlots.length} meeting slot{availableSlots.length !== 1 ? "s" : ""} available
+                      {translations.chatbot.slotsAvailable[lang](availableSlots.length)}
                     </button>
                   </div>
                 )}
-
                 <Separator />
-
                 {/* Input area */}
                 <form onSubmit={handleSubmit} className="p-3 flex gap-2 flex-shrink-0">
                   <Input
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type a message..."
+                    placeholder={t(translations.chatbot.placeholder, lang)}
                     className="flex-1 h-9 text-sm rounded-xl border-border/60"
                     disabled={sendMessageMutation.isPending}
                   />

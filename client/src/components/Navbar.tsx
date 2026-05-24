@@ -24,12 +24,16 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useCallback, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [location, navigate] = useLocation();
   const { data: settings } = trpc.settings.getPublic.useQuery();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { lang } = useLanguage();
 
   const isAdmin = user?.role === "admin";
   const siteName = settings?.siteName ?? "MCI Store";
@@ -43,10 +47,10 @@ export default function Navbar() {
   const closeMobile = () => setMobileOpen(false);
 
   const navLinks = [
-    { label: "Home", href: "/" },
-    { label: "Health Survey", href: "/survey" },
-    { label: "Products", href: "/products" },
-    ...(isAuthenticated ? [{ label: "My Orders", href: "/my-orders" }] : []),
+    { label: t(translations.nav.home, lang),         href: "/" },
+    { label: t(translations.nav.healthSurvey, lang), href: "/survey" },
+    { label: t(translations.nav.products, lang),     href: "/products" },
+    ...(isAuthenticated ? [{ label: t(translations.nav.myOrders, lang), href: "/my-orders" }] : []),
   ];
 
   return (
@@ -80,8 +84,9 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* ── Desktop auth ──────────────────────────────────────────────── */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* ── Desktop auth + language ───────────────────────────────────── */}
+        <div className="hidden md:flex items-center gap-2">
+          <LanguageSwitcher />
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -102,13 +107,13 @@ export default function Navbar() {
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
                     <User className="mr-2 h-4 w-4" />
-                    My Profile
+                    {t(translations.nav.profile, lang)}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/my-orders">
                     <ShoppingBag className="mr-2 h-4 w-4" />
-                    My Orders
+                    {t(translations.nav.orders, lang)}
                   </Link>
                 </DropdownMenuItem>
                 {isAdmin && (
@@ -117,7 +122,7 @@ export default function Navbar() {
                     <DropdownMenuItem asChild>
                       <Link href="/admin">
                         <Settings className="mr-2 h-4 w-4" />
-                        Admin Dashboard
+                        {t(translations.nav.adminDashboard, lang)}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -125,7 +130,7 @@ export default function Navbar() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
+                  {t(translations.nav.signOut, lang)}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -135,13 +140,14 @@ export default function Navbar() {
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => (window.location.href = getLoginUrl())}
               >
-                Sign In
+                {t(translations.nav.signIn, lang)}
               </Button>
           )}
         </div>
 
-        {/* ── Mobile: avatar (if signed in) + hamburger ─────────────────── */}
-        <div className="flex md:hidden items-center gap-2">
+        {/* ── Mobile: language + avatar (if signed in) + hamburger ─────── */}
+        <div className="flex md:hidden items-center gap-1.5">
+          <LanguageSwitcher compact />
           {isAuthenticated && (
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
@@ -218,18 +224,17 @@ export default function Navbar() {
                     <Link href="/profile" onClick={closeMobile}>
                       <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${location === "/profile" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/60 hover:text-primary"}`}>
                         <User className="h-4 w-4 flex-shrink-0" />
-                        My Profile
+                        {t(translations.nav.profile, lang)}
                       </div>
                     </Link>
                     {isAdmin && (
                       <Link href="/admin" onClick={closeMobile}>
                         <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${location.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/60 hover:text-primary"}`}>
                           <Settings className="h-4 w-4 flex-shrink-0" />
-                          Admin Dashboard
+                          {t(translations.nav.adminDashboard, lang)}
                         </div>
                       </Link>
                     )}
-
                   </>
                 )}
               </nav>
@@ -243,7 +248,7 @@ export default function Navbar() {
                     onClick={handleLogout}
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign Out
+                    {t(translations.nav.signOut, lang)}
                   </Button>
                 ) : (
                   <>
@@ -251,7 +256,7 @@ export default function Navbar() {
                       className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                       onClick={() => { closeMobile(); window.location.href = getLoginUrl(); }}
                     >
-                      Sign In
+                      {t(translations.nav.signIn, lang)}
                     </Button>
                   </>
                 )}

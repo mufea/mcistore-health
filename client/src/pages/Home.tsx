@@ -1,54 +1,11 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { ArrowRight, CheckCircle, Heart, Leaf, Shield, Sparkles, Star } from "lucide-react";
 import { Link } from "wouter";
 import MainLayout from "@/components/MainLayout";
-
-const features = [
-  {
-    icon: Heart,
-    title: "Personalized Health",
-    description: "Our intelligent survey maps your unique health profile to the right products.",
-  },
-  {
-    icon: Leaf,
-    title: "Natural Ingredients",
-    description: "Premium supplements and wellness products crafted from nature's finest sources.",
-  },
-  {
-    icon: Shield,
-    title: "Quality Assured",
-    description: "Every product is rigorously tested and certified for safety and efficacy.",
-  },
-  {
-    icon: Sparkles,
-    title: "Premium Experience",
-    description: "Curated wellness collections for those who demand the very best.",
-  },
-];
-
-const testimonials = [
-  {
-    name: "Sarah M.",
-    role: "Wellness Enthusiast",
-    text: "The health survey was incredibly insightful. The recommended products have transformed my daily routine.",
-    rating: 5,
-  },
-  {
-    name: "David L.",
-    role: "Executive",
-    text: "Finally, a health brand that understands my specific needs. The premium collection is exceptional.",
-    rating: 5,
-  },
-  {
-    name: "Priya K.",
-    role: "Fitness Coach",
-    text: "I recommend MCI Store to all my clients. The personalized approach makes all the difference.",
-    rating: 5,
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
 
 /** Full-width inner wrapper — no max-width cap, generous horizontal padding */
 function FullWide({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -60,10 +17,80 @@ function FullWide({ children, className = "" }: { children: React.ReactNode; cla
 }
 
 export default function Home() {
+  const { lang } = useLanguage();
   const { data: settings } = trpc.settings.getPublic.useQuery();
   const { data: featuredProducts } = trpc.products.list.useQuery({ segment: "standard" });
 
   const featured = (featuredProducts ?? []).filter((p) => p.isFeatured).slice(0, 4);
+
+  const features = [
+    {
+      icon: Heart,
+      title: t(translations.features.f1Title, lang),
+      description: t(translations.features.f1Desc, lang),
+    },
+    {
+      icon: Leaf,
+      title: t(translations.features.f2Title, lang),
+      description: t(translations.features.f2Desc, lang),
+    },
+    {
+      icon: Shield,
+      title: t(translations.features.f3Title, lang),
+      description: t(translations.features.f3Desc, lang),
+    },
+    {
+      icon: Sparkles,
+      title: t(translations.features.f4Title, lang),
+      description: t(translations.features.f4Desc, lang),
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: "Sarah M.",
+      role: t(translations.testimonials.t1Role, lang),
+      text: t(translations.testimonials.t1Text, lang),
+      rating: 5,
+    },
+    {
+      name: "David L.",
+      role: t(translations.testimonials.t2Role, lang),
+      text: t(translations.testimonials.t2Text, lang),
+      rating: 5,
+    },
+    {
+      name: "Priya K.",
+      role: t(translations.testimonials.t3Role, lang),
+      text: t(translations.testimonials.t3Text, lang),
+      rating: 5,
+    },
+  ];
+
+  const heroCardItems = [
+    t(translations.hero.cardItem1, lang),
+    t(translations.hero.cardItem2, lang),
+    t(translations.hero.cardItem3, lang),
+    t(translations.hero.cardItem4, lang),
+  ];
+
+  const howItWorksSteps = [
+    {
+      step: "01",
+      title: t(translations.howItWorks.step1Title, lang),
+      description: t(translations.howItWorks.step1Desc, lang),
+    },
+    {
+      step: "02",
+      title: t(translations.howItWorks.step2Title, lang),
+      description: t(translations.howItWorks.step2Desc, lang),
+    },
+    {
+      step: "03",
+      title: t(translations.howItWorks.step3Title, lang),
+      description: t(translations.howItWorks.step3Desc, lang),
+    },
+  ];
 
   return (
     <MainLayout>
@@ -79,32 +106,32 @@ export default function Home() {
             {/* Left: copy */}
             <div>
               <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-xs font-medium tracking-wide uppercase">
-                Premium Health &amp; Wellness
+                {t(translations.hero.badge, lang)}
               </Badge>
               <h1 className="font-serif text-5xl lg:text-6xl xl:text-7xl font-light text-foreground leading-tight mb-6">
-                Your Journey to{" "}
-                <span className="font-semibold text-primary italic">Optimal Health</span>{" "}
-                Starts Here
+                {t(translations.hero.titleLine1, lang)}{" "}
+                <span className="font-semibold text-primary italic">{t(translations.hero.titleHighlight, lang)}</span>{" "}
+                {t(translations.hero.titleLine2, lang)}
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
-                {settings?.siteTagline ?? "Discover personalized health products tailored to your unique needs through our intelligent health assessment."}
+                {settings?.siteTagline ?? t(translations.hero.tagline, lang)}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-8">
                   <Link href="/survey">
-                    Take Health Survey
+                    {t(translations.hero.ctaSurvey, lang)}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="gap-2 px-8">
-                  <Link href="/products">Browse Products</Link>
+                  <Link href="/products">{t(translations.hero.ctaProducts, lang)}</Link>
                 </Button>
               </div>
               <div className="mt-10 flex items-center gap-8">
                 {[
-                  { label: "Trusted Customers", value: "10,000+" },
-                  { label: "Premium Products", value: "200+" },
-                  { label: "Satisfaction Rate", value: "98%" },
+                  { label: t(translations.hero.stat1Label, lang), value: "10,000+" },
+                  { label: t(translations.hero.stat2Label, lang), value: "200+" },
+                  { label: t(translations.hero.stat3Label, lang), value: "98%" },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
                     <p className="font-serif text-2xl font-semibold text-foreground">{stat.value}</p>
@@ -122,12 +149,12 @@ export default function Home() {
                     <Heart className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-foreground">Health Assessment</p>
-                    <p className="text-xs text-muted-foreground">Personalized for you</p>
+                    <p className="font-semibold text-sm text-foreground">{t(translations.hero.cardTitle, lang)}</p>
+                    <p className="text-xs text-muted-foreground">{t(translations.hero.cardSub, lang)}</p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  {["Cardiovascular Health", "Immune Support", "Energy & Vitality", "Sleep Quality"].map((item) => (
+                  {heroCardItems.map((item) => (
                     <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
                       <CheckCircle className="h-3.5 w-3.5 text-primary flex-shrink-0" />
                       {item}
@@ -136,9 +163,9 @@ export default function Home() {
                 </div>
               </div>
               <div className="w-full max-w-xs bg-primary text-primary-foreground rounded-2xl p-5 shadow-lg">
-                <p className="font-serif text-lg font-light mb-1">Your Wellness Score</p>
+                <p className="font-serif text-lg font-light mb-1">{t(translations.hero.scoreLabel, lang)}</p>
                 <p className="font-serif text-4xl font-semibold">94<span className="text-xl font-light">/100</span></p>
-                <p className="text-sm text-primary-foreground/70 mt-1">Excellent health profile</p>
+                <p className="text-sm text-primary-foreground/70 mt-1">{t(translations.hero.scoreDesc, lang)}</p>
               </div>
               <div className="w-full max-w-sm bg-card border border-border/60 rounded-2xl p-5 shadow-md flex items-center gap-4">
                 <div className="flex gap-1">
@@ -153,35 +180,16 @@ export default function Home() {
         </FullWide>
       </section>
 
-      {/* ── Survey CTA Banner ── */}
-      <section className="bg-primary text-primary-foreground py-16">
-        <FullWide className="text-center">
-          <div className="gold-line mx-auto mb-6" style={{ background: "linear-gradient(to right, oklch(0.88 0.06 75), oklch(0.72 0.12 75))" }} />
-          <h2 className="font-serif text-3xl lg:text-5xl font-light mb-4">
-            Discover Your Perfect Health Profile
-          </h2>
-          <p className="text-primary-foreground/80 max-w-2xl mx-auto mb-8 leading-relaxed text-lg">
-            Answer a few simple questions about your health goals and lifestyle. Our intelligent system will recommend the perfect products for you.
-          </p>
-          <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 gap-2 px-10">
-            <Link href="/survey">
-              Start Free Assessment
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </FullWide>
-      </section>
-
       {/* ── Features ── 4-column on desktop */}
       <section className="py-24 bg-background">
         <FullWide>
           <div className="text-center mb-16">
             <div className="gold-line mx-auto mb-4" />
             <h2 className="font-serif text-3xl lg:text-5xl font-light text-foreground mb-3">
-              Why Choose MCI Store
+              {t(translations.features.sectionTitle, lang)}
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto text-base">
-              We combine science, nature, and personalization to deliver exceptional health outcomes.
+              {t(translations.features.sectionSub, lang)}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -210,13 +218,13 @@ export default function Home() {
               <div>
                 <div className="gold-line mb-4" />
                 <h2 className="font-serif text-3xl lg:text-5xl font-light text-foreground mb-2">
-                  Featured Products
+                  {t(translations.products.sectionTitle, lang)}
                 </h2>
-                <p className="text-muted-foreground text-base">Our most loved wellness essentials</p>
+                <p className="text-muted-foreground text-base">{t(translations.products.sectionSub, lang)}</p>
               </div>
               <Button asChild variant="ghost" className="gap-2 hidden sm:flex">
                 <Link href="/products">
-                  View All <ArrowRight className="h-4 w-4" />
+                  {t(translations.products.viewAll, lang)} <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -262,30 +270,14 @@ export default function Home() {
           <div className="text-center mb-16">
             <div className="gold-line mx-auto mb-4" />
             <h2 className="font-serif text-3xl lg:text-5xl font-light text-foreground mb-3">
-              How It Works
+              {t(translations.howItWorks.sectionTitle, lang)}
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto text-base">
-              Three simple steps to your personalized wellness journey
+              {t(translations.howItWorks.sectionSub, lang)}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto">
-            {[
-              {
-                step: "01",
-                title: "Take the Survey",
-                description: "Answer questions about your health goals, lifestyle, and current concerns.",
-              },
-              {
-                step: "02",
-                title: "Get Recommendations",
-                description: "Our system analyzes your answers and curates the perfect product selection.",
-              },
-              {
-                step: "03",
-                title: "Order & Transform",
-                description: "Choose your products, complete checkout, and begin your health transformation.",
-              },
-            ].map((step, i) => (
+            {howItWorksSteps.map((step, i) => (
               <div key={step.step} className="text-center relative">
                 <div className="w-16 h-16 rounded-full border-2 border-primary/30 flex items-center justify-center mx-auto mb-5 bg-primary/5">
                   <span className="font-serif text-2xl font-semibold text-primary">{step.step}</span>
@@ -301,7 +293,7 @@ export default function Home() {
           <div className="text-center mt-14">
             <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-10">
               <Link href="/survey">
-                Begin Your Journey
+                {t(translations.howItWorks.beginJourney, lang)}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -315,21 +307,21 @@ export default function Home() {
           <div className="text-center mb-16">
             <div className="gold-line mx-auto mb-4" />
             <h2 className="font-serif text-3xl lg:text-5xl font-light text-foreground mb-3">
-              What Our Customers Say
+              {t(translations.testimonials.sectionTitle, lang)}
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
-              <div key={t.name} className="bg-card rounded-2xl border border-border/60 p-8 card-hover">
+            {testimonials.map((testimonial) => (
+              <div key={testimonial.name} className="bg-card rounded-2xl border border-border/60 p-8 card-hover">
                 <div className="flex gap-1 mb-5">
-                  {Array.from({ length: t.rating }).map((_, i) => (
+                  {Array.from({ length: testimonial.rating }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-[oklch(0.72_0.12_75)] text-[oklch(0.72_0.12_75)]" />
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-5 italic">"{t.text}"</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5 italic">"{testimonial.text}"</p>
                 <div>
-                  <p className="font-semibold text-sm text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.role}</p>
+                  <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
+                  <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                 </div>
               </div>
             ))}
@@ -342,14 +334,14 @@ export default function Home() {
         <FullWide className="text-center">
           <div className="gold-line mx-auto mb-6" />
           <h2 className="font-serif text-3xl lg:text-5xl font-light text-foreground mb-4">
-            Ready to Transform Your Health?
+            {t(translations.cta.title, lang)}
           </h2>
           <p className="text-muted-foreground mb-10 leading-relaxed text-lg max-w-2xl mx-auto">
-            Join thousands of customers who have discovered their perfect wellness routine with MCI Store.
+            {t(translations.cta.subtitle, lang)}
           </p>
           <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-12">
             <Link href="/survey">
-              Start Your Assessment
+              {t(translations.cta.cta, lang)}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
