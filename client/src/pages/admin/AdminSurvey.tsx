@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { trpc } from "@/lib/trpc";
 import { ChevronDown, ChevronUp, Edit, Loader2, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -20,6 +21,8 @@ export default function AdminSurvey() {
 
   // Page dialog
   const [pageDialog, setPageDialog] = useState(false);
+  const [deletePageTarget, setDeletePageTarget] = useState<number | null>(null);
+  const [deleteQuestionTarget, setDeleteQuestionTarget] = useState<number | null>(null);
   const [editingPage, setEditingPage] = useState<any>(null);
   const [pageTitle, setPageTitle] = useState("");
   const [pageDesc, setPageDesc] = useState("");
@@ -170,9 +173,7 @@ export default function AdminSurvey() {
                     variant="ghost"
                     className="text-destructive hover:text-destructive"
                     onClick={() => {
-                      if (confirm("Delete this page and all its questions?")) {
-                        deletePageMutation.mutate({ id: page.id });
-                      }
+                      setDeletePageTarget(page.id);
                     }}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -225,9 +226,7 @@ export default function AdminSurvey() {
                           variant="ghost"
                           className="text-destructive hover:text-destructive"
                           onClick={() => {
-                            if (confirm("Delete this question?")) {
-                              deleteQuestionMutation.mutate({ id: q.id });
-                            }
+                            setDeleteQuestionTarget(q.id);
                           }}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -350,6 +349,47 @@ export default function AdminSurvey() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Delete Page Confirmation */}
+      <AlertDialog open={deletePageTarget !== null} onOpenChange={(open) => { if (!open) setDeletePageTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Survey Page</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this page and all its questions? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletePageTarget(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (deletePageTarget !== null) { deletePageMutation.mutate({ id: deletePageTarget }); setDeletePageTarget(null); } }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Question Confirmation */}
+      <AlertDialog open={deleteQuestionTarget !== null} onOpenChange={(open) => { if (!open) setDeleteQuestionTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Question</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this question? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteQuestionTarget(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (deleteQuestionTarget !== null) { deleteQuestionMutation.mutate({ id: deleteQuestionTarget }); setDeleteQuestionTarget(null); } }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }

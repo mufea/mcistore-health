@@ -30,6 +30,7 @@ import BackToHome from "@/components/BackToHome";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { type Language, t, translations } from "@/lib/i18n";
+import CheckoutStepper from "@/components/CheckoutStepper";
 
 interface Address {
   street: string;
@@ -404,6 +405,15 @@ export default function Checkout() {
             <div className="gold-line mb-4" />
             <h1 className="font-serif text-2xl sm:text-3xl font-light text-foreground">{t(translations.checkout.title, lang)}</h1>
           </div>
+
+          <CheckoutStepper
+            currentStep="checkout"
+            labels={{
+              checkout: t(translations.checkout.title, lang),
+              payment: t(translations.checkout.payment, lang),
+              confirmation: t(translations.checkout.confirmation, lang),
+            }}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* ── Left: Forms ─────────────────────────────────────────── */}

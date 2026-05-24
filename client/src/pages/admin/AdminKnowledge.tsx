@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -60,6 +61,7 @@ export default function AdminKnowledge() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null);
   const [form, setForm] = useState({
     title: "",
     content: "",
@@ -260,9 +262,7 @@ export default function AdminKnowledge() {
                       variant="ghost"
                       className="h-8 w-8 text-destructive hover:text-destructive"
                       onClick={() => {
-                        if (confirm("Delete this knowledge entry?")) {
-                          deleteMutation.mutate({ id: item.id });
-                        }
+                        setDeleteTarget({ id: item.id, title: item.title });
                       }}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -344,6 +344,26 @@ export default function AdminKnowledge() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Knowledge Entry</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &ldquo;{deleteTarget?.title}&rdquo;? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteTarget(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (deleteTarget) { deleteMutation.mutate({ id: deleteTarget.id }); setDeleteTarget(null); } }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }

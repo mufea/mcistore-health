@@ -285,6 +285,8 @@ export const translations = {
   // ── Checkout Page ──
   checkout: {
     title:              { en: "Checkout",                    ar: "الدفع",                         zh: "结账",                  es: "Pago",                            hi: "चेकआउट",                    id: "Pembayaran" },
+    payment:            { en: "Payment",                     ar: "الدفع",                         zh: "付款",                  es: "Pago",                            hi: "भुगतान",                    id: "Pembayaran" },
+    confirmation:       { en: "Confirmation",                ar: "التأكيد",                       zh: "确认",                  es: "Confirmación",                    hi: "पुष्टि",                    id: "Konfirmasi" },
     personalInfo:       { en: "Personal Information",       ar: "المعلومات الشخصية",              zh: "个人信息",              es: "Información Personal",            hi: "व्यक्तिगत जानकारी",         id: "Informasi Pribadi" },
     fullName:           { en: "Full Name",                  ar: "الاسم الكامل",                   zh: "全名",                  es: "Nombre Completo",                 hi: "पूरा नाम",                  id: "Nama Lengkap" },
     fullNamePlaceholder:{ en: "Your full name",             ar: "اسمك الكامل",                    zh: "您的全名",              es: "Tu nombre completo",              hi: "आपका पूरा नाम",              id: "Nama lengkap Anda" },

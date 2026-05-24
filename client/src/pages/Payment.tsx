@@ -10,6 +10,7 @@ import BackToHome from "@/components/BackToHome";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import CheckoutStepper from "@/components/CheckoutStepper";
 
 declare global {
   interface Window {
@@ -148,6 +149,15 @@ export default function Payment() {
             <h1 className="font-serif text-3xl font-light text-foreground mb-1">Complete Your Payment</h1>
             <p className="text-muted-foreground text-sm">Order #{params.orderNumber}</p>
           </div>
+
+          <CheckoutStepper
+            currentStep="payment"
+            labels={{
+              checkout: t(translations.checkout.title, lang),
+              payment: t(translations.checkout.payment, lang),
+              confirmation: t(translations.checkout.confirmation, lang),
+            }}
+          />
 
           {/* Order Summary Card */}
           <div className="bg-card rounded-xl border border-border/60 p-5 mb-6">

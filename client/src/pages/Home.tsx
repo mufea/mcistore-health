@@ -95,7 +95,7 @@ export default function Home() {
   return (
     <MainLayout>
       {/* ── Hero ── full-width asymmetric layout */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-accent/20 to-background min-h-[90vh] flex items-center">
+      <section className="relative overflow-hidden bg-gradient-to-br from-background via-accent/20 to-background py-16 sm:py-20 lg:py-24 flex items-center">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.72_0.12_75/0.08),transparent_60%)]" />
         {/* decorative large circle */}
         <div className="absolute right-0 top-0 w-[55vw] h-[55vw] max-w-4xl max-h-4xl rounded-full bg-primary/5 translate-x-1/3 -translate-y-1/4 pointer-events-none" />

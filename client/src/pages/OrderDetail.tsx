@@ -8,6 +8,7 @@ import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import CheckoutStepper from "@/components/CheckoutStepper";
 
 const statusOrder = ["pending", "processing", "shipped", "delivered", "cancelled"];
 
@@ -76,6 +77,15 @@ export default function OrderDetail() {
       <div className="py-12">
         <div className="container max-w-3xl">
           <BackToHome className="mb-8" />
+
+          <CheckoutStepper
+            currentStep="confirmation"
+            labels={{
+              checkout: t(translations.checkout.title, lang),
+              payment: t(translations.checkout.payment, lang),
+              confirmation: t(translations.checkout.confirmation, lang),
+            }}
+          />
 
           <div className="mb-8">
             <div className="gold-line mb-4" />

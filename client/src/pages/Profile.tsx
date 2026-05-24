@@ -135,17 +135,17 @@ function PersonalInfoSection() {
 
   return (
     <SectionCard
-      title="Personal Information"
+      title={t(translations.profile.personalInfo, lang)}
       icon={User}
       action={
         !editing ? (
           <Button variant="ghost" size="sm" onClick={() => setEditing(true)} className="gap-1.5 text-xs">
-            <Edit2 className="h-3.5 w-3.5" /> Edit
+            <Edit2 className="h-3.5 w-3.5" /> {t(translations.profile.edit, lang)}
           </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={handleCancel} className="gap-1.5 text-xs text-muted-foreground">
-              <X className="h-3.5 w-3.5" /> Cancel
+              <X className="h-3.5 w-3.5" /> {t(translations.profile.cancel, lang)}
             </Button>
             <Button
               size="sm"
@@ -158,7 +158,7 @@ function PersonalInfoSection() {
               ) : (
                 <Save className="h-3.5 w-3.5" />
               )}
-              Save
+              {t(translations.profile.save, lang)}
             </Button>
           </div>
         )
@@ -186,24 +186,24 @@ function PersonalInfoSection() {
         {/* Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Full Name</Label>
+            <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t(translations.profile.fullName, lang)}</Label>
             {editing ? (
               <Input
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="Your full name"
+                placeholder={t(translations.profile.fullNamePlaceholder, lang)}
               />
             ) : (
               <p className="text-sm text-foreground font-medium">{profile?.name ?? "—"}</p>
             )}
           </div>
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Email Address</Label>
+            <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t(translations.profile.emailAddress, lang)}</Label>
             <p className="text-sm text-foreground font-medium">{profile?.email ?? "—"}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Managed by your sign-in provider</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t(translations.profile.emailManaged, lang)}</p>
           </div>
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Phone Number</Label>
+            <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t(translations.profile.phoneNumber, lang)}</Label>
             {editing ? (
               <Input
                 value={form.phone}
@@ -215,7 +215,7 @@ function PersonalInfoSection() {
             )}
           </div>
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Member Since</Label>
+            <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t(translations.profile.memberSince, lang)}</Label>
             <p className="text-sm text-foreground font-medium">
               {profile?.createdAt
                 ? new Date(profile.createdAt).toLocaleDateString("en-ID", {
@@ -317,17 +317,17 @@ function AddressSection() {
 
   return (
     <SectionCard
-      title="Default Address"
+      title={t(translations.profile.defaultAddress, lang)}
       icon={MapPin}
       action={
         !editing ? (
           <Button variant="ghost" size="sm" onClick={() => setEditing(true)} className="gap-1.5 text-xs">
-            <Edit2 className="h-3.5 w-3.5" /> {hasAddress ? "Edit" : "Add Address"}
+            <Edit2 className="h-3.5 w-3.5" /> {hasAddress ? t(translations.profile.edit, lang) : t(translations.profile.addAddress, lang)}
           </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={handleCancel} className="gap-1.5 text-xs text-muted-foreground">
-              <X className="h-3.5 w-3.5" /> Cancel
+              <X className="h-3.5 w-3.5" /> {t(translations.profile.cancel, lang)}
             </Button>
             <Button
               size="sm"
@@ -340,7 +340,7 @@ function AddressSection() {
               ) : (
                 <Save className="h-3.5 w-3.5" />
               )}
-              Save
+              {t(translations.profile.save, lang)}
             </Button>
           </div>
         )
@@ -363,7 +363,7 @@ function AddressSection() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-3 pl-7">
-              This address will be pre-filled at checkout for faster ordering.
+              {t(translations.profile.addressPreFill, lang)}
             </p>
           </div>
         ) : (
@@ -371,15 +371,15 @@ function AddressSection() {
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
               <MapPin className="h-5 w-5 text-muted-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground mb-1">No address saved yet</p>
-            <p className="text-xs text-muted-foreground">Add your address to speed up checkout.</p>
+            <p className="text-sm text-muted-foreground mb-1">{t(translations.profile.noAddressSaved, lang)}</p>
+            <p className="text-xs text-muted-foreground">{t(translations.profile.noAddressHint, lang)}</p>
           </div>
         )
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
             <Label className="text-xs font-medium mb-1.5 block">
-              Street Address <span className="text-destructive">*</span>
+              {t(translations.profile.streetAddress, lang)} <span className="text-destructive">*</span>
             </Label>
             <Input
               value={form.streetAddress}
@@ -388,7 +388,7 @@ function AddressSection() {
             />
           </div>
           <div>
-            <Label className="text-xs font-medium mb-1.5 block">House / Apt Number</Label>
+            <Label className="text-xs font-medium mb-1.5 block">{t(translations.profile.aptNumber, lang)}</Label>
             <Input
               value={form.aptNumber}
               onChange={(e) => setForm((f) => ({ ...f, aptNumber: e.target.value }))}
@@ -397,7 +397,7 @@ function AddressSection() {
           </div>
           <div>
             <Label className="text-xs font-medium mb-1.5 block">
-              City <span className="text-destructive">*</span>
+              {t(translations.profile.city, lang)} <span className="text-destructive">*</span>
             </Label>
             <Input
               value={form.city}
@@ -407,7 +407,7 @@ function AddressSection() {
           </div>
           <div>
             <Label className="text-xs font-medium mb-1.5 block">
-              Province / State <span className="text-destructive">*</span>
+              {t(translations.profile.province, lang)} <span className="text-destructive">*</span>
             </Label>
             <Input
               value={form.province}
@@ -417,7 +417,7 @@ function AddressSection() {
           </div>
           <div>
             <Label className="text-xs font-medium mb-1.5 block">
-              Postal Code <span className="text-destructive">*</span>
+              {t(translations.profile.postalCode, lang)} <span className="text-destructive">*</span>
             </Label>
             <Input
               value={form.postalCode}
@@ -427,7 +427,7 @@ function AddressSection() {
           </div>
           <div className="sm:col-span-2">
             <Label className="text-xs font-medium mb-1.5 block">
-              Country <span className="text-destructive">*</span>
+              {t(translations.profile.country, lang)} <span className="text-destructive">*</span>
             </Label>
             <Input
               value={form.country}
@@ -444,10 +444,11 @@ function AddressSection() {
 // ─── Orders section ───────────────────────────────────────────────────────────
 
 function OrdersSection() {
+  const { lang } = useLanguage();
   const { data: orders, isLoading } = trpc.orders.myOrders.useQuery();
 
   return (
-    <SectionCard title="Order History" icon={ShoppingBag}>
+    <SectionCard title={t(translations.profile.orderHistory, lang)} icon={ShoppingBag}>
       {isLoading ? (
         <div className="flex items-center justify-center py-10">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -457,10 +458,10 @@ function OrdersSection() {
           <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
             <Package className="h-6 w-6 text-muted-foreground" />
           </div>
-          <p className="text-sm font-medium text-foreground mb-1">No orders yet</p>
-          <p className="text-xs text-muted-foreground mb-5">Start your wellness journey today.</p>
+          <p className="text-sm font-medium text-foreground mb-1">{t(translations.profile.noOrders, lang)}</p>
+          <p className="text-xs text-muted-foreground mb-5">{t(translations.profile.noOrdersHint, lang)}</p>
           <Button asChild size="sm" className="bg-primary text-primary-foreground">
-            <Link href="/survey">Take Health Survey</Link>
+            <Link href="/survey">{t(translations.profile.takeHealthSurvey, lang)}</Link>
           </Button>
         </div>
       ) : (
@@ -505,7 +506,7 @@ function OrdersSection() {
             <div className="pt-2 text-center">
               <Button asChild variant="ghost" size="sm" className="text-primary gap-1.5">
                 <Link href="/my-orders">
-                  View all {orders.length} orders <ChevronRight className="h-3.5 w-3.5" />
+                  {t(translations.profile.viewAllOrders, lang)} {orders.length} {t(translations.profile.orders, lang)} <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               </Button>
             </div>
@@ -520,6 +521,7 @@ function OrdersSection() {
 
 export default function Profile() {
   const { isAuthenticated, loading } = useAuth();
+  const { lang } = useLanguage();
 
   if (loading) {
     return (
@@ -539,14 +541,14 @@ export default function Profile() {
             <User className="h-8 w-8 text-primary" />
           </div>
           <div>
-            <h2 className="font-serif text-2xl font-semibold mb-2">Sign In Required</h2>
-            <p className="text-muted-foreground text-sm">Please sign in to view and manage your profile.</p>
+            <h2 className="font-serif text-2xl font-semibold mb-2">{t(translations.profile.signInRequired, lang)}</h2>
+            <p className="text-muted-foreground text-sm">{t(translations.profile.signInMsg, lang)}</p>
           </div>
           <Button
             className="bg-primary text-primary-foreground"
             onClick={() => (window.location.href = getLoginUrl())}
           >
-            Sign In
+            {t(translations.profile.signIn, lang)}
           </Button>
           <BackToHome />
         </div>
@@ -563,18 +565,18 @@ export default function Profile() {
           {/* Page header */}
           <div className="mb-10">
             <div className="gold-line mb-4" />
-            <h1 className="font-serif text-3xl font-light text-foreground">My Profile</h1>
+            <h1 className="font-serif text-3xl font-light text-foreground">{t(translations.profile.title, lang)}</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Manage your personal information, default address, and view your order history.
+              {t(translations.profile.subtitle, lang)}
             </p>
           </div>
 
           {/* Quick nav tabs */}
           <div className="flex gap-2 mb-8 overflow-x-auto pb-1">
             {[
-              { label: "Profile", href: "#profile" },
-              { label: "Address", href: "#address" },
-              { label: "Orders", href: "#orders" },
+              { label: t(translations.profile.tabProfile, lang), href: "#profile" },
+              { label: t(translations.profile.tabAddress, lang), href: "#address" },
+              { label: t(translations.profile.tabOrders, lang), href: "#orders" },
             ].map((tab) => (
               <a
                 key={tab.href}

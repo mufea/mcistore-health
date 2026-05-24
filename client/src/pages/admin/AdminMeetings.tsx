@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -50,6 +51,7 @@ export default function AdminMeetings() {
   const [, navigate] = useLocation();
   const [showSlotForm, setShowSlotForm] = useState(false);
   const [editingSlotId, setEditingSlotId] = useState<number | null>(null);
+  const [deleteSlotTarget, setDeleteSlotTarget] = useState<number | null>(null);
   const [slotForm, setSlotForm] = useState({
     title: "",
     description: "",
@@ -208,7 +210,7 @@ export default function AdminMeetings() {
                         </Button>
                         <Button
                           size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive"
-                          onClick={() => { if (confirm("Delete this slot?")) deleteSlot.mutate({ id: slot.id }); }}
+                          onClick={() => setDeleteSlotTarget(slot.id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -324,6 +326,26 @@ export default function AdminMeetings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Delete Slot Confirmation */}
+      <AlertDialog open={deleteSlotTarget !== null} onOpenChange={(open) => { if (!open) setDeleteSlotTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Slot</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this meeting slot? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteSlotTarget(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (deleteSlotTarget !== null) { deleteSlot.mutate({ id: deleteSlotTarget }); setDeleteSlotTarget(null); } }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }
