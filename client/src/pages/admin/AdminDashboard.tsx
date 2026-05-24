@@ -6,6 +6,8 @@ import {
   BarChart3,
   Brain,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   DollarSign,
   Home,
@@ -18,8 +20,9 @@ import {
   Users,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import BackToHome from "@/components/BackToHome";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const navItems = [
   { href: "/admin", label: "Overview", icon: BarChart3 },
@@ -36,6 +39,7 @@ const navItems = [
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, logout } = useAuth();
   const [location, navigate] = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -70,64 +74,125 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex bg-background">
       {/* Sidebar */}
-      <aside className="w-60 bg-sidebar-background text-sidebar-foreground flex-shrink-0 flex flex-col">
+      <aside
+        className={`relative bg-sidebar-background text-sidebar-foreground flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out ${
+          collapsed ? "w-16" : "w-60"
+        }`}
+      >
+        {/* Collapse toggle button — floats on the right edge */}
+        <button
+          onClick={() => setCollapsed((c) => !c)}
+          className="absolute -right-3 top-6 z-10 w-6 h-6 rounded-full bg-sidebar-background border border-sidebar-border flex items-center justify-center shadow-sm hover:bg-sidebar-accent transition-colors"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground/70" />
+          ) : (
+            <ChevronLeft className="h-3.5 w-3.5 text-sidebar-foreground/70" />
+          )}
+        </button>
+
         {/* Logo */}
-        <div className="p-5 border-b border-sidebar-border">
+        <div className={`border-b border-sidebar-border flex-shrink-0 ${collapsed ? "p-3 flex justify-center" : "p-5"}`}>
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center shadow-sm flex-shrink-0">
                 <span className="text-sidebar-primary-foreground text-sm font-bold tracking-tight">MC</span>
               </div>
-              <div>
-                <span className="font-bold text-sm text-sidebar-foreground tracking-tight">MCI Store</span>
-                <p className="text-[10px] text-sidebar-foreground/50 leading-none mt-0.5">Admin Dashboard</p>
-              </div>
+              {!collapsed && (
+                <div className="overflow-hidden">
+                  <span className="font-bold text-sm text-sidebar-foreground tracking-tight whitespace-nowrap">MCI Store</span>
+                  <p className="text-[10px] text-sidebar-foreground/50 leading-none mt-0.5 whitespace-nowrap">Admin Dashboard</p>
+                </div>
+              )}
             </div>
           </Link>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-2 space-y-0.5 overflow-hidden">
           {navItems.map((item) => {
             const isActive = location === item.href;
             const Icon = item.icon;
-            return (
+            const navBtn = (
               <Link href={item.href} key={item.href}>
                 <div
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 rounded-lg text-sm font-medium cursor-pointer transition-all ${
+                    collapsed ? "px-2 py-2.5 justify-center" : "px-3 py-2.5"
+                  } ${
                     isActive
                       ? "bg-sidebar-accent text-sidebar-accent-foreground"
                       : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                   }`}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
-                  {item.label}
+                  {!collapsed && <span className="truncate">{item.label}</span>}
                 </div>
               </Link>
             );
+
+            if (collapsed) {
+              return (
+                <Tooltip key={item.href} delayDuration={100}>
+                  <TooltipTrigger asChild>{navBtn}</TooltipTrigger>
+                  <TooltipContent side="right" className="text-xs">
+                    {item.label}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            }
+            return navBtn;
           })}
         </nav>
 
         {/* Bottom: Back to Website + Log Out */}
-        <div className="p-3 border-t border-sidebar-border space-y-0.5">
-          <Link href="/">
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all">
-              <Home className="h-4 w-4" />
-              Back to Website
-            </div>
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all"
-          >
-            <LogOut className="h-4 w-4" />
-            Log Out
-          </button>
+        <div className="p-2 border-t border-sidebar-border space-y-0.5 flex-shrink-0">
+          {collapsed ? (
+            <>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <Link href="/">
+                    <div className="flex items-center justify-center px-2 py-2.5 rounded-lg text-sm font-medium cursor-pointer text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all">
+                      <Home className="h-4 w-4" />
+                    </div>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="text-xs">Back to Website</TooltipContent>
+              </Tooltip>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center px-2 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-red-50 hover:text-red-600 transition-all"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="text-xs">Log Out</TooltipContent>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <Link href="/">
+                <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all">
+                  <Home className="h-4 w-4" />
+                  Back to Website
+                </div>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-red-50 hover:text-red-600 transition-all"
+              >
+                <LogOut className="h-4 w-4" />
+                Log Out
+              </button>
+            </>
+          )}
         </div>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto min-w-0">
         <div className="p-8">{children}</div>
       </main>
     </div>
