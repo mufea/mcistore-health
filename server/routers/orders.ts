@@ -150,6 +150,25 @@ export const ordersRouter = router({
     .mutation(async ({ input }) => {
       const { id, ...data } = input;
       await updateOrderStatus(id, data);
+      // Notify admin on important status changes
+      if (data.status && ["shipped", "delivered", "cancelled"].includes(data.status)) {
+        const order = await getOrderById(id);
+        if (order) {
+          const statusLabels: Record<string, string> = {
+            shipped: "📦 Order Shipped",
+            delivered: "✅ Order Delivered",
+            cancelled: "❌ Order Cancelled",
+          };
+          try {
+            await notifyOwner({
+              title: `${statusLabels[data.status]}: ${order.orderNumber}`,
+              content: `Order ${order.orderNumber} for ${order.customerName} (${order.customerEmail}) has been marked as ${data.status}. Total: IDR ${Number(order.total).toLocaleString()}.`,
+            });
+          } catch (e) {
+            console.warn("Failed to notify owner on status update:", e);
+          }
+        }
+      }
       return { success: true };
     }),
 });

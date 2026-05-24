@@ -72,7 +72,7 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="h-screen flex bg-background overflow-hidden">
       {/* Sidebar */}
       <aside
         className={`relative bg-sidebar-background text-sidebar-foreground flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out ${
@@ -110,7 +110,7 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-2 space-y-0.5 overflow-hidden">
+        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto min-h-0">
           {navItems.map((item) => {
             const isActive = location === item.href;
             const Icon = item.icon;
@@ -192,7 +192,7 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto min-w-0">
+      <main className="flex-1 overflow-y-auto min-w-0 h-full">
         {noPadding ? children : <div className="p-8">{children}</div>}
       </main>
     </div>

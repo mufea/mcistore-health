@@ -9,13 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { trpc } from "@/lib/trpc";
-import { Edit, ImagePlus, Leaf, Loader2, Plus, Search, Trash2, X } from "lucide-react";
+import { Edit, ImagePlus, Leaf, Loader2, Plus, Search, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Herbal Tea", "Vitamin", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
+const MAX_IMAGES = 6;
+
+type ImageEntry = { url: string; key: string; isUploading?: boolean; localPreview?: string };
 
 export default function AdminProducts() {
   const utils = trpc.useUtils();
@@ -32,12 +35,12 @@ export default function AdminProducts() {
   const [category, setCategory] = useState("Supplement");
   const [targetSegment, setTargetSegment] = useState("all");
   const [stock, setStock] = useState("100");
-  const [imageUrl, setImageUrl] = useState("");
-  const [imageKey, setImageKey] = useState("");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
+
+  // Multi-image state
+  const [images, setImages] = useState<ImageEntry[]>([]);
+  const [isUploadingAny, setIsUploadingAny] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadImageMutation = trpc.products.uploadImage.useMutation();
@@ -55,18 +58,11 @@ export default function AdminProducts() {
     onError: (e) => toast.error(e.message),
   });
 
-  const resetImageState = () => {
-    setImageUrl("");
-    setImageKey("");
-    setImagePreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
   const openNew = () => {
     setEditing(null);
     setName(""); setDescription(""); setPrice(""); setCategory("Supplement");
     setTargetSegment("all"); setStock("100"); setIsFeatured(false); setIsActive(true);
-    resetImageState();
+    setImages([]);
     setDialog(true);
   };
 
@@ -74,68 +70,90 @@ export default function AdminProducts() {
     setEditing(p);
     setName(p.name); setDescription(p.description ?? ""); setPrice(String(p.price));
     setCategory(p.category); setTargetSegment(p.targetSegment); setStock(String(p.stock));
-    setImageUrl(p.imageUrl ?? ""); setImageKey(p.imageKey ?? "");
-    setImagePreview(p.imageUrl ?? null);
     setIsFeatured(p.isFeatured); setIsActive(p.isActive);
+    // Load existing images: prefer images array, fall back to single imageUrl
+    if (p.images && p.images.length > 0) {
+      setImages(p.images.map((img: any) => ({ url: img.url, key: img.key })));
+    } else if (p.imageUrl) {
+      setImages([{ url: p.imageUrl, key: p.imageKey ?? "" }]);
+    } else {
+      setImages([]);
+    }
     setDialog(true);
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve((r.result as string).split(",")[1]);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
 
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("Image must be smaller than 4 MB");
-      return;
+  const handleFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+
+    const remaining = MAX_IMAGES - images.filter((i) => !i.isUploading).length;
+    const toUpload = files.slice(0, remaining);
+
+    if (files.length > remaining) {
+      toast.warning(`Only ${remaining} more image(s) can be added (max ${MAX_IMAGES})`);
     }
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
+
+    for (const file of toUpload) {
+      if (file.size > MAX_FILE_SIZE) { toast.error(`${file.name} is too large (max 4 MB)`); continue; }
+      if (!file.type.startsWith("image/")) { toast.error(`${file.name} is not an image`); continue; }
+
+      // Add placeholder with local preview
+      const localPreview = URL.createObjectURL(file);
+      const placeholder: ImageEntry = { url: "", key: "", isUploading: true, localPreview };
+      setImages((prev) => [...prev, placeholder]);
+      setIsUploadingAny(true);
+
+      try {
+        const base64 = await fileToBase64(file);
+        const result = await uploadImageMutation.mutateAsync({ base64, filename: file.name, mimeType: file.type });
+        setImages((prev) =>
+          prev.map((img) =>
+            img.localPreview === localPreview ? { url: result.url, key: result.key, localPreview } : img
+          )
+        );
+      } catch (err: any) {
+        toast.error(`Failed to upload ${file.name}: ${err?.message ?? "Unknown error"}`);
+        setImages((prev) => prev.filter((img) => img.localPreview !== localPreview));
+      } finally {
+        setIsUploadingAny(false);
+      }
     }
 
-    // Show local preview immediately
-    const reader = new FileReader();
-    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
-    reader.readAsDataURL(file);
+    // Reset input so same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
-    // Upload to S3
-    setIsUploading(true);
-    try {
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => {
-          const result = r.result as string;
-          // Strip the data:image/...;base64, prefix
-          resolve(result.split(",")[1]);
-        };
-        r.onerror = reject;
-        r.readAsDataURL(file);
-      });
+  const removeImage = (idx: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+  };
 
-      const result = await uploadImageMutation.mutateAsync({
-        base64,
-        filename: file.name,
-        mimeType: file.type,
-      });
-
-      setImageUrl(result.url);
-      setImageKey(result.key);
-      toast.success("Image uploaded successfully");
-    } catch (err: any) {
-      toast.error("Upload failed: " + (err?.message ?? "Unknown error"));
-      resetImageState();
-    } finally {
-      setIsUploading(false);
-    }
+  const setMainImage = (idx: number) => {
+    setImages((prev) => {
+      const next = [...prev];
+      const [main] = next.splice(idx, 1);
+      return [main, ...next];
+    });
   };
 
   const save = () => {
     if (!name.trim() || !price) return toast.error("Name and price are required");
+    const readyImages = images.filter((i) => !i.isUploading && i.url);
+    const primaryImage = readyImages[0];
     const data = {
       name, description, price, category,
-      targetSegment: targetSegment as any, stock: parseInt(stock),
-      imageUrl: imageUrl || undefined,
-      imageKey: imageKey || undefined,
+      targetSegment: targetSegment as any,
+      stock: parseInt(stock),
+      imageUrl: primaryImage?.url,
+      imageKey: primaryImage?.key,
+      images: readyImages.map(({ url, key }) => ({ url, key })),
       isFeatured, isActive,
     };
     if (editing) {
@@ -204,68 +222,64 @@ export default function AdminProducts() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
-              {filtered.map((product) => (
-                <tr key={product.id} className="hover:bg-muted/20 transition-colors">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-muted/50 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {product.imageUrl ? (
-                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <Leaf className="h-4 w-4 text-muted-foreground" />
-                        )}
+              {filtered.map((product) => {
+                const allImages = (product as any).images as { url: string; key: string }[] | undefined;
+                const thumbUrl = allImages?.[0]?.url ?? product.imageUrl;
+                return (
+                  <tr key={product.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-muted/50 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+                          {thumbUrl ? (
+                            <img src={thumbUrl} alt={product.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <Leaf className="h-4 w-4 text-muted-foreground" />
+                          )}
+                          {allImages && allImages.length > 1 && (
+                            <span className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                              {allImages.length}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{product.name}</p>
+                          {product.isFeatured && <Badge variant="secondary" className="text-xs mt-0.5">Featured</Badge>}
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{product.name}</p>
-                        {product.isFeatured && <Badge variant="secondary" className="text-xs mt-0.5">Featured</Badge>}
+                    </td>
+                    <td className="p-4"><span className="text-sm text-muted-foreground">{product.category}</span></td>
+                    <td className="p-4">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${segmentColor[product.targetSegment] ?? ""}`}>
+                        {product.targetSegment}
+                      </span>
+                    </td>
+                    <td className="p-4"><span className="text-sm font-medium">IDR {Number(product.price).toLocaleString("id-ID")}</span></td>
+                    <td className="p-4">
+                      <span className={`text-sm ${product.stock === 0 ? "text-destructive" : "text-foreground"}`}>{product.stock}</span>
+                    </td>
+                    <td className="p-4">
+                      <Badge variant={product.isActive ? "default" : "secondary"} className="text-xs">
+                        {product.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => openEdit(product)}><Edit className="h-3.5 w-3.5" /></Button>
+                        <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget({ id: product.id, name: product.name })}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-sm text-muted-foreground">{product.category}</span>
-                  </td>
-                  <td className="p-4">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${segmentColor[product.targetSegment] ?? ""}`}>
-                      {product.targetSegment}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-sm font-medium">IDR {Number(product.price).toLocaleString("id-ID")}</span>
-                  </td>
-                  <td className="p-4">
-                    <span className={`text-sm ${product.stock === 0 ? "text-destructive" : "text-foreground"}`}>
-                      {product.stock}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <Badge variant={product.isActive ? "default" : "secondary"} className="text-xs">
-                      {product.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => openEdit(product)}>
-                        <Edit className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => setDeleteTarget({ id: product.id, name: product.name })}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
 
       {/* Product Dialog */}
-      <Dialog open={dialog} onOpenChange={(open) => { if (!open) { setDialog(false); } else { setDialog(true); } }}>
+      <Dialog open={dialog} onOpenChange={(open) => setDialog(open)}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Product" : "New Product"}</DialogTitle>
@@ -310,71 +324,85 @@ export default function AdminProducts() {
               </div>
             </div>
 
-            {/* Image Upload */}
+            {/* Multi-image upload */}
             <div>
-              <Label className="text-sm font-medium mb-1.5 block">Product Image</Label>
+              <div className="flex items-center justify-between mb-1.5">
+                <Label className="text-sm font-medium">Product Images</Label>
+                <span className="text-xs text-muted-foreground">{images.filter((i) => !i.isUploading).length}/{MAX_IMAGES} images</span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-2">First image is the main display image. Click ★ to set as main. PNG/JPG/WEBP up to 4 MB each.</p>
+
+              <div className="grid grid-cols-3 gap-2">
+                {images.map((img, idx) => (
+                  <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-border/60 bg-muted/30">
+                    <img
+                      src={img.localPreview ?? img.url}
+                      alt={`Product image ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {img.isUploading && (
+                      <div className="absolute inset-0 bg-background/70 flex items-center justify-center">
+                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      </div>
+                    )}
+                    {!img.isUploading && (
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                        {idx !== 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setMainImage(idx)}
+                            className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors"
+                            title="Set as main image"
+                          >
+                            <Star className="h-3.5 w-3.5 text-amber-500" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx)}
+                          className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors"
+                          title="Remove image"
+                        >
+                          <X className="h-3.5 w-3.5 text-destructive" />
+                        </button>
+                      </div>
+                    )}
+                    {idx === 0 && !img.isUploading && (
+                      <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                        MAIN
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* Add more button */}
+                {images.filter((i) => !i.isUploading).length < MAX_IMAGES && (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingAny}
+                    className="aspect-square rounded-lg border-2 border-dashed border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-colors flex flex-col items-center justify-center gap-1 text-muted-foreground cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isUploadingAny ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    ) : (
+                      <>
+                        <ImagePlus className="h-5 w-5" />
+                        <span className="text-[10px]">Add photo</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 className="hidden"
-                onChange={handleFileChange}
+                onChange={handleFilesChange}
               />
-              {imagePreview ? (
-                <div className="relative group">
-                  <div className="w-full h-40 rounded-lg overflow-hidden border border-border/60 bg-muted/30">
-                    <img src={imagePreview} alt="Product preview" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploading}
-                    >
-                      {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <ImagePlus className="h-3.5 w-3.5 mr-1" />}
-                      Change
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={resetImageState}
-                      disabled={isUploading}
-                    >
-                      <X className="h-3.5 w-3.5 mr-1" />
-                      Remove
-                    </Button>
-                  </div>
-                  {isUploading && (
-                    <div className="absolute inset-0 bg-background/70 rounded-lg flex items-center justify-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                        <span className="text-xs text-muted-foreground">Uploading...</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="w-full h-32 rounded-lg border-2 border-dashed border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-colors flex flex-col items-center justify-center gap-2 text-muted-foreground cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                      <span className="text-xs">Uploading...</span>
-                    </>
-                  ) : (
-                    <>
-                      <ImagePlus className="h-6 w-6" />
-                      <span className="text-sm font-medium">Click to upload image</span>
-                      <span className="text-xs">PNG, JPG, WEBP up to 4 MB</span>
-                    </>
-                  )}
-                </button>
-              )}
             </div>
 
             <div className="flex items-center justify-between">
@@ -391,7 +419,7 @@ export default function AdminProducts() {
             <Button
               className="bg-primary text-primary-foreground"
               onClick={save}
-              disabled={isSaving || isUploading}
+              disabled={isSaving || isUploadingAny}
             >
               {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {editing ? "Save Changes" : "Create Product"}

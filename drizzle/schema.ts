@@ -88,6 +88,7 @@ export const products = mysqlTable("products", {
   category: varchar("category", { length: 128 }).notNull(),
   imageUrl: text("imageUrl"),
   imageKey: text("imageKey"),
+  images: json("images").$type<{ url: string; key: string }[]>(),
   targetSegment: mysqlEnum("targetSegment", ["all", "standard", "premium", "vip"]).default("all").notNull(),
   stock: int("stock").default(0).notNull(),
   isActive: boolean("isActive").default(true).notNull(),
