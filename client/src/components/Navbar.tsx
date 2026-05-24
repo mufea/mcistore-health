@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { getChangePasswordUrl, getLoginUrl, getPasswordResetUrl, getSignUpUrl } from "@/const";
+import { getLoginUrl, getPasswordResetUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   DropdownMenu,
@@ -13,7 +13,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Home,
-  KeyRound,
   LogOut,
   Menu,
   Package,
@@ -124,11 +123,6 @@ export default function Navbar() {
                   </>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => (window.location.href = getChangePasswordUrl())}>
-                  <KeyRound className="mr-2 h-4 w-4" />
-                  Change Password
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
@@ -138,14 +132,6 @@ export default function Navbar() {
           ) : (
             <div className="flex flex-col items-end gap-1">
               <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-primary/40 text-primary hover:bg-primary/5 hover:border-primary"
-                  onClick={() => (window.location.href = getSignUpUrl())}
-                >
-                  Sign Up
-                </Button>
                 <Button
                   size="sm"
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -251,14 +237,7 @@ export default function Navbar() {
                         </div>
                       </Link>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => { closeMobile(); window.location.href = getChangePasswordUrl(); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/60 hover:text-primary transition-colors"
-                    >
-                      <KeyRound className="h-4 w-4 flex-shrink-0" />
-                      Change Password
-                    </button>
+
                   </>
                 )}
               </nav>
@@ -281,13 +260,6 @@ export default function Navbar() {
                       onClick={() => { closeMobile(); window.location.href = getLoginUrl(); }}
                     >
                       Sign In
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full border-primary/40 text-primary hover:bg-primary/5 hover:border-primary"
-                      onClick={() => { closeMobile(); window.location.href = getSignUpUrl(); }}
-                    >
-                      Sign Up
                     </Button>
                     <div className="text-center pt-1">
                       <button
