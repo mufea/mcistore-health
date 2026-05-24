@@ -205,11 +205,11 @@ export default function ChatbotWidget() {
   return (
     <>
       {/* Floating button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
-            className="relative w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center"
+            className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center"
             aria-label="Open chat"
           >
             <MessageCircle className="h-6 w-6" />
@@ -223,7 +223,9 @@ export default function ChatbotWidget() {
         {isOpen && (
           <div
             className={`bg-background border border-border/60 rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ${
-              isMinimized ? "h-14 w-80" : "w-[380px] h-[600px] max-h-[85vh]"
+              isMinimized
+                ? "h-12 w-[calc(100vw-2rem)] sm:h-14 sm:w-80"
+                : "w-[calc(100vw-2rem)] max-w-[340px] sm:w-[380px] h-[65vh] sm:h-[600px] max-h-[75vh] sm:max-h-[85vh]"
             }`}
             style={{ boxShadow: "0 25px 60px rgba(0,0,0,0.15)" }}
           >
