@@ -34,7 +34,7 @@ import {
   FileText,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import AdminSidebar from "@/components/AdminSidebar";
 
 // ─── Knowledge categories ─────────────────────────────────────────────────────
@@ -55,6 +55,7 @@ const CATEGORIES = [
 
 export default function AdminKnowledge() {
   const { user, isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
@@ -138,7 +139,7 @@ export default function AdminKnowledge() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground mb-4">Access restricted to administrators.</p>
-          <Link href="/"><Button variant="outline"><Home className="h-4 w-4 mr-2" />Back to Home</Button></Link>
+          <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-input bg-background text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"><Home className="h-4 w-4" />Back to Home</button>
         </div>
       </div>
     );
