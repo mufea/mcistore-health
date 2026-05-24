@@ -20,6 +20,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
   zh: "Mandarin Chinese",
   es: "Spanish",
   hi: "Hindi",
+  id: "Indonesian",
 };
 
 // ─── Helper: build system prompt with knowledge base ─────────────────────────
@@ -101,7 +102,7 @@ export const chatbotRouter = router({
         sessionId: z.string().min(1),
         message: z.string().min(1).max(2000),
         userId: z.number().optional(),
-        language: z.enum(["en", "ar", "zh", "es", "hi"]).optional().default("en"),
+        language: z.enum(["en", "ar", "zh", "es", "hi", "id"]).optional().default("en"),
       })
     )
     .mutation(async ({ input }) => {

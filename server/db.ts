@@ -86,6 +86,7 @@ export async function updateUserProfile(
     postalCode: string;
     country: string;
     segment: "standard" | "premium" | "vip";
+    preferredLanguage: string;
   }>
 ) {
   const db = await getDb();

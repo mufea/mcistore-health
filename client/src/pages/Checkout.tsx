@@ -29,7 +29,7 @@ import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { t, translations } from "@/lib/i18n";
+import { type Language, t, translations } from "@/lib/i18n";
 
 interface Address {
   street: string;
@@ -47,17 +47,20 @@ function AddressFields({
   addr,
   onChange,
   prefix,
+  lang,
 }: {
   addr: Address;
   onChange: (field: keyof Address, value: string) => void;
   prefix: string;
+  lang: Language;
 }) {
+  const co = translations.checkout;
   return (
     <div className="space-y-4">
       {/* Street — full width */}
       <div>
         <Label htmlFor={`${prefix}-street`} className="text-sm font-medium mb-1.5 block">
-          Street Address <span className="text-destructive">*</span>
+          {t(co.streetAddress, lang)} <span className="text-destructive">*</span>
         </Label>
         <Input
           id={`${prefix}-street`}
@@ -72,7 +75,7 @@ function AddressFields({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label htmlFor={`${prefix}-apt`} className="text-sm font-medium mb-1.5 block">
-            House / Apt Number
+            {t(co.aptNumber, lang)}
           </Label>
           <Input
             id={`${prefix}-apt`}
@@ -84,7 +87,7 @@ function AddressFields({
         </div>
         <div>
           <Label htmlFor={`${prefix}-city`} className="text-sm font-medium mb-1.5 block">
-            City <span className="text-destructive">*</span>
+            {t(co.city, lang)} <span className="text-destructive">*</span>
           </Label>
           <Input
             id={`${prefix}-city`}
@@ -99,7 +102,7 @@ function AddressFields({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="sm:col-span-1">
           <Label htmlFor={`${prefix}-province`} className="text-sm font-medium mb-1.5 block">
-            Province / State <span className="text-destructive">*</span>
+            {t(co.province, lang)} <span className="text-destructive">*</span>
           </Label>
           <Input
             id={`${prefix}-province`}
@@ -111,7 +114,7 @@ function AddressFields({
         </div>
         <div>
           <Label htmlFor={`${prefix}-postal`} className="text-sm font-medium mb-1.5 block">
-            Postal Code <span className="text-destructive">*</span>
+            {t(co.postalCode, lang)} <span className="text-destructive">*</span>
           </Label>
           <Input
             id={`${prefix}-postal`}
@@ -123,7 +126,7 @@ function AddressFields({
         </div>
         <div>
           <Label htmlFor={`${prefix}-country`} className="text-sm font-medium mb-1.5 block">
-            Country <span className="text-destructive">*</span>
+            {t(co.country, lang)} <span className="text-destructive">*</span>
           </Label>
           <Input
             id={`${prefix}-country`}
@@ -223,8 +226,8 @@ export default function Checkout() {
         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6 text-center p-6">
           <ShoppingBag className="h-12 w-12 text-primary" />
           <div>
-            <h2 className="font-serif text-2xl font-semibold mb-2">Sign In Required</h2>
-            <p className="text-muted-foreground">Please sign in to complete your purchase.</p>
+            <h2 className="font-serif text-2xl font-semibold mb-2">{t(translations.checkout.signInRequired, lang)}</h2>
+            <p className="text-muted-foreground">{t(translations.checkout.signInDesc, lang)}</p>
           </div>
           <Button
             size="lg"
@@ -376,15 +379,15 @@ export default function Checkout() {
             <Separator className="my-3" />
             <div className="space-y-1.5 text-sm">
               <div className="flex justify-between text-muted-foreground">
-                <span>Subtotal</span>
+                <span>{t(translations.checkout.subtotal, lang)}</span>
                 <span>IDR {subtotal.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>Shipping</span>
+                <span>{t(translations.checkout.shipping, lang)}</span>
                 <span>IDR {shippingCost.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between font-semibold text-foreground pt-1">
-                <span>Total</span>
+                <span>{t(translations.checkout.total, lang)}</span>
                 <span>IDR {total.toLocaleString("id-ID")}</span>
               </div>
             </div>
@@ -399,7 +402,7 @@ export default function Checkout() {
 
           <div className="mb-6 sm:mb-8">
             <div className="gold-line mb-4" />
-            <h1 className="font-serif text-2xl sm:text-3xl font-light text-foreground">Checkout</h1>
+            <h1 className="font-serif text-2xl sm:text-3xl font-light text-foreground">{t(translations.checkout.title, lang)}</h1>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -410,24 +413,24 @@ export default function Checkout() {
               <SectionCard>
                 <div className="flex items-center gap-2 mb-5">
                   <User className="h-4 w-4 text-primary" />
-                  <h2 className="font-semibold text-foreground">Personal Information</h2>
+                  <h2 className="font-semibold text-foreground">{t(translations.checkout.personalInfo, lang)}</h2>
                 </div>
                 <div className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium mb-1.5 block">
-                      Full Name <span className="text-destructive">*</span>
+                      {t(translations.checkout.fullName, lang)} <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Your full name"
+                      placeholder={t(translations.checkout.fullNamePlaceholder, lang)}
                       className="h-11 text-base"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium mb-1.5 block">
-                        Email Address <span className="text-destructive">*</span>
+                        {t(translations.checkout.emailAddress, lang)} <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         type="email"
@@ -439,7 +442,7 @@ export default function Checkout() {
                     </div>
                     <div>
                       <Label className="text-sm font-medium mb-1.5 block">
-                        Phone Number <span className="text-destructive">*</span>
+                        {t(translations.checkout.phoneNumber, lang)} <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         type="tel"
@@ -458,7 +461,7 @@ export default function Checkout() {
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-primary" />
-                    <h2 className="font-semibold text-foreground">Billing Address</h2>
+                    <h2 className="font-semibold text-foreground">{t(translations.checkout.billingAddress, lang)}</h2>
                   </div>
                   {profile?.streetAddress && (
                     <button
@@ -476,7 +479,7 @@ export default function Checkout() {
                       className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors py-1.5 px-2 rounded-md hover:bg-primary/5"
                     >
                       <CheckCircle className="h-3.5 w-3.5" />
-                      Use saved
+                      {t(translations.checkout.useSaved, lang)}
                     </button>
                   )}
                 </div>
@@ -485,13 +488,13 @@ export default function Checkout() {
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20 mb-4">
                     <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                     <p className="text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">Pre-filled from your saved profile address.</span>{" "}
-                      Edit the fields below if needed.
+                      <span className="font-medium text-foreground">{t(translations.checkout.preFilledMsg, lang)}</span>{" "}
+                      {t(translations.checkout.editFieldsBelow, lang)}
                     </p>
                   </div>
                 )}
 
-                <AddressFields addr={userAddress} onChange={updateUserAddr} prefix="user" />
+                <AddressFields addr={userAddress} onChange={updateUserAddr} prefix="user" lang={lang} />
               </SectionCard>
 
               {/* Shipping Address */}
@@ -499,7 +502,7 @@ export default function Checkout() {
                 <div className="flex items-start justify-between mb-5 gap-3">
                   <div className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-primary" />
-                    <h2 className="font-semibold text-foreground">Shipping Address</h2>
+                    <h2 className="font-semibold text-foreground">{t(translations.checkout.shippingAddress, lang)}</h2>
                   </div>
                   {/* Larger tap target for checkbox row */}
                   <label
@@ -512,13 +515,13 @@ export default function Checkout() {
                       onCheckedChange={(c) => setSameAsUser(!!c)}
                       className="h-5 w-5"
                     />
-                    <span className="text-sm text-muted-foreground select-none">Same as billing</span>
+                    <span className="text-sm text-muted-foreground select-none">{t(translations.checkout.sameAsBilling, lang)}</span>
                   </label>
                 </div>
 
                 {sameAsUser ? (
                   <div className="bg-muted/40 rounded-lg p-4 text-sm text-muted-foreground">
-                    <p>Shipping to the same address as billing.</p>
+                    <p>{t(translations.checkout.shippingToBilling, lang)}</p>
                     {userAddress.street && (
                       <p className="mt-1 text-foreground font-medium">
                         {userAddress.street}{userAddress.apt ? `, ${userAddress.apt}` : ""},{" "}
@@ -528,13 +531,13 @@ export default function Checkout() {
                     )}
                   </div>
                 ) : (
-                  <AddressFields addr={shippingAddress} onChange={updateShippingAddr} prefix="shipping" />
+                  <AddressFields addr={shippingAddress} onChange={updateShippingAddr} prefix="shipping" lang={lang} />
                 )}
               </SectionCard>
 
               {/* Shipping Method */}
               <SectionCard>
-                <h2 className="font-semibold text-foreground mb-4">Shipping Method</h2>
+                <h2 className="font-semibold text-foreground mb-4">{t(translations.checkout.shippingMethod, lang)}</h2>
                 <RadioGroup
                   value={shippingType}
                   onValueChange={(v) => setShippingType(v as "national" | "international")}
@@ -543,14 +546,14 @@ export default function Checkout() {
                   {[
                     {
                       value: "national",
-                      label: "National Delivery",
-                      desc: "Delivery within Indonesia",
+                      label: t(translations.checkout.nationalDelivery, lang),
+                      desc: t(translations.checkout.nationalDesc, lang),
                       cost: settings?.shippingNationalCost ?? 50000,
                     },
                     {
                       value: "international",
-                      label: "International Delivery",
-                      desc: "Worldwide shipping",
+                      label: t(translations.checkout.internationalDelivery, lang),
+                      desc: t(translations.checkout.internationalDesc, lang),
                       cost: settings?.shippingInternationalCost ?? 250000,
                     },
                   ].map((opt) => (
@@ -584,7 +587,7 @@ export default function Checkout() {
               <SectionCard>
                 <div className="flex items-center gap-2 mb-4">
                   <CreditCard className="h-4 w-4 text-primary" />
-                  <h2 className="font-semibold text-foreground">Payment Method</h2>
+                  <h2 className="font-semibold text-foreground">{t(translations.checkout.paymentMethod, lang)}</h2>
                 </div>
                 <RadioGroup
                   value={paymentMethod}
@@ -595,15 +598,15 @@ export default function Checkout() {
                     {
                       value: "bank_transfer",
                       icon: <Building2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />,
-                      label: "Bank Transfer",
-                      desc: "Manual bank transfer — we'll send you the account details",
+                      label: t(translations.checkout.bankTransfer, lang),
+                      desc: t(translations.checkout.bankTransferDesc, lang),
                       badge: null,
                     },
                     {
                       value: "midtrans",
                       icon: <CreditCard className="h-5 w-5 text-muted-foreground flex-shrink-0" />,
-                      label: "Online Payment",
-                      desc: "Credit card, Virtual Account, QRIS, GoPay",
+                      label: t(translations.checkout.onlinePayment, lang),
+                      desc: t(translations.checkout.onlinePaymentDesc, lang),
                       badge: "Midtrans",
                     },
                   ].map((opt) => (
@@ -646,13 +649,13 @@ export default function Checkout() {
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     <>
-                      Place Order — IDR {total.toLocaleString("id-ID")}
+                      {t(translations.checkout.placeOrder, lang)} — IDR {total.toLocaleString("id-ID")}
                       <ArrowRight className="h-5 w-5" />
                     </>
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center mt-3">
-                  By placing your order, you agree to our terms and conditions.
+                  {t(translations.checkout.termsNote, lang)}
                 </p>
               </div>
             </div>
@@ -660,7 +663,7 @@ export default function Checkout() {
             {/* ── Right: Desktop Order Summary ─────────────────────────── */}
             <div className="hidden lg:block lg:col-span-1">
               <div className="bg-card rounded-xl border border-border/60 p-6 sticky top-24">
-                <h2 className="font-semibold text-foreground mb-4">Order Summary</h2>
+                <h2 className="font-semibold text-foreground mb-4">{t(translations.checkout.orderSummary, lang)}</h2>
 
                 <div className="space-y-3 mb-4">
                   {selectedProducts.map((product) => (
@@ -713,16 +716,16 @@ export default function Checkout() {
 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-muted-foreground">
-                    <span>Subtotal</span>
+                    <span>{t(translations.checkout.subtotal, lang)}</span>
                     <span>IDR {subtotal.toLocaleString("id-ID")}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
-                    <span>Shipping ({shippingType})</span>
+                    <span>{t(translations.checkout.shipping, lang)}</span>
                     <span>IDR {shippingCost.toLocaleString("id-ID")}</span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between font-semibold text-foreground text-base">
-                    <span>Total</span>
+                    <span>{t(translations.checkout.total, lang)}</span>
                     <span>IDR {total.toLocaleString("id-ID")}</span>
                   </div>
                 </div>
@@ -737,14 +740,14 @@ export default function Checkout() {
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <>
-                      Place Order
+                      {t(translations.checkout.placeOrder, lang)}
                       <ArrowRight className="h-4 w-4" />
                     </>
                   )}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center mt-3">
-                  By placing your order, you agree to our terms and conditions.
+                  {t(translations.checkout.termsNote, lang)}
                 </p>
               </div>
             </div>

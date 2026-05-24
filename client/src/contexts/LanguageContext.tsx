@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, type ReactNode } from "react";
 import { type Language, LANGUAGES } from "@/lib/i18n";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 interface LanguageContextValue {
   lang: Language;
@@ -30,6 +32,7 @@ function detectBrowserLanguage(): Language {
     if (bl.startsWith("zh")) return "zh";
     if (bl.startsWith("es")) return "es";
     if (bl.startsWith("hi")) return "hi";
+    if (bl.startsWith("id")) return "id";
   }
   return "en";
 }
@@ -44,17 +47,50 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   });
 
   const dir = LANGUAGES.find((l) => l.code === lang)?.dir ?? "ltr";
+  const { isAuthenticated } = useAuth();
 
-  const setLang = (newLang: Language) => {
-    setLangState(newLang);
-    localStorage.setItem(STORAGE_KEY, newLang);
-  };
+  // Load profile to sync language preference from DB
+  const { data: profile } = trpc.userProfile.get.useQuery(undefined, {
+    enabled: isAuthenticated,
+    staleTime: 60_000,
+  });
+
+  // Track whether we have applied the profile language once
+  const profileApplied = useRef(false);
+
+  useEffect(() => {
+    if (profile?.preferredLanguage && !profileApplied.current) {
+      const supported = LANGUAGES.map((l) => l.code);
+      const profileLang = profile.preferredLanguage as Language;
+      if (supported.includes(profileLang)) {
+        // Only override if the user hasn't manually changed it this session
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) {
+          setLangState(profileLang);
+          localStorage.setItem(STORAGE_KEY, profileLang);
+        }
+      }
+      profileApplied.current = true;
+    }
+  }, [profile]);
+
+  // Mutation to persist language to DB when user changes it
+  const updateProfile = trpc.userProfile.update.useMutation();
 
   // Apply dir to <html> element for RTL support (Arabic)
   useEffect(() => {
     document.documentElement.setAttribute("dir", dir);
     document.documentElement.setAttribute("lang", lang);
   }, [lang, dir]);
+
+  const setLang = (newLang: Language) => {
+    setLangState(newLang);
+    localStorage.setItem(STORAGE_KEY, newLang);
+    // Persist to DB if authenticated
+    if (isAuthenticated) {
+      updateProfile.mutate({ preferredLanguage: newLang });
+    }
+  };
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, dir }}>

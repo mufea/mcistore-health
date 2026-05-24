@@ -29,6 +29,7 @@ export const users = mysqlTable("users", {
   province: varchar("province", { length: 128 }),
   postalCode: varchar("postalCode", { length: 16 }),
   country: varchar("country", { length: 128 }),
+  preferredLanguage: varchar("preferredLanguage", { length: 8 }).default("en"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

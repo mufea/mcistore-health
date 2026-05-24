@@ -17,6 +17,7 @@ export const userProfileRouter = router({
       postalCode: ctx.user.postalCode,
       country: ctx.user.country,
       segment: ctx.user.segment,
+      preferredLanguage: ctx.user.preferredLanguage,
       createdAt: ctx.user.createdAt,
     };
   }),
@@ -32,6 +33,7 @@ export const userProfileRouter = router({
         province: z.string().optional(),
         postalCode: z.string().optional(),
         country: z.string().optional(),
+        preferredLanguage: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
