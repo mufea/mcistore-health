@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import {
   Home,
   LogOut,
@@ -158,6 +158,9 @@ export default function Navbar() {
             </SheetTrigger>
 
             <SheetContent side="right" className="w-72 p-0 flex flex-col">
+              {/* Visually hidden title for accessibility (required by Radix Dialog/Sheet) */}
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <SheetDescription className="sr-only">Site navigation links and account options</SheetDescription>
               {/* Sheet header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
                 <div className="flex items-center gap-2">
