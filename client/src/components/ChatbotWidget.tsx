@@ -224,8 +224,8 @@ export default function ChatbotWidget() {
           <div
             className={`bg-background border border-border/60 rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ${
               isMinimized
-                ? "h-12 w-[calc(100vw-2rem)] md:h-14 md:w-[420px]"
-                : "w-[calc(100vw-2rem)] max-w-[340px] md:w-[480px] md:max-w-[520px] h-[65vh] md:h-[680px] max-h-[75vh] md:max-h-[88vh]"
+                ? "h-12 w-[calc(100vw-2rem)] md:h-14 md:w-[440px]"
+                : "w-[calc(100vw-2rem)] max-w-[340px] md:w-[440px] h-[65vh] md:h-[calc(100vh-6rem)] max-h-[75vh] md:max-h-[calc(100vh-5rem)]"
             }`}
             style={{ boxShadow: "0 25px 60px rgba(0,0,0,0.15)" }}
           >
