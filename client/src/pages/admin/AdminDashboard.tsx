@@ -193,7 +193,7 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto min-w-0 h-full">
-        {noPadding ? children : <div className="p-8">{children}</div>}
+        {noPadding ? children : <div className="p-4 sm:p-8 admin-content">{children}</div>}
       </main>
     </div>
   );

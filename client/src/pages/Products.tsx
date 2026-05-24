@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Crown, Leaf, Loader2, Search } from "lucide-react";
+import { Crown, Loader2, Search } from "lucide-react";
+import ProductImageGallery from "@/components/ProductImageGallery";
 import { useState } from "react";
 import { Link } from "wouter";
 import MainLayout from "@/components/MainLayout";
@@ -90,20 +91,16 @@ export default function Products() {
                     className="group bg-card rounded-xl border border-border/60 overflow-hidden card-hover cursor-pointer animate-slide-up"
                     style={{ animationDelay: `${i * 40}ms` }}
                   >
-                    <div className="aspect-square bg-muted/30 flex items-center justify-center overflow-hidden relative">
-                      {product.imageUrl ? (
-                        <img
-                          src={product.imageUrl}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Leaf className="h-7 w-7 text-primary/40" />
-                        </div>
-                      )}
+                    <div className="aspect-square relative">
+                      <ProductImageGallery
+                        imageUrl={product.imageUrl}
+                        images={(product.images as { url: string; key: string }[] | null) ?? null}
+                        productName={product.name}
+                        mode="card"
+                        className="w-full h-full"
+                      />
                       {product.targetSegment !== "all" && (
-                        <div className="absolute top-2 right-2">
+                        <div className="absolute top-2 right-2 z-10">
                           <Badge className="text-xs bg-amber-500 text-white border-0">
                             <Crown className="h-3 w-3 mr-1" />
                             {product.targetSegment}
