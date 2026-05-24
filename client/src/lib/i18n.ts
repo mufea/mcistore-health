@@ -221,6 +221,48 @@ export const translations = {
     noOrdersSub:      { en: "Start your wellness journey today.", ar: "ابدأ رحلتك الصحية اليوم.", zh: "今天开始您的健康之旅。", es: "Comienza tu viaje de bienestar hoy.", hi: "आज अपनी वेलनेस यात्रा शुरू करें।" },
     takeHealthSurvey: { en: "Take Health Survey",              ar: "ابدأ الاستبيان الصحي",       zh: "参加健康调查",          es: "Realizar Encuesta de Salud",   hi: "स्वास्थ्य सर्वेक्षण लें" },
   },
+
+  // ── Order Detail Page ──
+  orderDetailPage: {
+    title:            { en: "Order Details",               ar: "تفاصيل الطلب",               zh: "订单详情",              es: "Detalles del Pedido",          hi: "ऑर्डर विवरण" },
+    notFoundTitle:    { en: "Order Not Found",              ar: "الطلب غير موجود",             zh: "未找到订单",            es: "Pedido No Encontrado",         hi: "ऑर्डर नहीं मिला" },
+    notFoundDesc:     { en: "We couldn't find this order. Please check your order number.", ar: "لم نتمكن من العثور على هذا الطلب. يرجى التحقق من رقم الطلب.", zh: "未找到此订单，请检查您的订单号。", es: "No pudimos encontrar este pedido. Por favor verifica tu número de pedido.", hi: "हम यह ऑर्डर नहीं ढूंढ सके। कृपया अपना ऑर्डर नंबर जांचें।" },
+    orderProgress:    { en: "Order Progress",               ar: "تقدم الطلب",                  zh: "订单进度",              es: "Progreso del Pedido",          hi: "ऑर्डर प्रगति" },
+    stepOrderPlaced:  { en: "Order Placed",                 ar: "تم تقديم الطلب",              zh: "已下单",                es: "Pedido Realizado",             hi: "ऑर्डर दिया गया" },
+    stepProcessing:   { en: "Processing",                   ar: "قيد المعالجة",                zh: "处理中",                es: "Procesando",                   hi: "प्रक्रिया में" },
+    stepShipped:      { en: "Shipped",                      ar: "تم الشحن",                   zh: "已发货",                es: "Enviado",                      hi: "भेजा गया" },
+    stepDelivered:    { en: "Delivered",                    ar: "تم التسليم",                  zh: "已送达",                es: "Entregado",                    hi: "डिलीवर हुआ" },
+    paymentStatus:    { en: "Payment Status",               ar: "حالة الدفع",                  zh: "付款状态",              es: "Estado de Pago",               hi: "भुगतान स्थिति" },
+    paymentMethod:    { en: "Payment Method",               ar: "طريقة الدفع",                 zh: "付款方式",              es: "Método de Pago",               hi: "भुगतान विधि" },
+    itemsOrdered:     { en: "Items Ordered",                ar: "العناصر المطلوبة",             zh: "已订购商品",            es: "Artículos Pedidos",            hi: "ऑर्डर किए गए आइटम" },
+    qty:              { en: "Qty",                          ar: "الكمية",                     zh: "数量",                  es: "Cant.",                        hi: "मात्रा" },
+    subtotal:         { en: "Subtotal",                     ar: "المجموع الفرعي",               zh: "小计",                  es: "Subtotal",                     hi: "उप-कुल" },
+    shipping:         { en: "Shipping",                     ar: "الشحن",                      zh: "运费",                  es: "Envío",                        hi: "शिपिंग" },
+    total:            { en: "Total",                        ar: "الإجمالي",                    zh: "总计",                  es: "Total",                        hi: "कुल" },
+    billingAddress:   { en: "Billing Address",              ar: "عنوان الفوترة",               zh: "账单地址",              es: "Dirección de Facturación",     hi: "बिलिंग पता" },
+    shippingAddress:  { en: "Shipping Address",             ar: "عنوان الشحن",                 zh: "收货地址",              es: "Dirección de Envío",           hi: "शिपिंग पता" },
+  },
+
+  // ── Toast / Notification Messages (user-facing pages only) ──
+  toast: {
+    // Profile
+    profileUpdated:       { en: "Profile updated successfully.",         ar: "تم تحديث الملف الشخصي بنجاح.",         zh: "个人资料更新成功。",        es: "Perfil actualizado correctamente.",        hi: "प्रोफ़ाइल सफलतापूर्वक अपडेट हुई।" },
+    profileUpdateFailed:  { en: "Failed to update profile. Please try again.", ar: "فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.", zh: "更新个人资料失败，请重试。", es: "Error al actualizar perfil. Inténtalo de nuevo.", hi: "प्रोफ़ाइल अपडेट विफल। कृपया पुनः प्रयास करें।" },
+    addressSaved:         { en: "Address saved successfully.",            ar: "تم حفظ العنوان بنجاح.",                 zh: "地址保存成功。",            es: "Dirección guardada correctamente.",        hi: "पता सफलतापूर्वक सहेजा गया।" },
+    addressSaveFailed:    { en: "Failed to save address. Please try again.", ar: "فشل حفظ العنوان. يرجى المحاولة مرة أخرى.", zh: "保存地址失败，请重试。", es: "Error al guardar dirección. Inténtalo de nuevo.", hi: "पता सहेजना विफल। कृपया पुनः प्रयास करें।" },
+    // Checkout
+    fillRequiredFields:   { en: "Please fill in all required fields.",    ar: "يرجى ملء جميع الحقول المطلوبة.",       zh: "请填写所有必填字段。",      es: "Por favor completa todos los campos requeridos.", hi: "कृपया सभी आवश्यक फ़ील्ड भरें।" },
+    orderFailed:          { en: "Failed to create order. Please try again.", ar: "فشل إنشاء الطلب. يرجى المحاولة مرة أخرى.", zh: "创建订单失败，请重试。", es: "Error al crear el pedido. Inténtalo de nuevo.", hi: "ऑर्डर बनाना विफल। कृपया पुनः प्रयास करें।" },
+    // Payment
+    paymentSuccess:       { en: "Payment successful!",                    ar: "تمت عملية الدفع بنجاح!",               zh: "付款成功！",               es: "¡Pago exitoso!",                          hi: "भुगतान सफल!" },
+    paymentPending:       { en: "Payment pending. We'll update you when confirmed.", ar: "الدفع قيد الانتظار. سنخبرك عند التأكيد.", zh: "付款待处理，确认后我们会通知您。", es: "Pago pendiente. Te avisaremos cuando se confirme.", hi: "भुगतान लंबित। पुष्टि होने पर हम आपको अपडेट करेंगे।" },
+    paymentFailed:        { en: "Payment failed. Please try again.",      ar: "فشل الدفع. يرجى المحاولة مرة أخرى.",   zh: "付款失败，请重试。",        es: "Pago fallido. Por favor inténtalo de nuevo.",  hi: "भुगतान विफल। कृपया पुनः प्रयास करें।" },
+    paymentInitFailed:    { en: "Failed to initiate payment",             ar: "فشل بدء عملية الدفع",                  zh: "发起付款失败",             es: "Error al iniciar el pago",               hi: "भुगतान शुरू करना विफल" },
+    copiedToClipboard:    { en: "Copied to clipboard!",                   ar: "تم النسخ إلى الحافظة!",                zh: "已复制到剪贴板！",         es: "¡Copiado al portapapeles!",              hi: "क्लिपबोर्ड में कॉपी हुआ!" },
+    // Chatbot
+    chatSendFailed:       { en: "Failed to send message",                 ar: "فشل إرسال الرسالة",                    zh: "发送消息失败",             es: "Error al enviar mensaje",               hi: "संदेश भेजना विफल" },
+    meetingBooked:        { en: "Meeting booked successfully!",            ar: "تم حجز الاجتماع بنجاح!",               zh: "会议预订成功！",           es: "¡Reunión reservada con éxito!",          hi: "मीटिंग सफलतापूर्वक बुक हुई!" },
+  },
 } as const;
 
 // ─── Helper to get a translation ─────────────────────────────────────────────

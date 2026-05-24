@@ -21,6 +21,8 @@ import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
@@ -92,6 +94,7 @@ function SectionCard({
 // ─── Personal info form ───────────────────────────────────────────────────────
 
 function PersonalInfoSection() {
+  const { lang } = useLanguage();
   const utils = trpc.useUtils();
   const { data: profile, isLoading } = trpc.userProfile.get.useQuery();
   const updateMutation = trpc.userProfile.update.useMutation({
@@ -99,9 +102,9 @@ function PersonalInfoSection() {
       utils.userProfile.get.invalidate();
       utils.auth.me.invalidate();
       setEditing(false);
-      toast.success("Profile updated successfully.");
+      toast.success(t(translations.toast.profileUpdated, lang));
     },
-    onError: () => toast.error("Failed to update profile. Please try again."),
+    onError: () => toast.error(t(translations.toast.profileUpdateFailed, lang)),
   });
 
   const [editing, setEditing] = useState(false);
@@ -241,6 +244,7 @@ type AddressForm = {
 };
 
 function AddressSection() {
+  const { lang } = useLanguage();
   const utils = trpc.useUtils();
   const { data: profile, isLoading } = trpc.userProfile.get.useQuery();
   const updateMutation = trpc.userProfile.update.useMutation({
@@ -248,9 +252,9 @@ function AddressSection() {
       utils.userProfile.get.invalidate();
       utils.auth.me.invalidate();
       setEditing(false);
-      toast.success("Address saved successfully.");
+      toast.success(t(translations.toast.addressSaved, lang));
     },
-    onError: () => toast.error("Failed to save address. Please try again."),
+    onError: () => toast.error(t(translations.toast.addressSaveFailed, lang)),
   });
 
   const [editing, setEditing] = useState(false);

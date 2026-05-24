@@ -8,6 +8,8 @@ import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
 
 declare global {
   interface Window {
@@ -23,6 +25,7 @@ declare global {
 }
 
 export default function Payment() {
+  const { lang } = useLanguage();
   const params = useParams<{ orderNumber: string }>();
   const search = useSearch();
   const [, navigate] = useLocation();
@@ -69,15 +72,15 @@ export default function Payment() {
       setPaymentInitiated(true);
       window.snap.pay(result.token, {
         onSuccess: () => {
-          toast.success("Payment successful!");
+          toast.success(t(translations.toast.paymentSuccess, lang));
           navigate(`/order/${params.orderNumber}`);
         },
         onPending: () => {
-          toast.info("Payment pending. We'll update you when confirmed.");
+          toast.info(t(translations.toast.paymentPending, lang));
           refetchStatus();
         },
         onError: () => {
-          toast.error("Payment failed. Please try again.");
+          toast.error(t(translations.toast.paymentFailed, lang));
         },
         onClose: () => {
           setPaymentInitiated(false);
@@ -85,13 +88,13 @@ export default function Payment() {
         },
       });
     } catch (err: any) {
-      toast.error(err.message ?? "Failed to initiate payment");
+      toast.error(err.message ?? t(translations.toast.paymentInitFailed, lang));
     }
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard!");
+    toast.success(t(translations.toast.copiedToClipboard, lang));
   };
 
   if (!order) {

@@ -6,13 +6,8 @@ import { CheckCircle, Clock, Loader2, MapPin, Package, Truck } from "lucide-reac
 import { useParams } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
-
-const statusSteps = [
-  { key: "pending", label: "Order Placed", icon: Clock },
-  { key: "processing", label: "Processing", icon: Package },
-  { key: "shipped", label: "Shipped", icon: Truck },
-  { key: "delivered", label: "Delivered", icon: CheckCircle },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
 
 const statusOrder = ["pending", "processing", "shipped", "delivered", "cancelled"];
 
@@ -32,6 +27,17 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function OrderDetail() {
+  const { lang } = useLanguage();
+  const o = translations.orderDetailPage;
+
+  // Build translated status steps inside the component so they react to lang changes
+  const statusSteps = [
+    { key: "pending",    label: t(o.stepOrderPlaced, lang), icon: Clock },
+    { key: "processing", label: t(o.stepProcessing,  lang), icon: Package },
+    { key: "shipped",    label: t(o.stepShipped,     lang), icon: Truck },
+    { key: "delivered",  label: t(o.stepDelivered,   lang), icon: CheckCircle },
+  ];
+
   const params = useParams<{ orderNumber: string }>();
   const { data: order, isLoading } = trpc.orders.getByNumber.useQuery(
     { orderNumber: params.orderNumber ?? "" },
@@ -54,8 +60,8 @@ export default function OrderDetail() {
         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6 text-center p-6">
           <Package className="h-12 w-12 text-muted-foreground" />
           <div>
-            <h2 className="font-serif text-2xl font-semibold mb-2">Order Not Found</h2>
-            <p className="text-muted-foreground">We couldn't find this order. Please check your order number.</p>
+            <h2 className="font-serif text-2xl font-semibold mb-2">{t(o.notFoundTitle, lang)}</h2>
+            <p className="text-muted-foreground">{t(o.notFoundDesc, lang)}</p>
           </div>
           <BackToHome />
         </div>
@@ -75,7 +81,7 @@ export default function OrderDetail() {
             <div className="gold-line mb-4" />
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="font-serif text-3xl font-light text-foreground mb-1">Order Details</h1>
+                <h1 className="font-serif text-3xl font-light text-foreground mb-1">{t(o.title, lang)}</h1>
                 <p className="text-muted-foreground text-sm">#{order.orderNumber}</p>
               </div>
               <div className="text-right">
@@ -94,7 +100,7 @@ export default function OrderDetail() {
           {/* Progress Tracker */}
           {order.status !== "cancelled" && (
             <div className="bg-card rounded-xl border border-border/60 p-6 mb-6">
-              <h2 className="font-semibold text-foreground mb-6">Order Progress</h2>
+              <h2 className="font-semibold text-foreground mb-6">{t(o.orderProgress, lang)}</h2>
               <div className="relative">
                 <div className="absolute top-5 left-5 right-5 h-0.5 bg-border" />
                 <div
@@ -149,11 +155,11 @@ export default function OrderDetail() {
           <div className="bg-card rounded-xl border border-border/60 p-5 mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-0.5">Payment Status</p>
+                <p className="text-sm text-muted-foreground mb-0.5">{t(o.paymentStatus, lang)}</p>
                 <StatusBadge status={order.paymentStatus} />
               </div>
               <div className="text-right">
-                <p className="text-sm text-muted-foreground mb-0.5">Payment Method</p>
+                <p className="text-sm text-muted-foreground mb-0.5">{t(o.paymentMethod, lang)}</p>
                 <p className="text-sm font-medium capitalize">{order.paymentMethod.replace("_", " ")}</p>
               </div>
             </div>
@@ -161,7 +167,7 @@ export default function OrderDetail() {
 
           {/* Items */}
           <div className="bg-card rounded-xl border border-border/60 p-6 mb-6">
-            <h2 className="font-semibold text-foreground mb-4">Items Ordered</h2>
+            <h2 className="font-semibold text-foreground mb-4">{t(o.itemsOrdered, lang)}</h2>
             <div className="space-y-3">
               {(order as any).items?.map((item: any) => (
                 <div key={item.id} className="flex items-center justify-between gap-3">
@@ -171,7 +177,7 @@ export default function OrderDetail() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">{item.productName}</p>
-                      <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                      <p className="text-xs text-muted-foreground">{t(o.qty, lang)}: {item.quantity}</p>
                     </div>
                   </div>
                   <span className="text-sm font-medium">IDR {Number(item.subtotal).toLocaleString("id-ID")}</span>
@@ -181,16 +187,16 @@ export default function OrderDetail() {
             <Separator className="my-4" />
             <div className="space-y-2 text-sm">
               <div className="flex justify-between text-muted-foreground">
-                <span>Subtotal</span>
+                <span>{t(o.subtotal, lang)}</span>
                 <span>IDR {Number(order.subtotal).toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>Shipping ({order.shippingType})</span>
+                <span>{t(o.shipping, lang)} ({order.shippingType})</span>
                 <span>IDR {Number(order.shippingCost).toLocaleString("id-ID")}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between font-semibold text-foreground text-base">
-                <span>Total</span>
+                <span>{t(o.total, lang)}</span>
                 <span>IDR {Number(order.total).toLocaleString("id-ID")}</span>
               </div>
             </div>
@@ -201,7 +207,7 @@ export default function OrderDetail() {
             <div className="bg-card rounded-xl border border-border/60 p-5">
               <div className="flex items-center gap-2 mb-3">
                 <MapPin className="h-4 w-4 text-primary" />
-                <h3 className="font-semibold text-sm">Billing Address</h3>
+                <h3 className="font-semibold text-sm">{t(o.billingAddress, lang)}</h3>
               </div>
               <div className="text-sm text-muted-foreground space-y-0.5">
                 <p className="font-medium text-foreground">{order.customerName}</p>
@@ -214,7 +220,7 @@ export default function OrderDetail() {
             <div className="bg-card rounded-xl border border-border/60 p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Truck className="h-4 w-4 text-primary" />
-                <h3 className="font-semibold text-sm">Shipping Address</h3>
+                <h3 className="font-semibold text-sm">{t(o.shippingAddress, lang)}</h3>
               </div>
               <div className="text-sm text-muted-foreground space-y-0.5">
                 <p>{order.shippingStreet}{order.shippingApt ? `, ${order.shippingApt}` : ""}</p>

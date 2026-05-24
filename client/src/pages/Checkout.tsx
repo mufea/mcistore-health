@@ -28,6 +28,8 @@ import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
 
 interface Address {
   street: string;
@@ -153,6 +155,7 @@ function SectionCard({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function Checkout() {
+  const { lang } = useLanguage();
   const search = useSearch();
   const [, navigate] = useLocation();
   const params = new URLSearchParams(search);
@@ -267,7 +270,7 @@ export default function Checkout() {
 
   const handleSubmit = async () => {
     if (!isValid()) {
-      toast.error("Please fill in all required fields.");
+      toast.error(t(translations.toast.fillRequiredFields, lang));
       return;
     }
     try {
@@ -303,7 +306,7 @@ export default function Checkout() {
       });
       navigate(`/payment/${result.orderNumber}?method=${paymentMethod}`);
     } catch (err: any) {
-      toast.error(err.message ?? "Failed to create order. Please try again.");
+      toast.error(err.message ?? t(translations.toast.orderFailed, lang));
     }
   };
 

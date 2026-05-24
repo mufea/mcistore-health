@@ -93,7 +93,7 @@ export default function ChatbotWidget() {
       if (!isOpen) setHasUnread(true);
     },
     onError: (e) => {
-      toast.error("Failed to send message: " + e.message);
+      toast.error(t(translations.toast.chatSendFailed, lang) + ": " + e.message);
       setMessages((prev) => prev.slice(0, -1)); // remove optimistic
     },
   });
@@ -125,7 +125,7 @@ export default function ChatbotWidget() {
 
   const bookMeetingMutation = trpc.chatbot.meeting.book.useMutation({
     onSuccess: (data) => {
-      toast.success("Meeting booked successfully!");
+      toast.success(t(translations.toast.meetingBooked, lang));
       setShowBookingForm(false);
       setSelectedSlot(null);
       const confirmMsg: Message = {
@@ -248,7 +248,8 @@ export default function ChatbotWidget() {
                 {/* Language switcher — compact icon-only, styled for dark header */}
                 <LanguageSwitcher
                   compact
-                  className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  showActiveCode
+                  className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground w-auto px-2 gap-1"
                 />
                 <button
                   onClick={() => setIsMinimized(!isMinimized)}

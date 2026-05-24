@@ -13,10 +13,12 @@ import { cn } from "@/lib/utils";
 interface LanguageSwitcherProps {
   /** compact = icon-only button (for chatbot header); default = icon + native label */
   compact?: boolean;
+  /** showActiveCode = show 2-letter language code next to icon in compact mode */
+  showActiveCode?: boolean;
   className?: string;
 }
 
-export default function LanguageSwitcher({ compact = false, className }: LanguageSwitcherProps) {
+export default function LanguageSwitcher({ compact = false, showActiveCode = false, className }: LanguageSwitcherProps) {
   const { lang, setLang } = useLanguage();
   const current = LANGUAGES.find((l) => l.code === lang) ?? LANGUAGES[0];
 
@@ -36,6 +38,9 @@ export default function LanguageSwitcher({ compact = false, className }: Languag
           <Globe className="h-4 w-4 flex-shrink-0" />
           {!compact && (
             <span className="hidden sm:inline">{current.nativeLabel}</span>
+          )}
+          {compact && showActiveCode && (
+            <span className="text-[10px] font-bold tracking-wide uppercase leading-none">{current.code.toUpperCase()}</span>
           )}
         </Button>
       </DropdownMenuTrigger>
