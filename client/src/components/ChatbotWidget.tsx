@@ -205,7 +205,7 @@ export default function ChatbotWidget() {
   return (
     <>
       {/* Floating button */}
-      <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
@@ -224,8 +224,8 @@ export default function ChatbotWidget() {
           <div
             className={`bg-background border border-border/60 rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ${
               isMinimized
-                ? "h-12 w-[calc(100vw-2rem)] md:h-14 md:w-[440px]"
-                : "w-[calc(100vw-2rem)] max-w-[340px] md:w-[440px] h-[65vh] md:h-[calc(100vh-6rem)] max-h-[75vh] md:max-h-[calc(100vh-5rem)]"
+                ? "h-12 w-[calc(100vw-2rem)] sm:h-14 sm:w-80"
+                : "w-[calc(100vw-2rem)] max-w-[340px] sm:w-[380px] h-[65vh] sm:h-[600px] max-h-[75vh] sm:max-h-[85vh]"
             }`}
             style={{ boxShadow: "0 25px 60px rgba(0,0,0,0.15)" }}
           >
