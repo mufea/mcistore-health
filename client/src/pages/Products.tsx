@@ -9,8 +9,12 @@ import { useState } from "react";
 import { Link } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
 
 export default function Products() {
+  const { lang } = useLanguage();
+  const p = translations.productsPage;
   const { user, isAuthenticated } = useAuth();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
@@ -39,9 +43,9 @@ export default function Products() {
           {/* Header */}
           <div className="mb-10">
             <div className="gold-line mb-4" />
-            <h1 className="font-serif text-4xl font-light text-foreground mb-3">Our Products</h1>
+            <h1 className="font-serif text-4xl font-light text-foreground mb-3">{t(p.title, lang)}</h1>
             <p className="text-muted-foreground max-w-lg">
-              Discover our curated collection of premium health and wellness products.
+              {t(p.subtitle, lang)}
             </p>
           </div>
 
@@ -50,7 +54,7 @@ export default function Products() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search products..."
+                placeholder={t(p.searchPlaceholder, lang)}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -58,12 +62,12 @@ export default function Products() {
             </div>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder={t(p.categoryPlaceholder, lang)} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
-                    {cat === "all" ? "All Categories" : cat}
+                    {cat === "all" ? t(p.allCategories, lang) : cat}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -76,7 +80,7 @@ export default function Products() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-muted-foreground">No products found matching your criteria.</p>
+              <p className="text-muted-foreground">{t(p.noProducts, lang)}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -117,7 +121,7 @@ export default function Products() {
                         <span className="font-semibold text-foreground text-sm">
                           IDR {Number(product.price).toLocaleString("id-ID")}
                         </span>
-                        <span className="text-xs text-primary font-medium">View →</span>
+                        <span className="text-xs text-primary font-medium">{t(p.viewProduct, lang)}</span>
                       </div>
                     </div>
                   </div>

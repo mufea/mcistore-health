@@ -183,6 +183,7 @@ export default function ChatbotWidget() {
         sessionId,
         message: text,
         userId: user?.id,
+        language: lang,
       });
     },
     [sessionId, user, sendMessageMutation]

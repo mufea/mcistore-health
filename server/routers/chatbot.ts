@@ -13,9 +13,18 @@ import {
   orderItems,
 } from "../../drizzle/schema";
 
+// ─── Language name map for system prompt ─────────────────────────────────────
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English",
+  ar: "Arabic",
+  zh: "Mandarin Chinese",
+  es: "Spanish",
+  hi: "Hindi",
+};
+
 // ─── Helper: build system prompt with knowledge base ─────────────────────────
 
-async function buildSystemPrompt(): Promise<string> {
+async function buildSystemPrompt(language = "en"): Promise<string> {
   const db = await getDb();
   let knowledgeContext = "";
 
@@ -34,6 +43,11 @@ async function buildSystemPrompt(): Promise<string> {
     }
   }
 
+  const langName = LANGUAGE_NAMES[language] ?? "English";
+  const langInstruction = language !== "en"
+    ? `\n\n**IMPORTANT: The user has selected ${langName} as their language. You MUST respond entirely in ${langName}. Do not switch to any other language.**`
+    : "";
+
   return `You are a friendly and professional health advisor assistant for MCI Store — a trusted health and wellness e-commerce platform. You help customers with:
 
 1. **Order Management**: Look up order status, track shipments, answer questions about orders. When a customer provides an order number, use the order lookup tool to fetch real-time data.
@@ -46,7 +60,7 @@ Always be warm, professional, and solution-oriented. If you cannot help with som
 When a customer asks to:
 - Check an order → ask for their order number and look it up
 - Book a meeting → show available slots and guide them to book
-- Learn about products → use the knowledge base to answer accurately${knowledgeContext}`;
+- Learn about products → use the knowledge base to answer accurately${langInstruction}${knowledgeContext}`;
 }
 
 // ─── Helper: get or create conversation ──────────────────────────────────────
@@ -87,6 +101,7 @@ export const chatbotRouter = router({
         sessionId: z.string().min(1),
         message: z.string().min(1).max(2000),
         userId: z.number().optional(),
+        language: z.enum(["en", "ar", "zh", "es", "hi"]).optional().default("en"),
       })
     )
     .mutation(async ({ input }) => {
@@ -113,8 +128,8 @@ export const chatbotRouter = router({
 
       const historyOrdered = history.reverse();
 
-      // Build system prompt with knowledge base
-      const systemPrompt = await buildSystemPrompt();
+      // Build system prompt with knowledge base (language-aware)
+      const systemPrompt = await buildSystemPrompt(input.language);
 
       // Check if the message is about an order
       let orderContext = "";

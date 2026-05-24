@@ -110,6 +110,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-arabic: 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
 }
 
 @layer base {
@@ -132,6 +133,16 @@
 /* Premium typography utilities */
 .font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
 .font-sans { font-family: 'Inter', system-ui, sans-serif; }
+
+/* Arabic / RTL font override — applied when LanguageContext sets dir=rtl on <html> */
+:root[dir="rtl"] body,
+:root[lang="ar"] body {
+  font-family: 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+}
+:root[dir="rtl"] .font-serif,
+:root[lang="ar"] .font-serif {
+  font-family: 'Noto Sans Arabic', Georgia, serif;
+}
 
 /* Elegant section divider */
 .section-divider {

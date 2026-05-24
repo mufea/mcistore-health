@@ -12,6 +12,8 @@ import { nanoid } from "nanoid";
 import { useLocation } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t, translations } from "@/lib/i18n";
 
 function getSessionId() {
   let id = sessionStorage.getItem("survey_session_id");
@@ -23,6 +25,8 @@ function getSessionId() {
 }
 
 export default function Survey() {
+  const { lang } = useLanguage();
+  const s = translations.surveyPage;
   const [, navigate] = useLocation();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -37,8 +41,9 @@ export default function Survey() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="min-h-[60vh] flex items-center justify-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="text-muted-foreground">{t(s.loading, lang)}</span>
         </div>
       </MainLayout>
     );
@@ -52,8 +57,8 @@ export default function Survey() {
             <CheckCircle className="h-8 w-8 text-muted-foreground" />
           </div>
           <div>
-            <h2 className="font-serif text-2xl font-semibold mb-2">Survey Coming Soon</h2>
-            <p className="text-muted-foreground">Our health assessment is being prepared. Please check back soon.</p>
+            <h2 className="font-serif text-2xl font-semibold mb-2">{t(s.comingSoonTitle, lang)}</h2>
+            <p className="text-muted-foreground">{t(s.comingSoonDesc, lang)}</p>
           </div>
           <BackToHome />
         </div>
@@ -70,9 +75,9 @@ export default function Survey() {
           </div>
           <div className="animate-slide-up" style={{ animationDelay: "100ms" }}>
             <div className="gold-line mx-auto mb-4" />
-            <h2 className="font-serif text-3xl font-light mb-3">Assessment Complete</h2>
+            <h2 className="font-serif text-3xl font-light mb-3">{t(s.completeTitle, lang)}</h2>
             <p className="text-muted-foreground max-w-sm leading-relaxed">
-              Thank you for completing your health assessment. We've identified your wellness profile and curated the perfect products for you.
+              {t(s.completeDesc, lang)}
             </p>
           </div>
           <div className="animate-slide-up" style={{ animationDelay: "200ms" }}>
@@ -81,7 +86,7 @@ export default function Survey() {
               className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-8"
               onClick={() => navigate(`/recommendations?segment=${segment}&session=${sessionId}`)}
             >
-              View My Recommendations
+              {t(s.viewRecommendations, lang)}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
@@ -149,7 +154,7 @@ export default function Survey() {
             <BackToHome className="mb-6" />
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground font-medium">
-                Step {currentPageIndex + 1} of {totalPages}
+                {t(s.stepOf, lang)} {currentPageIndex + 1} {t(s.of, lang)} {totalPages}
               </span>
               <span className="text-sm text-primary font-medium">{Math.round(progress)}% complete</span>
             </div>
@@ -242,7 +247,7 @@ export default function Survey() {
                 {question.type === "text" && (
                   <Textarea
                     className="ml-9 resize-none"
-                    placeholder="Share your thoughts..."
+                    placeholder={t(s.shareThoughts, lang)}
                     value={(answers[String(question.id)] as string) ?? ""}
                     onChange={(e) => handleAnswer(question.id, e.target.value)}
                     rows={3}
@@ -261,11 +266,11 @@ export default function Survey() {
                       className="w-full"
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>1 — Not at all</span>
+                      <span>{t(s.scaleMin, lang)}</span>
                       <span className="font-semibold text-primary text-sm">
                         {answers[String(question.id)] ?? "5"}
                       </span>
-                      <span>10 — Extremely</span>
+                      <span>{t(s.scaleMax, lang)}</span>
                     </div>
                   </div>
                 )}
@@ -282,7 +287,7 @@ export default function Survey() {
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Previous
+              {t(s.previous, lang)}
             </Button>
             <Button
               onClick={handleNext}
@@ -293,12 +298,12 @@ export default function Survey() {
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : currentPageIndex === totalPages - 1 ? (
                 <>
-                  Complete Assessment
+                  {t(s.completeAssessment, lang)}
                   <CheckCircle className="h-4 w-4" />
                 </>
               ) : (
                 <>
-                  Continue
+                  {t(s.continue, lang)}
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}

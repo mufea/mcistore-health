@@ -151,6 +151,37 @@ export const translations = {
     cancel:         { en: "Cancel",                   ar: "إلغاء",                    zh: "取消",                  es: "Cancelar",                    hi: "रद्द करें" },
     languageLabel:  { en: "Language",                 ar: "اللغة",                    zh: "语言",                  es: "Idioma",                      hi: "भाषा" },
   },
+
+  // ── Products Page ──
+  productsPage: {
+    title:          { en: "Our Products",                  ar: "منتجاتنا",                  zh: "我们的产品",            es: "Nuestros Productos",          hi: "हमारे उत्पाद" },
+    subtitle:       { en: "Discover our curated collection of premium health and wellness products.", ar: "اكتشف مجموعتنا المنتقاة من منتجات الصحة والعافية المتميزة.", zh: "探索我们精心策划的优质健康与保健产品系列。", es: "Descubre nuestra colección seleccionada de productos premium de salud y bienestar.", hi: "हमारे प्रीमियम स्वास्थ्य और वेलनेस उत्पादों के क्यूरेटेड संग्रह की खोज करें।" },
+    searchPlaceholder: { en: "Search products...",        ar: "ابحث عن المنتجات...",        zh: "搜索产品...",            es: "Buscar productos...",          hi: "उत्पाद खोजें..." },
+    categoryPlaceholder: { en: "Category",               ar: "الفئة",                     zh: "类别",                  es: "Categoría",                   hi: "श्रेणी" },
+    allCategories:  { en: "All Categories",              ar: "جميع الفئات",               zh: "所有类别",              es: "Todas las Categorías",        hi: "सभी श्रेणियां" },
+    noProducts:     { en: "No products found matching your criteria.", ar: "لم يتم العثور على منتجات تطابق معاييرك.", zh: "未找到符合您条件的产品。", es: "No se encontraron productos que coincidan con sus criterios.", hi: "आपके मानदंड से मेल खाने वाले कोई उत्पाद नहीं मिले।" },
+    viewProduct:    { en: "View →",                      ar: "عرض ←",                     zh: "查看 →",                es: "Ver →",                        hi: "देखें →" },
+    backToHome:     { en: "Back to Home",                ar: "العودة للرئيسية",           zh: "返回首页",              es: "Volver al Inicio",            hi: "होम पर वापस" },
+  },
+
+  // ── Survey Page ──
+  surveyPage: {
+    loading:           { en: "Loading survey...",          ar: "جارٍ تحميل الاستبيان...",  zh: "正在加载调查...",       es: "Cargando encuesta...",         hi: "सर्वेक्षण लोड हो रहा है..." },
+    comingSoonTitle:   { en: "Survey Coming Soon",         ar: "الاستبيان قادم قريباً",    zh: "调查即将推出",          es: "Encuesta Próximamente",        hi: "सर्वेक्षण जल्द आ रहा है" },
+    comingSoonDesc:    { en: "Our health assessment is being prepared. Please check back soon.", ar: "يتم إعداد تقييمنا الصحي. يرجى المراجعة قريباً.", zh: "我们的健康评估正在准备中，请稍后再来。", es: "Nuestra evaluación de salud está siendo preparada. Por favor, vuelve pronto.", hi: "हमारा स्वास्थ्य मूल्यांकन तैयार किया जा रहा है। कृपया जल्द वापस देखें।" },
+    completeTitle:     { en: "Assessment Complete",        ar: "اكتمل التقييم",             zh: "评估完成",              es: "Evaluación Completa",          hi: "मूल्यांकन पूर्ण" },
+    completeDesc:      { en: "Thank you for completing your health assessment. We've identified your wellness profile and curated the perfect products for you.", ar: "شكراً لإكمال تقييمك الصحي. لقد حددنا ملفك الصحي واخترنا المنتجات المثالية لك.", zh: "感谢您完成健康评估。我们已确定您的健康档案并为您精心挑选了完美的产品。", es: "Gracias por completar tu evaluación de salud. Hemos identificado tu perfil de bienestar y seleccionado los productos perfectos para ti.", hi: "अपना स्वास्थ्य मूल्यांकन पूरा करने के लिए धन्यवाद। हमने आपकी वेलनेस प्रोफ़ाइल की पहचान की है और आपके लिए सही उत्पाद चुने हैं।" },
+    viewRecommendations: { en: "View My Recommendations", ar: "عرض توصياتي",              zh: "查看我的推荐",          es: "Ver Mis Recomendaciones",      hi: "मेरी सिफारिशें देखें" },
+    question:          { en: "Question",                  ar: "سؤال",                     zh: "问题",                  es: "Pregunta",                     hi: "प्रश्न" },
+    of:                { en: "of",                        ar: "من",                      zh: "共",                   es: "de",                          hi: "में से" },
+    shareThoughts:     { en: "Share your thoughts...",    ar: "شارك أفكارك...",           zh: "分享您的想法...",       es: "Comparte tus pensamientos...", hi: "अपने विचार साझा करें..." },
+    scaleMin:          { en: "1 — Not at all",            ar: "1 — ليس على الإطلاق",     zh: "1 — 完全没有",          es: "1 — Para nada",               hi: "1 — बिल्कुल नहीं" },
+    scaleMax:          { en: "10 — Extremely",            ar: "10 — بشكل كبير جداً",     zh: "10 — 非常",             es: "10 — Extremadamente",         hi: "10 — अत्यधिक" },
+    previous:          { en: "Previous",                  ar: "السابق",                   zh: "上一步",                es: "Anterior",                     hi: "पिछला" },
+    continue:          { en: "Continue",                  ar: "متابعة",                   zh: "继续",                  es: "Continuar",                    hi: "जारी रखें" },
+    completeAssessment:{ en: "Complete Assessment",       ar: "إكمال التقييم",             zh: "完成评估",              es: "Completar Evaluación",         hi: "मूल्यांकन पूर्ण करें" },
+    stepOf:            { en: "Step",                      ar: "خطوة",                     zh: "步骤",                  es: "Paso",                         hi: "चरण" },
+  },
 } as const;
 
 // ─── Helper to get a translation ─────────────────────────────────────────────
