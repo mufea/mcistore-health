@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { getLoginUrl, getPasswordResetUrl } from "@/const";
+import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   DropdownMenu,
@@ -115,7 +115,7 @@ export default function Navbar() {
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/mufea21">
+                      <Link href="/admin">
                         <Settings className="mr-2 h-4 w-4" />
                         Admin Dashboard
                       </Link>
@@ -130,24 +130,13 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  onClick={() => (window.location.href = getLoginUrl())}
-                >
-                  Sign In
-                </Button>
-              </div>
-              <button
-                type="button"
-                onClick={() => (window.location.href = getPasswordResetUrl())}
-                className="text-[11px] text-muted-foreground hover:text-primary transition-colors underline-offset-2 hover:underline"
+            <Button
+                size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={() => (window.location.href = getLoginUrl())}
               >
-                Forgot password?
-              </button>
-            </div>
+                Sign In
+              </Button>
           )}
         </div>
 
@@ -230,8 +219,8 @@ export default function Navbar() {
                       </div>
                     </Link>
                     {isAdmin && (
-                      <Link href="/mufea21" onClick={closeMobile}>
-                        <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${location.startsWith("/mufea21") ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/60 hover:text-primary"}`}>
+                      <Link href="/admin" onClick={closeMobile}>
+                        <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${location.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/60 hover:text-primary"}`}>
                           <Settings className="h-4 w-4 flex-shrink-0" />
                           Admin Dashboard
                         </div>
@@ -261,15 +250,6 @@ export default function Navbar() {
                     >
                       Sign In
                     </Button>
-                    <div className="text-center pt-1">
-                      <button
-                        type="button"
-                        onClick={() => { closeMobile(); window.location.href = getPasswordResetUrl(); }}
-                        className="text-xs text-muted-foreground hover:text-primary transition-colors underline-offset-2 hover:underline"
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
                   </>
                 )}
               </div>

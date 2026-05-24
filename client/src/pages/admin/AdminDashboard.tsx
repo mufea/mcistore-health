@@ -22,15 +22,15 @@ import { useCallback } from "react";
 import BackToHome from "@/components/BackToHome";
 
 const navItems = [
-  { href: "/mufea21", label: "Overview", icon: BarChart3 },
-  { href: "/mufea21/survey", label: "Survey Manager", icon: ClipboardList },
-  { href: "/mufea21/products", label: "Products", icon: Package },
-  { href: "/mufea21/orders", label: "Orders", icon: ShoppingBag },
-  { href: "/mufea21/knowledge", label: "Knowledge Base", icon: Brain },
-  { href: "/mufea21/meetings", label: "Meetings", icon: Calendar },
-  { href: "/mufea21/chatbot", label: "Conversations", icon: MessageCircle },
-  { href: "/mufea21/settings", label: "Settings", icon: Settings },
-  { href: "/mufea21/users", label: "Users", icon: Users },
+  { href: "/admin", label: "Overview", icon: BarChart3 },
+  { href: "/admin/survey", label: "Survey Manager", icon: ClipboardList },
+  { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/knowledge", label: "Knowledge Base", icon: Brain },
+  { href: "/admin/meetings", label: "Meetings", icon: Calendar },
+  { href: "/admin/chatbot", label: "Conversations", icon: MessageCircle },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/users", label: "Users", icon: Users },
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {

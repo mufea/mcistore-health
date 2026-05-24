@@ -57,17 +57,6 @@ function Router() {
       <Route path="/admin/meetings" component={AdminMeetings} />
       <Route path="/admin/chatbot" component={AdminChatbot} />
 
-      {/* Legacy /mufea21 admin routes (canonical) */}
-      <Route path="/mufea21" component={AdminDashboard} />
-      <Route path="/mufea21/survey" component={AdminSurvey} />
-      <Route path="/mufea21/products" component={AdminProducts} />
-      <Route path="/mufea21/orders" component={AdminOrders} />
-      <Route path="/mufea21/settings" component={AdminSettings} />
-      <Route path="/mufea21/users" component={AdminUsers} />
-      <Route path="/mufea21/knowledge" component={AdminKnowledge} />
-      <Route path="/mufea21/meetings" component={AdminMeetings} />
-      <Route path="/mufea21/chatbot" component={AdminChatbot} />
-
       {/* 404 */}
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
