@@ -20,6 +20,7 @@ import {
   Settings,
   ShoppingBag,
   Stethoscope,
+  Trash2,
   User,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
@@ -27,7 +28,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { parseStoredCartIds, parseStoredQuantities } from "@/lib/cartQuantities";
+import { parseStoredCartIds, parseStoredQuantities, removeCartItem } from "@/lib/cartQuantities";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -67,6 +68,15 @@ export default function Navbar() {
   }, [logout, navigate]);
 
   const closeMobile = () => setMobileOpen(false);
+
+  const removeMobileCartItem = (productId: number) => {
+    const currentCartIds = parseStoredCartIds(sessionStorage.getItem("pending_cart"));
+    const currentQuantities = parseStoredQuantities(sessionStorage.getItem("pending_quantities"));
+    const next = removeCartItem(currentCartIds, currentQuantities, productId);
+    sessionStorage.setItem("pending_cart", JSON.stringify(next.cartIds));
+    sessionStorage.setItem("pending_quantities", JSON.stringify(next.quantities));
+    setMobileCartIds(next.cartIds);
+  };
 
   const navLinks = [
     { label: t(translations.nav.home, lang),         href: "/" },
@@ -268,6 +278,27 @@ export default function Navbar() {
                     <span className="text-xs font-medium text-muted-foreground">{cartItemCount} {t(translations.nav.cartItems, lang)}</span>
                   </div>
                   {cartTotal > 0 && <p className="mb-2 text-xs text-muted-foreground">IDR {cartTotal.toLocaleString("id-ID")}</p>}
+                  <div className="mb-2 max-h-24 space-y-1 overflow-y-auto pr-0.5">
+                    {mobileCartIds.map((productId) => {
+                      const product = cartProducts?.find((item) => item.id === productId);
+                      const label = product?.name ?? `Product #${productId}`;
+                      return (
+                        <div key={productId} className="flex items-center justify-between gap-2 rounded-md bg-background/70 px-2 py-1.5">
+                          <span className="min-w-0 truncate text-xs text-foreground">{label} <span className="text-muted-foreground">×{cartQuantities[productId] ?? 1}</span></span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 flex-shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => removeMobileCartItem(productId)}
+                            aria-label={`${t(translations.nav.removeFromCart, lang)}: ${label}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
                   <Link href={checkoutHref} onClick={closeMobile}>
                     <div className="flex items-center justify-between rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
                       {t(translations.nav.goToCheckout, lang)}

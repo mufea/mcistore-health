@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, resolveCheckoutQuantities } from "./cartQuantities";
+import { parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, removeCartItem, resolveCheckoutQuantities } from "./cartQuantities";
 
 describe("checkout quantity resolution", () => {
   it("uses query quantities before persisted cart quantities", () => {
@@ -24,5 +24,12 @@ describe("checkout quantity resolution", () => {
 
   it("reads only valid, unique product IDs from persisted cart storage", () => {
     expect(parseStoredCartIds("[101, 202, 101, 0, \"invalid\"]")).toEqual([101, 202]);
+  });
+
+  it("removes an item and its quantity without changing other cart entries", () => {
+    expect(removeCartItem([101, 202], { 101: 3, 202: 2 }, 101)).toEqual({
+      cartIds: [202],
+      quantities: { 202: 2 },
+    });
   });
 });

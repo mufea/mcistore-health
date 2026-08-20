@@ -27,6 +27,7 @@ export const translations = {
     cartSummary:   { en: "Your Cart",    ar: "سلة التسوق",  zh: "您的购物车", es: "Tu Carrito", hi: "आपकी कार्ट", id: "Keranjang Anda" },
     cartItems:     { en: "items",        ar: "منتج",        zh: "件商品",   es: "artículos",  hi: "आइटम",      id: "item" },
     goToCheckout:  { en: "Go to Checkout", ar: "الانتقال للدفع", zh: "前往结账", es: "Ir a Pagar", hi: "चेकआउट पर जाएँ", id: "Lanjut ke Checkout" },
+    removeFromCart:{ en: "Remove from cart", ar: "إزالة من السلة", zh: "从购物车移除", es: "Eliminar del carrito", hi: "कार्ट से हटाएं", id: "Hapus dari keranjang" },
   },
 
   // ── Hero Section ──

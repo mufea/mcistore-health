@@ -90,3 +90,4 @@
 
 ## Mobile Cart Access
 - [x] Show a non-empty cart summary and direct Checkout action in the mobile navigation drawer
+- [x] Add direct item-removal controls to the mobile cart summary and synchronize persisted cart state

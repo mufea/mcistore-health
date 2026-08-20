@@ -25,6 +25,16 @@ export function parseStoredCartIds(raw: string | null | undefined): number[] {
   }
 }
 
+export function removeCartItem(
+  cartIds: number[],
+  quantities: ProductQuantities,
+  productId: number,
+): { cartIds: number[]; quantities: ProductQuantities } {
+  const nextCartIds = cartIds.filter((id) => id !== productId);
+  const { [productId]: _removed, ...nextQuantities } = quantities;
+  return { cartIds: nextCartIds, quantities: nextQuantities };
+}
+
 export function parseStoredQuantities(raw: string | null | undefined): ProductQuantities {
   try {
     const parsed = raw ? JSON.parse(raw) : {};
