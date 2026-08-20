@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clearCart, parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, removeCartItem, resolveCheckoutQuantities, updateCartItemQuantity } from "./cartQuantities";
+import { canIncreaseCartQuantity, clearCart, parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, removeCartItem, resolveCheckoutQuantities, updateCartItemQuantity } from "./cartQuantities";
 
 describe("checkout quantity resolution", () => {
   it("uses query quantities before persisted cart quantities", () => {
@@ -43,5 +43,11 @@ describe("checkout quantity resolution", () => {
       quantities: { 101: 4, 202: 2 },
     });
     expect(updateCartItemQuantity([101], { 101: 1 }, 101, 0).quantities).toEqual({ 101: 1 });
+  });
+
+  it("blocks quantity increases at the available stock limit", () => {
+    expect(canIncreaseCartQuantity(1, 2)).toBe(true);
+    expect(canIncreaseCartQuantity(2, 2)).toBe(false);
+    expect(canIncreaseCartQuantity(1, 0)).toBe(false);
   });
 });

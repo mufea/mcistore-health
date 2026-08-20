@@ -52,6 +52,10 @@ export function updateCartItemQuantity(
   };
 }
 
+export function canIncreaseCartQuantity(quantity: number, stock: number): boolean {
+  return stock > 0 && quantity < stock;
+}
+
 export function parseStoredQuantities(raw: string | null | undefined): ProductQuantities {
   try {
     const parsed = raw ? JSON.parse(raw) : {};

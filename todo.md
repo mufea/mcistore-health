@@ -94,3 +94,4 @@
 - [x] Add a Clear Cart action that removes all persisted mobile cart items and quantities at once
 - [x] Add a confirmation dialog before the mobile Clear Cart action removes all items
 - [x] Add stock-aware plus and minus quantity controls for each item in the mobile cart summary
+- [x] Show a translated toast when a mobile cart increase reaches available stock

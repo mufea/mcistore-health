@@ -34,6 +34,7 @@ export const translations = {
     cancel:        { en: "Cancel", ar: "إلغاء", zh: "取消", es: "Cancelar", hi: "रद्द करें", id: "Batal" },
     decreaseQuantity: { en: "Decrease quantity", ar: "تقليل الكمية", zh: "减少数量", es: "Reducir cantidad", hi: "मात्रा घटाएँ", id: "Kurangi kuantitas" },
     increaseQuantity: { en: "Increase quantity", ar: "زيادة الكمية", zh: "增加数量", es: "Aumentar cantidad", hi: "मात्रा बढ़ाएँ", id: "Tambah kuantitas" },
+    stockLimitReached: { en: "Only {stock} item(s) are available in stock.", ar: "المتوفر في المخزون هو {stock} فقط.", zh: "库存仅剩 {stock} 件。", es: "Solo hay {stock} artículo(s) disponible(s) en stock.", hi: "स्टॉक में केवल {stock} आइटम उपलब्ध हैं।", id: "Stok yang tersedia hanya {stock} item." },
   },
 
   // ── Hero Section ──

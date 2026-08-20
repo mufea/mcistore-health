@@ -38,10 +38,11 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { clearCart, parseStoredCartIds, parseStoredQuantities, removeCartItem, updateCartItemQuantity } from "@/lib/cartQuantities";
+import { canIncreaseCartQuantity, clearCart, parseStoredCartIds, parseStoredQuantities, removeCartItem, updateCartItemQuantity } from "@/lib/cartQuantities";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -107,6 +108,14 @@ export default function Navbar() {
     sessionStorage.setItem("pending_cart", JSON.stringify(next.cartIds));
     sessionStorage.setItem("pending_quantities", JSON.stringify(next.quantities));
     setMobileCartIds(next.cartIds);
+  };
+
+  const increaseMobileCartQuantity = (productId: number, quantity: number, stock: number) => {
+    if (!canIncreaseCartQuantity(quantity, stock)) {
+      toast.error(t(translations.nav.stockLimitReached, lang).replace("{stock}", String(stock)));
+      return;
+    }
+    updateMobileCartQuantity(productId, quantity + 1, stock);
   };
 
   const navLinks = [
@@ -314,7 +323,8 @@ export default function Navbar() {
                       const product = cartProducts?.find((item) => item.id === productId);
                       const label = product?.name ?? `Product #${productId}`;
                       const quantity = cartQuantities[productId] ?? 1;
-                      const stock = product?.stock;
+                      const stock = product?.stock ?? 0;
+                      const atStockLimit = !canIncreaseCartQuantity(quantity, stock);
                       return (
                         <div key={productId} className="flex items-center justify-between gap-2 rounded-md bg-background/70 px-2 py-1.5">
                           <span className="min-w-0 truncate text-xs text-foreground">{label}</span>
@@ -335,10 +345,11 @@ export default function Navbar() {
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6 text-muted-foreground hover:bg-muted disabled:opacity-35"
-                              onClick={() => updateMobileCartQuantity(productId, quantity + 1, stock)}
-                              disabled={!product || quantity >= (stock ?? 0)}
+                              className={`h-6 w-6 text-muted-foreground hover:bg-muted disabled:opacity-35 ${atStockLimit ? "text-amber-700 hover:bg-amber-50" : ""}`}
+                              onClick={() => increaseMobileCartQuantity(productId, quantity, stock)}
+                              disabled={!product}
                               aria-label={`${t(translations.nav.increaseQuantity, lang)}: ${label}`}
+                              title={atStockLimit ? t(translations.nav.stockLimitReached, lang).replace("{stock}", String(stock)) : undefined}
                             >
                               <Plus className="h-3.5 w-3.5" />
                             </Button>
