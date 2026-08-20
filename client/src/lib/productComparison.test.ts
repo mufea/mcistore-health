@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addComparedProductToCart, buildAlternativeCheckoutPath, canSelectForComparison, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "./productComparison";
+import { addComparedProductToCart, buildAlternativeCheckoutPath, buildMultiProductCheckoutPath, canSelectForComparison, getAlternativeCartSummary, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "./productComparison";
 
 describe("product comparison selection", () => {
   it("adds and removes compared products up to the maximum", () => {
@@ -21,5 +21,10 @@ describe("product comparison selection", () => {
 
   it("builds a direct checkout URL for a selected alternative", () => {
     expect(buildAlternativeCheckoutPath(8, "premium care")).toBe("/checkout?products=8&segment=premium%20care&quantities=8%3A1");
+  });
+
+  it("calculates a total for alternative products held in the cart", () => {
+    expect(getAlternativeCartSummary([{ id: 1, price: "10000" }, { id: 2, price: 15000 }], [1, 2], { 1: 2, 2: 1 })).toEqual({ productIds: [1, 2], itemCount: 3, total: 35000 });
+    expect(buildMultiProductCheckoutPath([1, 2], "standard", { 1: 2, 2: 1 })).toBe("/checkout?products=1,2&segment=standard&quantities=1%3A2%2C2%3A1");
   });
 });

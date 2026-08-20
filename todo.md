@@ -125,3 +125,4 @@
 - [x] Add a side-by-side comparison experience for selected available alternatives
 - [x] Add direct Add to Cart actions for each selected alternative in the comparison table
 - [x] Add direct Buy Now actions for each selected alternative in the comparison table
+- [x] Show a floating total for multiple alternative products added to the cart

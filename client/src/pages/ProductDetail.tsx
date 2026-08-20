@@ -14,7 +14,7 @@ import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { filterAlternativesByNeed, filterAlternativesByText, getAlternativeNeeds, getInStockAlternatives, shouldShowAlternativeSearch } from "@/lib/productAlternatives";
-import { addComparedProductToCart, buildAlternativeCheckoutPath, canSelectForComparison, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
+import { addComparedProductToCart, buildAlternativeCheckoutPath, buildMultiProductCheckoutPath, canSelectForComparison, getAlternativeCartSummary, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
 
 function getStoredCart(): number[] {
   try {
@@ -52,6 +52,8 @@ export default function ProductDetail() {
   const [alternativeNeed, setAlternativeNeed] = useState("all");
   const [alternativeSearch, setAlternativeSearch] = useState("");
   const [comparedAlternativeIds, setComparedAlternativeIds] = useState<number[]>([]);
+  const [alternativeCartIds, setAlternativeCartIds] = useState<number[]>([]);
+  const [alternativeCartQuantities, setAlternativeCartQuantities] = useState<Record<number, number>>({});
   const segment = isAuthenticated ? (user?.segment ?? "standard") : "standard";
 
   const { data: product, isLoading } = trpc.products.getById.useQuery(
@@ -77,6 +79,7 @@ export default function ProductDetail() {
   const comparisonProducts = comparedAlternativeIds
     .map((id) => availableAlternatives.find((item) => item.id === id))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
+  const alternativeCart = getAlternativeCartSummary(availableAlternatives, alternativeCartIds, alternativeCartQuantities);
   const recommendationTitle = inStock ? t(detail.relatedProducts, lang) : t(detail.availableAlternatives, lang);
 
   const requestSignIn = () => {
@@ -108,6 +111,8 @@ export default function ProductDetail() {
     const result = addComparedProductToCart(getStoredCart(), getStoredQuantities(), alternativeId);
     sessionStorage.setItem("pending_cart", JSON.stringify(result.cart));
     sessionStorage.setItem("pending_quantities", JSON.stringify(result.quantities));
+    setAlternativeCartIds(result.cart.filter((id) => availableAlternatives.some((item) => item.id === id)));
+    setAlternativeCartQuantities(result.quantities);
     if (!isAuthenticated) {
       requestSignIn();
       return;
@@ -134,6 +139,16 @@ export default function ProductDetail() {
       return;
     }
     navigate(buildAlternativeCheckoutPath(alternativeId, segment));
+  };
+
+  const checkoutAlternativeCart = () => {
+    const storedCart = getStoredCart();
+    const storedQuantities = getStoredQuantities();
+    if (!isAuthenticated) {
+      requestSignIn();
+      return;
+    }
+    navigate(buildMultiProductCheckoutPath(alternativeCart.productIds, segment, alternativeCartQuantities));
   };
 
   if (isLoading) {
@@ -329,6 +344,18 @@ export default function ProductDetail() {
                 <p className="rounded-lg border border-dashed border-border p-5 text-sm text-muted-foreground">{alternativeSearch.trim() ? t(detail.noAlternativesForSearch, lang) : t(detail.noAlternativesForNeed, lang)}</p>
               )}
             </section>
+          )}
+          {!inStock && alternativeCart.productIds.length > 1 && (
+            <aside className="fixed bottom-4 left-4 right-4 z-40 rounded-2xl border border-primary/20 bg-card/95 p-4 shadow-xl backdrop-blur sm:left-auto sm:right-6 sm:w-[22rem]" aria-label={t(detail.alternativeCart, lang)}>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t(detail.alternativeCart, lang)}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{alternativeCart.itemCount} {t(detail.items, lang)}</p>
+                  <p className="mt-1 text-lg font-semibold text-primary">IDR {alternativeCart.total.toLocaleString("id-ID")}</p>
+                </div>
+                <Button onClick={checkoutAlternativeCart} className="shrink-0"><Check className="mr-2 h-4 w-4" />{t(detail.checkout, lang)}</Button>
+              </div>
+            </aside>
           )}
         </div>
       </main>
