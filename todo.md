@@ -83,3 +83,6 @@
 - [x] Add an admin-only Test Midtrans Connection action with clear success and failure feedback
 - [x] Persist product quantities from product detail through checkout and order creation
 - [x] Add date-range and product-category filters to the admin Orders CSV export
+
+## Admin Sidebar Cleanup
+- [x] Remove the duplicate X button from the admin sidebar while preserving required navigation controls
