@@ -35,6 +35,10 @@ export function removeCartItem(
   return { cartIds: nextCartIds, quantities: nextQuantities };
 }
 
+export function clearCart(): { cartIds: number[]; quantities: ProductQuantities } {
+  return { cartIds: [], quantities: {} };
+}
+
 export function parseStoredQuantities(raw: string | null | undefined): ProductQuantities {
   try {
     const parsed = raw ? JSON.parse(raw) : {};

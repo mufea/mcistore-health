@@ -28,7 +28,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { parseStoredCartIds, parseStoredQuantities, removeCartItem } from "@/lib/cartQuantities";
+import { clearCart, parseStoredCartIds, parseStoredQuantities, removeCartItem } from "@/lib/cartQuantities";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -73,6 +73,13 @@ export default function Navbar() {
     const currentCartIds = parseStoredCartIds(sessionStorage.getItem("pending_cart"));
     const currentQuantities = parseStoredQuantities(sessionStorage.getItem("pending_quantities"));
     const next = removeCartItem(currentCartIds, currentQuantities, productId);
+    sessionStorage.setItem("pending_cart", JSON.stringify(next.cartIds));
+    sessionStorage.setItem("pending_quantities", JSON.stringify(next.quantities));
+    setMobileCartIds(next.cartIds);
+  };
+
+  const clearMobileCart = () => {
+    const next = clearCart();
     sessionStorage.setItem("pending_cart", JSON.stringify(next.cartIds));
     sessionStorage.setItem("pending_quantities", JSON.stringify(next.quantities));
     setMobileCartIds(next.cartIds);
@@ -299,6 +306,15 @@ export default function Navbar() {
                       );
                     })}
                   </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="mb-2 h-8 w-full gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={clearMobileCart}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    {t(translations.nav.clearCart, lang)}
+                  </Button>
                   <Link href={checkoutHref} onClick={closeMobile}>
                     <div className="flex items-center justify-between rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
                       {t(translations.nav.goToCheckout, lang)}
