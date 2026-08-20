@@ -12,6 +12,7 @@ import ProductImageGallery from "@/components/ProductImageGallery";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import { getInStockAlternatives } from "@/lib/productAlternatives";
 
 function getStoredCart(): number[] {
   try {
@@ -59,6 +60,11 @@ export default function ProductDetail() {
   const related = (relatedProducts ?? [])
     .filter((item) => item.id !== product?.id && (item.category === product?.category || item.isFeatured))
     .slice(0, 4);
+  const availableAlternatives = product && !inStock
+    ? getInStockAlternatives(product, relatedProducts ?? [])
+    : [];
+  const recommendations = inStock ? related : availableAlternatives;
+  const recommendationTitle = inStock ? t(detail.relatedProducts, lang) : t(detail.availableAlternatives, lang);
 
   const requestSignIn = () => {
     sessionStorage.setItem("pending_checkout_after_login", "true");
@@ -198,19 +204,20 @@ export default function ProductDetail() {
             </div>
           </section>
 
-          {related.length > 0 && (
+          {recommendations.length > 0 && (
             <section className="mt-16 border-t border-border/60 pt-10">
               <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <div className="gold-line mb-3" />
-                  <h2 className="font-serif text-3xl font-light text-foreground">{t(detail.relatedProducts, lang)}</h2>
+                  <h2 className="font-serif text-3xl font-light text-foreground">{recommendationTitle}</h2>
+                  {!inStock && <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t(detail.alternativesHint, lang)}</p>}
                 </div>
                 <Button asChild variant="ghost" size="sm" className="text-primary">
                   <Link href="/products">{t(detail.viewAll, lang)}<ArrowLeft className="ml-2 h-4 w-4 rotate-180" /></Link>
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                {related.map((item) => (
+                {recommendations.map((item) => (
                   <Link key={item.id} href={`/products/${item.id}`}>
                     <article className="group overflow-hidden rounded-xl border border-border/60 bg-card transition-shadow hover:shadow-md">
                       <ProductImageGallery imageUrl={item.imageUrl} images={item.images ?? null} productName={item.name} mode="card" className="aspect-square" />
