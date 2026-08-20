@@ -14,6 +14,7 @@ import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { filterAlternativesByNeed, filterAlternativesByText, getAlternativeNeeds, getInStockAlternatives, shouldShowAlternativeSearch } from "@/lib/productAlternatives";
+import { canSelectForComparison, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
 
 function getStoredCart(): number[] {
   try {
@@ -50,6 +51,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [alternativeNeed, setAlternativeNeed] = useState("all");
   const [alternativeSearch, setAlternativeSearch] = useState("");
+  const [comparedAlternativeIds, setComparedAlternativeIds] = useState<number[]>([]);
   const segment = isAuthenticated ? (user?.segment ?? "standard") : "standard";
 
   const { data: product, isLoading } = trpc.products.getById.useQuery(
@@ -72,6 +74,9 @@ export default function ProductDetail() {
   const filteredRecommendations = !inStock
     ? filterAlternativesByText(filterAlternativesByNeed(recommendations, alternativeNeed), alternativeSearch)
     : recommendations;
+  const comparisonProducts = comparedAlternativeIds
+    .map((id) => availableAlternatives.find((item) => item.id === id))
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
   const recommendationTitle = inStock ? t(detail.relatedProducts, lang) : t(detail.availableAlternatives, lang);
 
   const requestSignIn = () => {
@@ -239,23 +244,61 @@ export default function ProductDetail() {
                       )}
                     </>
                   )}
+                  {!inStock && availableAlternatives.length > 0 && (
+                    <p className="mt-3 text-xs text-muted-foreground">{t(detail.comparisonLimit, lang)}</p>
+                  )}
                 </div>
                 <Button asChild variant="ghost" size="sm" className="text-primary">
                   <Link href="/products">{t(detail.viewAll, lang)}<ArrowLeft className="ml-2 h-4 w-4 rotate-180" /></Link>
                 </Button>
               </div>
+              {!inStock && comparisonProducts.length > 0 && (
+                <div className="mb-6 overflow-hidden rounded-xl border border-primary/20 bg-primary/5">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-primary/15 px-4 py-3">
+                    <div>
+                      <h3 className="font-semibold text-foreground">{t(detail.comparison, lang)}</h3>
+                      <p className="text-xs text-muted-foreground">{t(detail.selectedProducts, lang)} · {comparisonProducts.length}/{MAX_COMPARISON_PRODUCTS}</p>
+                    </div>
+                    <Button size="sm" variant="ghost" onClick={() => setComparedAlternativeIds([])}>{t(detail.clearComparison, lang)}</Button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-left text-sm">
+                      <thead className="bg-background/70">
+                        <tr>
+                          <th className="min-w-32 px-4 py-3 font-medium text-muted-foreground">{t(detail.productDetails, lang)}</th>
+                          {comparisonProducts.map((item) => <th key={item.id} className="min-w-48 px-4 py-3 font-semibold text-foreground">{item.name}</th>)}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/70">
+                        <tr><th className="px-4 py-3 font-medium text-muted-foreground">{t(detail.price, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3 font-semibold text-primary">IDR {Number(item.price).toLocaleString("id-ID")}</td>)}</tr>
+                        <tr><th className="px-4 py-3 font-medium text-muted-foreground">{t(detail.availableStock, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3">{item.stock} {t(detail.stock, lang)}</td>)}</tr>
+                        <tr><th className="px-4 py-3 font-medium text-muted-foreground">{t(detail.category, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3">{item.category}</td>)}</tr>
+                        <tr><th className="px-4 py-3 font-medium text-muted-foreground">{t(detail.tags, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3">{item.tags?.join(", ") || "—"}</td>)}</tr>
+                        <tr><th className="px-4 py-3 align-top font-medium text-muted-foreground">{t(detail.description, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3 leading-6">{item.description || "—"}</td>)}</tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
               {filteredRecommendations.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {filteredRecommendations.map((item) => (
-                  <Link key={item.id} href={`/products/${item.id}`}>
-                    <article className="group overflow-hidden rounded-xl border border-border/60 bg-card transition-shadow hover:shadow-md">
+                  <div key={item.id}>
+                    <Link href={`/products/${item.id}`}>
+                      <article className="group overflow-hidden rounded-xl border border-border/60 bg-card transition-shadow hover:shadow-md">
                       <ProductImageGallery imageUrl={item.imageUrl} images={item.images ?? null} productName={item.name} mode="card" className="aspect-square" />
                       <div className="p-3">
                         <p className="line-clamp-1 text-sm font-semibold text-foreground">{item.name}</p>
                         <p className="mt-1 text-sm font-semibold text-primary">IDR {Number(item.price).toLocaleString("id-ID")}</p>
                       </div>
-                    </article>
-                  </Link>
+                      </article>
+                    </Link>
+                    {!inStock && (
+                      <Button className="mt-2 w-full" size="sm" variant={comparedAlternativeIds.includes(item.id) ? "default" : "outline"} onClick={() => setComparedAlternativeIds((ids) => toggleComparedProduct(ids, item.id))} disabled={!canSelectForComparison(comparedAlternativeIds, item.id)} aria-pressed={comparedAlternativeIds.includes(item.id)}>
+                        {comparedAlternativeIds.includes(item.id) ? t(detail.selected, lang) : t(detail.compare, lang)}
+                      </Button>
+                    )}
+                  </div>
                 ))}
                 </div>
               ) : (

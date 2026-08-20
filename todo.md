@@ -122,3 +122,4 @@
 - [x] Add need-based filters to in-stock alternative product recommendations
 - [x] Keep translated alternative search available even when alternatives have no tags
 - [x] Cover text filtering of untagged alternatives in tests
+- [x] Add a side-by-side comparison experience for selected available alternatives
