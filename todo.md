@@ -107,3 +107,6 @@
 - [x] Finalize or release reservations when bank-transfer payment status is changed by admin
 - [x] Prove production product-read module triggers cleanup before returning stock availability
 - [x] Prove a refunded bank-transfer payment releases its active reservation
+
+## Payment Reservation Experience
+- [x] Show a real-time reservation countdown and expiry guidance on the Payment page

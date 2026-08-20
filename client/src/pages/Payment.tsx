@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
-import { Building2, CheckCircle, Copy, CreditCard, ExternalLink, Loader2, RefreshCw } from "lucide-react";
+import { Building2, CheckCircle, Clock3, Copy, CreditCard, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 import { useParams, useSearch, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import CheckoutStepper from "@/components/CheckoutStepper";
+import { formatReservationCountdown, remainingReservationMs } from "@/lib/reservationTimer";
 
 declare global {
   interface Window {
@@ -47,6 +48,22 @@ export default function Payment() {
 
   const [midtransLoaded, setMidtransLoaded] = useState(false);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  const reservationExpiresAt = order?.reservationExpiresAt ?? null;
+  const reservationActive = order?.reservationStatus === "active" && Boolean(reservationExpiresAt);
+  const reservationRemaining = remainingReservationMs(reservationExpiresAt, now);
+  const reservationExpired = reservationActive && reservationRemaining === 0;
+
+  useEffect(() => {
+    if (!reservationActive || reservationExpired) return;
+    setNow(Date.now());
+    const timer = window.setInterval(() => setNow(Date.now()), 1_000);
+    return () => window.clearInterval(timer);
+  }, [reservationActive, reservationExpired, reservationExpiresAt]);
+
+  useEffect(() => {
+    if (reservationExpired) setPaymentInitiated(false);
+  }, [reservationExpired]);
 
   // Load Midtrans Snap script
   useEffect(() => {
@@ -150,9 +167,24 @@ export default function Payment() {
             <p className="text-muted-foreground text-sm">Order #{params.orderNumber}</p>
           </div>
 
-          {order.reservationStatus === "active" && (
-            <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-              {t(translations.checkout.reservationNotice, lang)}
+          {reservationActive && !reservationExpired && (
+            <div className="mb-5 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <Clock3 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+              <div>
+                <p>{t(translations.checkout.reservationNotice, lang)}</p>
+                <p className="mt-1 font-semibold tabular-nums" aria-label={`${t(translations.checkout.reservationTimeLeft, lang)}: ${formatReservationCountdown(reservationRemaining)}`}>
+                  {t(translations.checkout.reservationTimeLeft, lang)}: {formatReservationCountdown(reservationRemaining)}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {reservationExpired && (
+            <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+              <p>{t(translations.checkout.reservationExpired, lang)}</p>
+              <Button className="mt-3" size="sm" variant="outline" onClick={() => navigate("/checkout")}>
+                {t(translations.checkout.returnToCheckout, lang)}
+              </Button>
             </div>
           )}
 
@@ -301,7 +333,7 @@ export default function Payment() {
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
                 size="lg"
                 onClick={handleMidtransPayment}
-                disabled={createTokenMutation.isPending || !midtransLoaded || paymentInitiated}
+                disabled={createTokenMutation.isPending || !midtransLoaded || paymentInitiated || reservationExpired}
               >
                 {createTokenMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
