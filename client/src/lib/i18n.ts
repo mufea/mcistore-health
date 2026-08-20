@@ -24,6 +24,9 @@ export const translations = {
     profile:       { en: "Profile",      ar: "الملف الشخصي",zh: "个人资料",es: "Perfil",    hi: "प्रोफ़ाइल", id: "Profil" },
     settings:      { en: "Settings",     ar: "الإعدادات",   zh: "设置",   es: "Configuración", hi: "सेटिंग्स", id: "Pengaturan" },
     orders:        { en: "Orders",       ar: "الطلبات",     zh: "订单",   es: "Pedidos",   hi: "आदेश", id: "Pesanan" },
+    cartSummary:   { en: "Your Cart",    ar: "سلة التسوق",  zh: "您的购物车", es: "Tu Carrito", hi: "आपकी कार्ट", id: "Keranjang Anda" },
+    cartItems:     { en: "items",        ar: "منتج",        zh: "件商品",   es: "artículos",  hi: "आइटम",      id: "item" },
+    goToCheckout:  { en: "Go to Checkout", ar: "الانتقال للدفع", zh: "前往结账", es: "Ir a Pagar", hi: "चेकआउट पर जाएँ", id: "Lanjut ke Checkout" },
   },
 
   // ── Hero Section ──

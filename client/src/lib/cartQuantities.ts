@@ -15,6 +15,16 @@ export function parseCheckoutQuantities(raw: string | null | undefined): Product
   }, {});
 }
 
+export function parseStoredCartIds(raw: string | null | undefined): number[] {
+  try {
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return [...new Set(parsed.map(toPositiveInteger).filter((id): id is number => id !== null))];
+  } catch {
+    return [];
+  }
+}
+
 export function parseStoredQuantities(raw: string | null | undefined): ProductQuantities {
   try {
     const parsed = raw ? JSON.parse(raw) : {};

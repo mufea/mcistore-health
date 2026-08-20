@@ -12,6 +12,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import {
+  ArrowRight,
   Home,
   LogOut,
   Menu,
@@ -22,20 +23,42 @@ import {
   User,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { parseStoredCartIds, parseStoredQuantities } from "@/lib/cartQuantities";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [location, navigate] = useLocation();
   const { data: settings } = trpc.settings.getPublic.useQuery();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileCartIds, setMobileCartIds] = useState<number[]>([]);
   const { lang } = useLanguage();
 
   const isAdmin = user?.role === "admin";
   const siteName = settings?.siteName ?? "MCI Store";
+  const cartQuantities = parseStoredQuantities(sessionStorage.getItem("pending_quantities"));
+  const cartItemCount = mobileCartIds.reduce((sum, productId) => sum + (cartQuantities[productId] ?? 1), 0);
+  const checkoutQuantities = mobileCartIds.map((productId) => `${productId}:${cartQuantities[productId] ?? 1}`).join(",");
+  const checkoutHref = `/checkout?products=${mobileCartIds.join(",")}&segment=${user?.segment ?? "standard"}&quantities=${encodeURIComponent(checkoutQuantities)}`;
+
+  const { data: cartProducts } = trpc.products.list.useQuery(
+    { segment: user?.segment ?? "standard" },
+    { enabled: mobileOpen && mobileCartIds.length > 0 }
+  );
+  const cartTotal = (cartProducts ?? [])
+    .filter((product) => mobileCartIds.includes(product.id))
+    .reduce((sum, product) => sum + Number(product.price) * (cartQuantities[product.id] ?? 1), 0);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const syncCart = () => setMobileCartIds(parseStoredCartIds(sessionStorage.getItem("pending_cart")));
+    syncCart();
+    window.addEventListener("storage", syncCart);
+    return () => window.removeEventListener("storage", syncCart);
+  }, [mobileOpen]);
 
   const handleLogout = useCallback(async () => {
     setMobileOpen(false);
@@ -234,6 +257,25 @@ export default function Navbar() {
                   </>
                 )}
               </nav>
+
+              {mobileCartIds.length > 0 && (
+                <div className="mx-4 mb-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
+                  <div className="mb-2 flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <ShoppingBag className="h-4 w-4 text-primary" />
+                      {t(translations.nav.cartSummary, lang)}
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground">{cartItemCount} {t(translations.nav.cartItems, lang)}</span>
+                  </div>
+                  {cartTotal > 0 && <p className="mb-2 text-xs text-muted-foreground">IDR {cartTotal.toLocaleString("id-ID")}</p>}
+                  <Link href={checkoutHref} onClick={closeMobile}>
+                    <div className="flex items-center justify-between rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+                      {t(translations.nav.goToCheckout, lang)}
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  </Link>
+                </div>
+              )}
 
               {/* Bottom auth actions */}
               <div className="px-4 py-4 border-t border-border/60 space-y-2">

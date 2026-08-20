@@ -87,3 +87,6 @@
 ## Admin Sidebar Cleanup
 - [x] Remove the duplicate X button from the admin sidebar while preserving required navigation controls
 - [x] Remove the duplicate X button from the mobile navigation drawer while retaining its required close control
+
+## Mobile Cart Access
+- [x] Show a non-empty cart summary and direct Checkout action in the mobile navigation drawer
