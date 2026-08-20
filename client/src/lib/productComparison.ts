@@ -20,3 +20,7 @@ export function addComparedProductToCart(
     quantities: { ...quantities, [productId]: quantities[productId] ?? 1 },
   };
 }
+
+export function buildAlternativeCheckoutPath(productId: number, segment: string) {
+  return `/checkout?products=${productId}&segment=${encodeURIComponent(segment)}&quantities=${encodeURIComponent(`${productId}:1`)}`;
+}
