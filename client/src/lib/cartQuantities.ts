@@ -39,6 +39,19 @@ export function clearCart(): { cartIds: number[]; quantities: ProductQuantities 
   return { cartIds: [], quantities: {} };
 }
 
+export function updateCartItemQuantity(
+  cartIds: number[],
+  quantities: ProductQuantities,
+  productId: number,
+  quantity: number,
+): { cartIds: number[]; quantities: ProductQuantities } {
+  const safeQuantity = Math.max(1, Math.floor(quantity));
+  return {
+    cartIds: [...cartIds],
+    quantities: { ...quantities, [productId]: safeQuantity },
+  };
+}
+
 export function parseStoredQuantities(raw: string | null | undefined): ProductQuantities {
   try {
     const parsed = raw ? JSON.parse(raw) : {};

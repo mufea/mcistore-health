@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clearCart, parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, removeCartItem, resolveCheckoutQuantities } from "./cartQuantities";
+import { clearCart, parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, removeCartItem, resolveCheckoutQuantities, updateCartItemQuantity } from "./cartQuantities";
 
 describe("checkout quantity resolution", () => {
   it("uses query quantities before persisted cart quantities", () => {
@@ -35,5 +35,13 @@ describe("checkout quantity resolution", () => {
 
   it("clears every persisted cart item and quantity", () => {
     expect(clearCart()).toEqual({ cartIds: [], quantities: {} });
+  });
+
+  it("updates a cart item quantity without allowing values below one", () => {
+    expect(updateCartItemQuantity([101, 202], { 101: 1, 202: 2 }, 101, 4)).toEqual({
+      cartIds: [101, 202],
+      quantities: { 101: 4, 202: 2 },
+    });
+    expect(updateCartItemQuantity([101], { 101: 1 }, 101, 0).quantities).toEqual({ 101: 1 });
   });
 });

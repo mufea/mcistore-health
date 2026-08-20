@@ -27,7 +27,9 @@ import {
   Home,
   LogOut,
   Menu,
+  Minus,
   Package,
+  Plus,
   Settings,
   ShoppingBag,
   Stethoscope,
@@ -39,7 +41,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { clearCart, parseStoredCartIds, parseStoredQuantities, removeCartItem } from "@/lib/cartQuantities";
+import { clearCart, parseStoredCartIds, parseStoredQuantities, removeCartItem, updateCartItemQuantity } from "@/lib/cartQuantities";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -91,6 +93,17 @@ export default function Navbar() {
 
   const clearMobileCart = () => {
     const next = clearCart();
+    sessionStorage.setItem("pending_cart", JSON.stringify(next.cartIds));
+    sessionStorage.setItem("pending_quantities", JSON.stringify(next.quantities));
+    setMobileCartIds(next.cartIds);
+  };
+
+  const updateMobileCartQuantity = (productId: number, quantity: number, stock?: number) => {
+    const currentCartIds = parseStoredCartIds(sessionStorage.getItem("pending_cart"));
+    const currentQuantities = parseStoredQuantities(sessionStorage.getItem("pending_quantities"));
+    const normalizedQuantity = Math.max(1, quantity);
+    const cappedQuantity = stock && stock > 0 ? Math.min(normalizedQuantity, stock) : normalizedQuantity;
+    const next = updateCartItemQuantity(currentCartIds, currentQuantities, productId, cappedQuantity);
     sessionStorage.setItem("pending_cart", JSON.stringify(next.cartIds));
     sessionStorage.setItem("pending_quantities", JSON.stringify(next.quantities));
     setMobileCartIds(next.cartIds);
@@ -300,19 +313,46 @@ export default function Navbar() {
                     {mobileCartIds.map((productId) => {
                       const product = cartProducts?.find((item) => item.id === productId);
                       const label = product?.name ?? `Product #${productId}`;
+                      const quantity = cartQuantities[productId] ?? 1;
+                      const stock = product?.stock;
                       return (
                         <div key={productId} className="flex items-center justify-between gap-2 rounded-md bg-background/70 px-2 py-1.5">
-                          <span className="min-w-0 truncate text-xs text-foreground">{label} <span className="text-muted-foreground">×{cartQuantities[productId] ?? 1}</span></span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 flex-shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                            onClick={() => removeMobileCartItem(productId)}
-                            aria-label={`${t(translations.nav.removeFromCart, lang)}: ${label}`}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+                          <span className="min-w-0 truncate text-xs text-foreground">{label}</span>
+                          <div className="flex flex-shrink-0 items-center gap-0.5">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:bg-muted disabled:opacity-35"
+                              onClick={() => updateMobileCartQuantity(productId, quantity - 1, stock)}
+                              disabled={quantity <= 1}
+                              aria-label={`${t(translations.nav.decreaseQuantity, lang)}: ${label}`}
+                            >
+                              <Minus className="h-3.5 w-3.5" />
+                            </Button>
+                            <span className="w-5 text-center text-xs font-semibold text-foreground" aria-live="polite">{quantity}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:bg-muted disabled:opacity-35"
+                              onClick={() => updateMobileCartQuantity(productId, quantity + 1, stock)}
+                              disabled={!product || quantity >= (stock ?? 0)}
+                              aria-label={`${t(translations.nav.increaseQuantity, lang)}: ${label}`}
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="ml-0.5 h-6 w-6 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                              onClick={() => removeMobileCartItem(productId)}
+                              aria-label={`${t(translations.nav.removeFromCart, lang)}: ${label}`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </div>
                       );
                     })}
