@@ -11,6 +11,12 @@ import {
   getOrdersByUserId,
   getProductById,
   getSetting,
+  expireStockReservations,
+  finalizeStockReservation,
+  releaseOrderStockReservation,
+  releaseReservedStock,
+  reservationExpiry,
+  reserveStock,
   updateOrderStatus,
 } from "../db";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "../_core/trpc";
@@ -60,6 +66,7 @@ export const ordersRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      await expireStockReservations();
       const requestedQuantities = input.items.reduce((result, item) => {
         result.set(item.productId, (result.get(item.productId) ?? 0) + item.quantity);
         return result;
@@ -87,6 +94,14 @@ export const ordersRouter = router({
         });
       }
 
+      const stockReserved = await reserveStock(trustedItems);
+      if (!stockReserved) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "One or more products no longer have enough stock available. Please review your cart.",
+        });
+      }
+
       // Get shipping cost from settings
       const shippingKey =
         input.shippingType === "national"
@@ -100,37 +115,45 @@ export const ordersRouter = router({
 
       const orderNumber = `VW-${Date.now()}-${nanoid(6).toUpperCase()}`;
 
-      const order = await createOrder(
-        {
-          orderNumber,
-          userId: ctx.user?.id,
-          customerName: input.customerName,
-          customerEmail: input.customerEmail,
-          customerPhone: input.customerPhone,
-          streetAddress: input.userAddress.street,
-          aptNumber: input.userAddress.apt,
-          city: input.userAddress.city,
-          province: input.userAddress.province,
-          postalCode: input.userAddress.postalCode,
-          country: input.userAddress.country,
-          shippingStreet: input.shippingAddress.street,
-          shippingApt: input.shippingAddress.apt,
-          shippingCity: input.shippingAddress.city,
-          shippingProvince: input.shippingAddress.province,
-          shippingPostal: input.shippingAddress.postalCode,
-          shippingCountry: input.shippingAddress.country,
-          shippingType: input.shippingType,
-          shippingCost: String(shippingCost),
-          paymentMethod: input.paymentMethod,
-          paymentStatus: "pending",
-          status: "pending",
-          subtotal: String(subtotal),
-          total: String(total),
-          surveyResponseId: input.surveyResponseId,
-          notes: input.notes,
-        },
-        trustedItems
-      );
+      let order;
+      try {
+        order = await createOrder(
+          {
+            orderNumber,
+            userId: ctx.user?.id,
+            customerName: input.customerName,
+            customerEmail: input.customerEmail,
+            customerPhone: input.customerPhone,
+            streetAddress: input.userAddress.street,
+            aptNumber: input.userAddress.apt,
+            city: input.userAddress.city,
+            province: input.userAddress.province,
+            postalCode: input.userAddress.postalCode,
+            country: input.userAddress.country,
+            shippingStreet: input.shippingAddress.street,
+            shippingApt: input.shippingAddress.apt,
+            shippingCity: input.shippingAddress.city,
+            shippingProvince: input.shippingAddress.province,
+            shippingPostal: input.shippingAddress.postalCode,
+            shippingCountry: input.shippingAddress.country,
+            shippingType: input.shippingType,
+            shippingCost: String(shippingCost),
+            paymentMethod: input.paymentMethod,
+            paymentStatus: "pending",
+            status: "pending",
+            subtotal: String(subtotal),
+            total: String(total),
+            surveyResponseId: input.surveyResponseId,
+            notes: input.notes,
+            reservationStatus: "active",
+            reservationExpiresAt: reservationExpiry(),
+          },
+          trustedItems
+        );
+      } catch (error) {
+        await releaseReservedStock(trustedItems);
+        throw error;
+      }
 
       // Notify admin
       try {
@@ -142,7 +165,7 @@ export const ordersRouter = router({
         console.warn("Failed to notify owner:", e);
       }
 
-      return { orderId: order.id, orderNumber, total, shippingCost };
+      return { orderId: order.id, orderNumber, total, shippingCost, reservationExpiresAt: order.reservationExpiresAt };
     }),
 
   // Public: get order by number (for status tracking)
@@ -245,6 +268,24 @@ export const ordersRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, ...data } = input;
+      const currentOrder = await getOrderById(id);
+      if (!currentOrder) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+      }
+
+      const shouldFinalize = data.paymentStatus === "paid" && currentOrder.reservationStatus === "active";
+      if (shouldFinalize && !(await finalizeStockReservation(id))) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "This stock reservation is no longer active. Please verify product availability before confirming payment.",
+        });
+      }
+
+      const shouldRelease = data.paymentStatus === "failed" || data.paymentStatus === "refunded" || data.status === "cancelled";
+      if (shouldRelease) {
+        await releaseOrderStockReservation(id);
+      }
+
       await updateOrderStatus(id, data);
       // Notify admin on important status changes
       if (data.status && ["shipped", "delivered", "cancelled"].includes(data.status)) {

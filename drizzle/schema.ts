@@ -91,6 +91,7 @@ export const products = mysqlTable("products", {
   images: json("images").$type<{ url: string; key: string }[]>(),
   targetSegment: mysqlEnum("targetSegment", ["all", "standard", "premium", "vip"]).default("all").notNull(),
   stock: int("stock").default(0).notNull(),
+  reservedStock: int("reservedStock").default(0).notNull(),
   isActive: boolean("isActive").default(true).notNull(),
   isFeatured: boolean("isFeatured").default(false).notNull(),
   tags: json("tags").$type<string[]>(),
@@ -137,6 +138,10 @@ export const orders = mysqlTable("orders", {
   midtransToken: text("midtransToken"),
   midtransRedirectUrl: text("midtransRedirectUrl"),
   midtransPaymentType: varchar("midtransPaymentType", { length: 64 }),
+  // Temporary inventory hold while payment is being completed.
+  reservationStatus: mysqlEnum("reservationStatus", ["active", "released", "expired", "fulfilled"]).default("active").notNull(),
+  reservationExpiresAt: timestamp("reservationExpiresAt"),
+  reservationFinalizedAt: timestamp("reservationFinalizedAt"),
   // Order status
   status: mysqlEnum("status", ["pending", "processing", "shipped", "delivered", "cancelled"]).default("pending").notNull(),
   // Totals

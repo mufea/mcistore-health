@@ -5,6 +5,7 @@ import {
   getOrderItems,
   getProductById,
   getSetting,
+  expireStockReservations,
   updateOrderByMidtransId,
   updateOrderStatus,
 } from "../db";
@@ -37,9 +38,16 @@ export const paymentRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      await expireStockReservations();
       const order = await getOrderByNumber(input.orderNumber);
       if (!order) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+      }
+      if (order.reservationStatus !== "active" || !order.reservationExpiresAt || order.reservationExpiresAt <= new Date()) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Your 10-minute stock reservation has expired. Please return to Checkout and place the order again.",
+        });
       }
 
       const orderItems = await getOrderItems(order.id);

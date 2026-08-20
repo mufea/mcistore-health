@@ -150,6 +150,12 @@ export default function Payment() {
             <p className="text-muted-foreground text-sm">Order #{params.orderNumber}</p>
           </div>
 
+          {order.reservationStatus === "active" && (
+            <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              {t(translations.checkout.reservationNotice, lang)}
+            </div>
+          )}
+
           <CheckoutStepper
             currentStep="payment"
             labels={{

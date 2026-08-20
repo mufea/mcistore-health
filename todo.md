@@ -100,3 +100,10 @@
 - [x] Show remaining stock beside each mobile cart item
 - [x] Show a translated success toast after a mobile cart quantity update
 - [x] Validate current stock server-side before order creation and payment initiation
+
+## Payment Stock Reservations
+- [x] Implement temporary stock reservation with expiry while a payment is in progress
+- [x] Release expired reservations during all customer-facing stock reads
+- [x] Finalize or release reservations when bank-transfer payment status is changed by admin
+- [x] Prove production product-read module triggers cleanup before returning stock availability
+- [x] Prove a refunded bank-transfer payment releases its active reservation

@@ -11,6 +11,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { getOrderByNumber, getSetting, updateOrderByMidtransId, updateOrderStatus } from "../db";
 import { notifyOwner } from "./notification";
+import { applyPaymentReservationOutcome } from "../stockReservation";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -100,9 +101,13 @@ async function startServer() {
         midtransPaymentType: payment_type,
       });
 
+      const order = await getOrderByNumber(order_id);
+      if (order) {
+        await applyPaymentReservationOutcome(order.id, paymentStatus);
+      }
+
       // Notify admin on successful payment
       if (paymentStatus === "paid") {
-        const order = await getOrderByNumber(order_id);
         if (order) {
           try {
             await notifyOwner({

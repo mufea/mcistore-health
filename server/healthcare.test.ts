@@ -1,7 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { createOrder, getAllOrders, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById } from "./db";
+import { createOrder, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, releaseOrderStockReservation } from "./db";
+import { applyPaymentReservationOutcome } from "./stockReservation";
+import { availableStock, isReservationExpired } from "./reservationPolicy";
+import { getProductsAfterReservationCleanup } from "./customerStockRead";
+import { getProducts as getCustomerProducts } from "./productRead";
 
 // ─── Mock DB ──────────────────────────────────────────────────────────────────
 
@@ -34,6 +38,12 @@ vi.mock("./db", () => ({
   getOrderProductCategories: vi.fn().mockResolvedValue([]),
   getAllOrders: vi.fn().mockResolvedValue([]),
   getOrdersByUserId: vi.fn().mockResolvedValue([]),
+  expireStockReservations: vi.fn().mockResolvedValue(undefined),
+  reserveStock: vi.fn().mockResolvedValue(true),
+  releaseReservedStock: vi.fn().mockResolvedValue(undefined),
+  reservationExpiry: vi.fn().mockReturnValue(new Date("2026-08-20T00:10:00.000Z")),
+  releaseOrderStockReservation: vi.fn().mockResolvedValue(true),
+  finalizeStockReservation: vi.fn().mockResolvedValue(true),
   updateOrderStatus: vi.fn().mockResolvedValue(undefined),
   updateOrderByMidtransId: vi.fn().mockResolvedValue(undefined),
   getSetting: vi.fn().mockResolvedValue(null),
@@ -471,12 +481,108 @@ describe("orders.create stock validation", () => {
 
 describe("payment.createMidtransToken stock validation", () => {
   it("rejects payment when stock changes after Checkout", async () => {
-    vi.mocked(getOrderByNumber).mockResolvedValueOnce({ id: 88, orderNumber: "VW-STOCK-001" } as any);
+    vi.mocked(getOrderByNumber).mockResolvedValueOnce({
+      id: 88,
+      orderNumber: "VW-STOCK-001",
+      reservationStatus: "active",
+      reservationExpiresAt: new Date(Date.now() + 10 * 60_000),
+    } as any);
     vi.mocked(getOrderItems).mockResolvedValueOnce([{ productId: 7, quantity: 2 }] as any);
     vi.mocked(getProductById).mockResolvedValueOnce({ id: 7, stock: 1, isActive: true } as any);
 
     const caller = appRouter.createCaller(makeCtx());
     await expect(caller.payment.createMidtransToken({ orderNumber: "VW-STOCK-001" }))
       .rejects.toThrow("Product stock has changed");
+  });
+
+  it("rejects an expired stock reservation before starting Midtrans", async () => {
+    vi.mocked(getOrderByNumber).mockResolvedValueOnce({
+      id: 89,
+      orderNumber: "VW-EXPIRED-001",
+      reservationStatus: "active",
+      reservationExpiresAt: new Date(Date.now() - 60_000),
+    } as any);
+    const caller = appRouter.createCaller(makeCtx());
+    await expect(caller.payment.createMidtransToken({ orderNumber: "VW-EXPIRED-001" }))
+      .rejects.toThrow("stock reservation has expired");
+  });
+});
+
+describe("manual payment stock reservation lifecycle", () => {
+  it("finalizes an active bank-transfer reservation when admin confirms payment", async () => {
+    vi.mocked(getOrderById).mockResolvedValueOnce({ id: 51, reservationStatus: "active" } as any);
+    vi.mocked(finalizeStockReservation).mockResolvedValueOnce(true);
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await caller.orders.updateStatus({ id: 51, paymentStatus: "paid" });
+    expect(finalizeStockReservation).toHaveBeenCalledWith(51);
+  });
+
+  it("releases an active reservation when admin marks payment as failed", async () => {
+    vi.mocked(getOrderById).mockResolvedValueOnce({ id: 52, reservationStatus: "active" } as any);
+    vi.mocked(releaseOrderStockReservation).mockResolvedValueOnce(true);
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await caller.orders.updateStatus({ id: 52, paymentStatus: "failed" });
+    expect(releaseOrderStockReservation).toHaveBeenCalledWith(52);
+  });
+
+  it("releases an active reservation when admin cancels a bank-transfer order", async () => {
+    vi.mocked(getOrderById).mockResolvedValueOnce({ id: 53, reservationStatus: "active" } as any);
+    vi.mocked(releaseOrderStockReservation).mockResolvedValueOnce(true);
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await caller.orders.updateStatus({ id: 53, status: "cancelled" });
+    expect(releaseOrderStockReservation).toHaveBeenCalledWith(53);
+  });
+
+  it("releases an active reservation when admin refunds a bank-transfer payment", async () => {
+    vi.mocked(getOrderById).mockResolvedValueOnce({ id: 54, reservationStatus: "active" } as any);
+    vi.mocked(releaseOrderStockReservation).mockResolvedValueOnce(true);
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await caller.orders.updateStatus({ id: 54, paymentStatus: "refunded" });
+    expect(releaseOrderStockReservation).toHaveBeenCalledWith(54);
+  });
+});
+
+describe("lazy reservation expiry policy", () => {
+  it("restores visible availability once an active hold reaches its expiry time", () => {
+    const now = new Date("2026-08-20T08:00:00.000Z");
+    expect(isReservationExpired("active", new Date("2026-08-20T07:50:00.000Z"), now)).toBe(true);
+    expect(availableStock(5, 2)).toBe(3);
+    // Once lazy cleanup releases the two held units, customer stock reads return full availability.
+    expect(availableStock(5, 0)).toBe(5);
+  });
+
+  it("runs getProducts cleanup before returning restored customer stock availability", async () => {
+    let reservedStock = 2;
+    const releaseExpired = vi.fn(async () => { reservedStock = 0; });
+    const visibleStock = await getProductsAfterReservationCleanup(
+      releaseExpired,
+      async () => availableStock(5, reservedStock),
+    );
+    expect(releaseExpired).toHaveBeenCalledOnce();
+    expect(visibleStock).toBe(5);
+  });
+
+  it("uses the production getProducts path to clean holds before returning availability", async () => {
+    let reservedStock = 2;
+    const releaseExpired = vi.fn(async () => { reservedStock = 0; });
+    const rows = await getCustomerProducts(releaseExpired, async () => [
+      { id: 10, name: "Reserved Product", stock: 5, reservedStock },
+    ]);
+    expect(releaseExpired).toHaveBeenCalledOnce();
+    expect(rows[0].stock).toBe(5);
+  });
+});
+
+describe("Midtrans reservation outcomes", () => {
+  it("finalizes held inventory after a successful Midtrans payment", async () => {
+    vi.mocked(finalizeStockReservation).mockResolvedValueOnce(true);
+    await applyPaymentReservationOutcome(61, "paid");
+    expect(finalizeStockReservation).toHaveBeenCalledWith(61);
+  });
+
+  it("releases held inventory after a failed Midtrans payment", async () => {
+    vi.mocked(releaseOrderStockReservation).mockResolvedValueOnce(true);
+    await applyPaymentReservationOutcome(62, "failed");
+    expect(releaseOrderStockReservation).toHaveBeenCalledWith(62);
   });
 });

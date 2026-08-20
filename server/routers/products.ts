@@ -44,7 +44,7 @@ export const productsRouter = router({
         return null; // Restricted
       }
 
-      return product;
+      return { ...product, stock: Math.max(0, product.stock - product.reservedStock) };
     }),
 
   // Admin: list all products

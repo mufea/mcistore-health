@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, or } from "drizzle-orm";
+import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertOrder,
@@ -15,6 +15,7 @@ import {
   users,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import { getProducts as getCustomerProducts } from "./productRead";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -228,22 +229,22 @@ export async function getProducts(segment?: "standard" | "premium" | "vip") {
   if (segment === "premium") allowedSegments.push("standard", "premium");
   if (segment === "vip") allowedSegments.push("standard", "premium", "vip");
 
-  return db
-    .select()
-    .from(products)
-    .where(
-      and(
-        eq(products.isActive, true),
-        inArray(products.targetSegment, allowedSegments as ("all" | "standard" | "premium" | "vip")[])
+  return getCustomerProducts(expireStockReservations, () => db
+      .select()
+      .from(products)
+      .where(
+        and(
+          eq(products.isActive, true),
+          inArray(products.targetSegment, allowedSegments as ("all" | "standard" | "premium" | "vip")[])
+        )
       )
-    )
-    .orderBy(desc(products.isFeatured), products.name);
+      .orderBy(desc(products.isFeatured), products.name));
 }
 
 export async function getProductById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+  const result = await getCustomerProducts(expireStockReservations, () => db.select().from(products).where(eq(products.id, id)).limit(1));
   return result[0];
 }
 
@@ -303,6 +304,102 @@ export async function createOrder(
   );
 
   return order;
+}
+
+type StockReservationItem = { productId: number; quantity: number };
+const RESERVATION_MINUTES = 10;
+
+function affectedRows(result: unknown): number {
+  return Number((result as any)?.[0]?.affectedRows ?? 0);
+}
+
+export async function releaseReservedStock(items: StockReservationItem[]) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  for (const item of items) {
+    await db.update(products).set({
+      reservedStock: sql`GREATEST(${products.reservedStock} - ${item.quantity}, 0)`,
+    }).where(eq(products.id, item.productId));
+  }
+}
+
+/** Lazily releases holds when stock is queried or a payment is processed. */
+export async function expireStockReservations(now = new Date()) {
+  const db = await getDb();
+  if (!db) return;
+  const expired = await db.select({ id: orders.id }).from(orders).where(and(
+    eq(orders.reservationStatus, "active"),
+    sql`${orders.reservationExpiresAt} IS NOT NULL AND ${orders.reservationExpiresAt} <= ${now}`,
+  ));
+
+  for (const reservation of expired) {
+    const claim = await db.update(orders).set({ reservationStatus: "expired" }).where(and(
+      eq(orders.id, reservation.id),
+      eq(orders.reservationStatus, "active"),
+    ));
+    if (affectedRows(claim) === 0) continue;
+    const items = await getOrderItems(reservation.id);
+    await releaseReservedStock(items);
+  }
+}
+
+/** Atomically reserves currently available stock (physical stock minus active holds). */
+export async function reserveStock(items: StockReservationItem[]): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const reserved: StockReservationItem[] = [];
+
+  for (const item of items) {
+    const result = await db.update(products).set({
+      reservedStock: sql`${products.reservedStock} + ${item.quantity}`,
+    }).where(and(
+      eq(products.id, item.productId),
+      eq(products.isActive, true),
+      sql`${products.stock} - ${products.reservedStock} >= ${item.quantity}`,
+    ));
+    if (affectedRows(result) !== 1) {
+      await releaseReservedStock(reserved);
+      return false;
+    }
+    reserved.push(item);
+  }
+  return true;
+}
+
+export function reservationExpiry(from = new Date()) {
+  return new Date(from.getTime() + RESERVATION_MINUTES * 60_000);
+}
+
+/** Releases an active order reservation after cancellation, failure, or expiry. */
+export async function releaseOrderStockReservation(orderId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const claim = await db.update(orders).set({ reservationStatus: "released" }).where(and(
+    eq(orders.id, orderId),
+    eq(orders.reservationStatus, "active"),
+  ));
+  if (affectedRows(claim) === 0) return false;
+  await releaseReservedStock(await getOrderItems(orderId));
+  return true;
+}
+
+/** Converts an active hold into sold inventory exactly once after payment succeeds. */
+export async function finalizeStockReservation(orderId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const claim = await db.update(orders).set({
+    reservationStatus: "fulfilled",
+    reservationFinalizedAt: new Date(),
+  }).where(and(eq(orders.id, orderId), eq(orders.reservationStatus, "active")));
+  if (affectedRows(claim) === 0) return false;
+
+  for (const item of await getOrderItems(orderId)) {
+    await db.update(products).set({
+      stock: sql`GREATEST(${products.stock} - ${item.quantity}, 0)`,
+      reservedStock: sql`GREATEST(${products.reservedStock} - ${item.quantity}, 0)`,
+    }).where(eq(products.id, item.productId));
+  }
+  return true;
 }
 
 export async function getOrderByNumber(orderNumber: string) {
