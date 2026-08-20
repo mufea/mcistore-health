@@ -119,3 +119,4 @@
 - [x] Show a translated low-stock indicator on product cards when available stock is five units or fewer
 - [x] Add a translated low-stock-only filter to the product catalog
 - [x] Show in-stock similar-product recommendations when a product detail is out of stock
+- [x] Add need-based filters to in-stock alternative product recommendations

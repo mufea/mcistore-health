@@ -12,7 +12,7 @@ import ProductImageGallery from "@/components/ProductImageGallery";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
-import { getInStockAlternatives } from "@/lib/productAlternatives";
+import { filterAlternativesByNeed, getAlternativeNeeds, getInStockAlternatives } from "@/lib/productAlternatives";
 
 function getStoredCart(): number[] {
   try {
@@ -47,6 +47,7 @@ export default function ProductDetail() {
   const detail = translations.productDetail;
   const productId = Number(params.id);
   const [quantity, setQuantity] = useState(1);
+  const [alternativeNeed, setAlternativeNeed] = useState("all");
   const segment = isAuthenticated ? (user?.segment ?? "standard") : "standard";
 
   const { data: product, isLoading } = trpc.products.getById.useQuery(
@@ -64,6 +65,10 @@ export default function ProductDetail() {
     ? getInStockAlternatives(product, relatedProducts ?? [])
     : [];
   const recommendations = inStock ? related : availableAlternatives;
+  const alternativeNeeds = !inStock ? getAlternativeNeeds(availableAlternatives) : [];
+  const filteredRecommendations = !inStock
+    ? filterAlternativesByNeed(recommendations, alternativeNeed)
+    : recommendations;
   const recommendationTitle = inStock ? t(detail.relatedProducts, lang) : t(detail.availableAlternatives, lang);
 
   const requestSignIn = () => {
@@ -211,13 +216,26 @@ export default function ProductDetail() {
                   <div className="gold-line mb-3" />
                   <h2 className="font-serif text-3xl font-light text-foreground">{recommendationTitle}</h2>
                   {!inStock && <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t(detail.alternativesHint, lang)}</p>}
+                  {!inStock && alternativeNeeds.length > 0 && (
+                    <div className="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label={t(detail.filterByNeed, lang)}>
+                      <Button size="sm" variant={alternativeNeed === "all" ? "default" : "outline"} onClick={() => setAlternativeNeed("all")} aria-pressed={alternativeNeed === "all"}>
+                        {t(detail.allNeeds, lang)}
+                      </Button>
+                      {alternativeNeeds.map((need) => (
+                        <Button key={need} size="sm" variant={alternativeNeed === need ? "default" : "outline"} onClick={() => setAlternativeNeed(need)} aria-pressed={alternativeNeed === need}>
+                          {need}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <Button asChild variant="ghost" size="sm" className="text-primary">
                   <Link href="/products">{t(detail.viewAll, lang)}<ArrowLeft className="ml-2 h-4 w-4 rotate-180" /></Link>
                 </Button>
               </div>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                {recommendations.map((item) => (
+              {filteredRecommendations.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {filteredRecommendations.map((item) => (
                   <Link key={item.id} href={`/products/${item.id}`}>
                     <article className="group overflow-hidden rounded-xl border border-border/60 bg-card transition-shadow hover:shadow-md">
                       <ProductImageGallery imageUrl={item.imageUrl} images={item.images ?? null} productName={item.name} mode="card" className="aspect-square" />
@@ -228,7 +246,10 @@ export default function ProductDetail() {
                     </article>
                   </Link>
                 ))}
-              </div>
+                </div>
+              ) : (
+                <p className="rounded-lg border border-dashed border-border p-5 text-sm text-muted-foreground">{t(detail.noAlternativesForNeed, lang)}</p>
+              )}
             </section>
           )}
         </div>

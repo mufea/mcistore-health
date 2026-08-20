@@ -3,6 +3,7 @@ export type AlternativeCandidate = {
   category: string;
   stock: number;
   isFeatured: boolean;
+  tags?: string[] | null;
 };
 
 export function getInStockAlternatives<T extends AlternativeCandidate>(
@@ -18,4 +19,12 @@ export function getInStockAlternatives<T extends AlternativeCandidate>(
       return score(b) - score(a);
     })
     .slice(0, limit);
+}
+
+export function getAlternativeNeeds(products: AlternativeCandidate[]) {
+  return [...new Set(products.flatMap((product) => product.tags ?? []))].sort((a, b) => a.localeCompare(b));
+}
+
+export function filterAlternativesByNeed<T extends AlternativeCandidate>(products: T[], need: string) {
+  return need === "all" ? products : products.filter((product) => product.tags?.includes(need));
 }
