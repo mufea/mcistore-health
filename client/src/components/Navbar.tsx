@@ -99,7 +99,7 @@ export default function Navbar() {
     setMobileCartIds(next.cartIds);
   };
 
-  const updateMobileCartQuantity = (productId: number, quantity: number, stock?: number) => {
+  const updateMobileCartQuantity = (productId: number, quantity: number, stock?: number, productName?: string) => {
     const currentCartIds = parseStoredCartIds(sessionStorage.getItem("pending_cart"));
     const currentQuantities = parseStoredQuantities(sessionStorage.getItem("pending_quantities"));
     const normalizedQuantity = Math.max(1, quantity);
@@ -108,14 +108,17 @@ export default function Navbar() {
     sessionStorage.setItem("pending_cart", JSON.stringify(next.cartIds));
     sessionStorage.setItem("pending_quantities", JSON.stringify(next.quantities));
     setMobileCartIds(next.cartIds);
+    if (productName) {
+      toast.success(`${productName}: ${t(translations.nav.quantityUpdated, lang).replace("{quantity}", String(cappedQuantity))}`);
+    }
   };
 
-  const increaseMobileCartQuantity = (productId: number, quantity: number, stock: number) => {
+  const increaseMobileCartQuantity = (productId: number, quantity: number, stock: number, productName: string) => {
     if (!canIncreaseCartQuantity(quantity, stock)) {
       toast.error(t(translations.nav.stockLimitReached, lang).replace("{stock}", String(stock)));
       return;
     }
-    updateMobileCartQuantity(productId, quantity + 1, stock);
+    updateMobileCartQuantity(productId, quantity + 1, stock, productName);
   };
 
   const navLinks = [
@@ -325,16 +328,24 @@ export default function Navbar() {
                       const quantity = cartQuantities[productId] ?? 1;
                       const stock = product?.stock ?? 0;
                       const atStockLimit = !canIncreaseCartQuantity(quantity, stock);
+                      const remainingStock = Math.max(0, stock - quantity);
                       return (
                         <div key={productId} className="flex items-center justify-between gap-2 rounded-md bg-background/70 px-2 py-1.5">
-                          <span className="min-w-0 truncate text-xs text-foreground">{label}</span>
+                          <div className="min-w-0">
+                            <span className="block truncate text-xs text-foreground">{label}</span>
+                            {product && (
+                              <span className="block text-[10px] text-muted-foreground">
+                                {t(translations.nav.stockRemaining, lang).replace("{stock}", String(remainingStock))}
+                              </span>
+                            )}
+                          </div>
                           <div className="flex flex-shrink-0 items-center gap-0.5">
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
                               className="h-6 w-6 text-muted-foreground hover:bg-muted disabled:opacity-35"
-                              onClick={() => updateMobileCartQuantity(productId, quantity - 1, stock)}
+                              onClick={() => updateMobileCartQuantity(productId, quantity - 1, stock, label)}
                               disabled={quantity <= 1}
                               aria-label={`${t(translations.nav.decreaseQuantity, lang)}: ${label}`}
                             >
@@ -346,7 +357,7 @@ export default function Navbar() {
                               variant="ghost"
                               size="icon"
                               className={`h-6 w-6 text-muted-foreground hover:bg-muted disabled:opacity-35 ${atStockLimit ? "text-amber-700 hover:bg-amber-50" : ""}`}
-                              onClick={() => increaseMobileCartQuantity(productId, quantity, stock)}
+                              onClick={() => increaseMobileCartQuantity(productId, quantity, stock, label)}
                               disabled={!product}
                               aria-label={`${t(translations.nav.increaseQuantity, lang)}: ${label}`}
                               title={atStockLimit ? t(translations.nav.stockLimitReached, lang).replace("{stock}", String(stock)) : undefined}

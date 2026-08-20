@@ -2,6 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
   getOrderByNumber,
+  getOrderItems,
+  getProductById,
   getSetting,
   updateOrderByMidtransId,
   updateOrderStatus,
@@ -38,6 +40,17 @@ export const paymentRouter = router({
       const order = await getOrderByNumber(input.orderNumber);
       if (!order) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+      }
+
+      const orderItems = await getOrderItems(order.id);
+      for (const item of orderItems) {
+        const product = await getProductById(item.productId);
+        if (!product || !product.isActive || product.stock < item.quantity) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "Product stock has changed. Please return to Checkout and review your cart before payment.",
+          });
+        }
       }
 
       const config = await getMidtransConfig();

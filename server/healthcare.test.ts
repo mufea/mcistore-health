@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { getAllOrders, getOrderProductCategories } from "./db";
+import { createOrder, getAllOrders, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById } from "./db";
 
 // ─── Mock DB ──────────────────────────────────────────────────────────────────
 
@@ -430,5 +430,53 @@ describe("userProfile.update", () => {
       country: "Indonesia",
     });
     expect(result.success).toBe(true);
+  });
+});
+
+// ─── Stock Validation Tests ────────────────────────────────────────────────────
+
+describe("orders.create stock validation", () => {
+  const baseOrderInput = {
+    customerName: "Stock Test",
+    customerEmail: "stock@example.com",
+    customerPhone: "+62812345678",
+    userAddress: { street: "Jl. Test", city: "Jakarta", province: "DKI Jakarta", postalCode: "12345", country: "Indonesia" },
+    shippingAddress: { street: "Jl. Test", city: "Jakarta", province: "DKI Jakarta", postalCode: "12345", country: "Indonesia" },
+    shippingType: "national" as const,
+    paymentMethod: "midtrans" as const,
+    items: [{ productId: 7, productName: "Client supplied name", productPrice: 1, quantity: 2, subtotal: 2 }],
+  };
+
+  it("uses server product data for a valid in-stock order", async () => {
+    vi.mocked(getProductById).mockResolvedValueOnce({
+      id: 7, name: "Verified Product", price: "125000", stock: 3, isActive: true,
+    } as any);
+    const caller = appRouter.createCaller(makeUserCtx());
+    await caller.orders.create(baseOrderInput);
+
+    expect(createOrder).toHaveBeenCalledWith(
+      expect.objectContaining({ subtotal: "250000", total: "250000" }),
+      [{ productId: 7, productName: "Verified Product", productPrice: 125000, quantity: 2, subtotal: 250000 }],
+    );
+  });
+
+  it("rejects order creation when current stock is insufficient", async () => {
+    vi.mocked(getProductById).mockResolvedValueOnce({
+      id: 7, name: "Verified Product", price: "125000", stock: 1, isActive: true,
+    } as any);
+    const caller = appRouter.createCaller(makeUserCtx());
+    await expect(caller.orders.create(baseOrderInput)).rejects.toThrow("only has 1 item(s) available");
+  });
+});
+
+describe("payment.createMidtransToken stock validation", () => {
+  it("rejects payment when stock changes after Checkout", async () => {
+    vi.mocked(getOrderByNumber).mockResolvedValueOnce({ id: 88, orderNumber: "VW-STOCK-001" } as any);
+    vi.mocked(getOrderItems).mockResolvedValueOnce([{ productId: 7, quantity: 2 }] as any);
+    vi.mocked(getProductById).mockResolvedValueOnce({ id: 7, stock: 1, isActive: true } as any);
+
+    const caller = appRouter.createCaller(makeCtx());
+    await expect(caller.payment.createMidtransToken({ orderNumber: "VW-STOCK-001" }))
+      .rejects.toThrow("Product stock has changed");
   });
 });

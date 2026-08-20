@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
   createOrder,
@@ -8,6 +9,7 @@ import {
   getOrderItems,
   getOrderProductCategories,
   getOrdersByUserId,
+  getProductById,
   getSetting,
   updateOrderStatus,
 } from "../db";
@@ -58,6 +60,33 @@ export const ordersRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const requestedQuantities = input.items.reduce((result, item) => {
+        result.set(item.productId, (result.get(item.productId) ?? 0) + item.quantity);
+        return result;
+      }, new Map<number, number>());
+
+      const trustedItems = [] as typeof input.items;
+      for (const [productId, quantity] of requestedQuantities) {
+        const product = await getProductById(productId);
+        if (!product || !product.isActive) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "One or more products are no longer available." });
+        }
+        if (product.stock < quantity) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: `${product.name} only has ${product.stock} item(s) available in stock.`,
+          });
+        }
+        const price = Number(product.price);
+        trustedItems.push({
+          productId,
+          productName: product.name,
+          productPrice: price,
+          quantity,
+          subtotal: price * quantity,
+        });
+      }
+
       // Get shipping cost from settings
       const shippingKey =
         input.shippingType === "national"
@@ -66,7 +95,7 @@ export const ordersRouter = router({
       const shippingCostStr = await getSetting(shippingKey);
       const shippingCost = parseFloat(shippingCostStr ?? "0");
 
-      const subtotal = input.items.reduce((sum, item) => sum + item.subtotal, 0);
+      const subtotal = trustedItems.reduce((sum, item) => sum + item.subtotal, 0);
       const total = subtotal + shippingCost;
 
       const orderNumber = `VW-${Date.now()}-${nanoid(6).toUpperCase()}`;
@@ -100,14 +129,14 @@ export const ordersRouter = router({
           surveyResponseId: input.surveyResponseId,
           notes: input.notes,
         },
-        input.items
+        trustedItems
       );
 
       // Notify admin
       try {
         await notifyOwner({
           title: `New Order: ${orderNumber}`,
-          content: `A new order has been placed by ${input.customerName} (${input.customerEmail}) for ${input.items.length} item(s). Total: IDR ${total.toLocaleString()}. Payment method: ${input.paymentMethod}.`,
+          content: `A new order has been placed by ${input.customerName} (${input.customerEmail}) for ${trustedItems.length} item(s). Total: IDR ${total.toLocaleString()}. Payment method: ${input.paymentMethod}.`,
         });
       } catch (e) {
         console.warn("Failed to notify owner:", e);

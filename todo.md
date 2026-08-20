@@ -95,3 +95,8 @@
 - [x] Add a confirmation dialog before the mobile Clear Cart action removes all items
 - [x] Add stock-aware plus and minus quantity controls for each item in the mobile cart summary
 - [x] Show a translated toast when a mobile cart increase reaches available stock
+
+## Stock Safeguards
+- [x] Show remaining stock beside each mobile cart item
+- [x] Show a translated success toast after a mobile cart quantity update
+- [x] Validate current stock server-side before order creation and payment initiation
