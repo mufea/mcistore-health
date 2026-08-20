@@ -325,6 +325,17 @@ export async function getOrderItems(orderId: number) {
   return db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
 }
 
+export async function getOrderProductCategories(orderId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const rows = await db
+    .select({ category: products.category })
+    .from(orderItems)
+    .innerJoin(products, eq(orderItems.productId, products.id))
+    .where(eq(orderItems.orderId, orderId));
+  return [...new Set(rows.map((row) => row.category))];
+}
+
 export async function getAllOrders() {
   const db = await getDb();
   if (!db) return [];

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { getAllOrders } from "./db";
+import { getAllOrders, getOrderProductCategories } from "./db";
 
 // ─── Mock DB ──────────────────────────────────────────────────────────────────
 
@@ -31,6 +31,7 @@ vi.mock("./db", () => ({
   getOrderByNumber: vi.fn().mockResolvedValue(undefined),
   getOrderById: vi.fn().mockResolvedValue(undefined),
   getOrderItems: vi.fn().mockResolvedValue([]),
+  getOrderProductCategories: vi.fn().mockResolvedValue([]),
   getAllOrders: vi.fn().mockResolvedValue([]),
   getOrdersByUserId: vi.fn().mockResolvedValue([]),
   updateOrderStatus: vi.fn().mockResolvedValue(undefined),
@@ -377,14 +378,36 @@ describe("orders.exportCsv", () => {
       },
     ] as any);
 
+    vi.mocked(getOrderProductCategories).mockResolvedValueOnce(["Supplement"]);
+
     const caller = appRouter.createCaller(makeAdminCtx());
-    const result = await caller.orders.exportCsv({ status: "shipped" });
+    const result = await caller.orders.exportCsv({
+      status: "shipped",
+      dateFrom: "2026-08-01",
+      dateTo: "2026-08-31",
+      category: "Supplement",
+    });
 
     expect(result.filename).toMatch(/^orders-\d{4}-\d{2}-\d{2}\.csv$/);
     expect(result.count).toBe(1);
     expect(result.content).toContain("Order Number");
     expect(result.content).toContain("VW-CSV-001");
     expect(result.content).toContain("'=SUM(1,1)");
+    expect(result.content).toContain("Supplement");
+  });
+});
+
+describe("payment.testMidtransConnection", () => {
+  it("requires admin role", async () => {
+    const caller = appRouter.createCaller(makeUserCtx());
+    await expect(caller.payment.testMidtransConnection()).rejects.toThrow();
+  });
+
+  it("reports missing saved credentials without calling Midtrans", async () => {
+    const caller = appRouter.createCaller(makeAdminCtx());
+    const result = await caller.payment.testMidtransConnection();
+    expect(result.success).toBe(false);
+    expect(result.message).toContain("must be saved");
   });
 });
 

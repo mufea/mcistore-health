@@ -40,6 +40,9 @@ export default function AdminOrders() {
   const { data: orders, isLoading } = trpc.orders.adminList.useQuery();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | (typeof ORDER_STATUSES)[number]>("all");
+  const [exportDateFrom, setExportDateFrom] = useState("");
+  const [exportDateTo, setExportDateTo] = useState("");
+  const [exportCategory, setExportCategory] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [detailDialog, setDetailDialog] = useState(false);
   const [newStatus, setNewStatus] = useState("");
@@ -56,10 +59,16 @@ export default function AdminOrders() {
     onError: (e) => toast.error(e.message),
   });
 
+  const { data: products } = trpc.products.adminList.useQuery();
+  const productCategories = Array.from(new Set((products ?? []).map((product) => product.category))).sort();
+
   const exportCsvQuery = trpc.orders.exportCsv.useQuery(
     {
       status: statusFilter === "all" ? undefined : statusFilter,
       search: search || undefined,
+      dateFrom: exportDateFrom || undefined,
+      dateTo: exportDateTo || undefined,
+      category: exportCategory === "all" ? undefined : exportCategory,
     },
     { enabled: false }
   );
@@ -81,13 +90,13 @@ export default function AdminOrders() {
   };
 
   const exportCsv = async () => {
-    if (filtered.length === 0) {
-      toast.error("No orders available to export.");
+    if (exportDateFrom && exportDateTo && exportDateFrom > exportDateTo) {
+      toast.error("Start date must be before the end date.");
       return;
     }
 
     const result = await exportCsvQuery.refetch();
-    if (!result.data) {
+    if (!result.data || result.data.count === 0) {
       toast.error("Unable to prepare the CSV export.");
       return;
     }
@@ -121,7 +130,8 @@ export default function AdminOrders() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="flex flex-col gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search by order #, name, email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
@@ -139,6 +149,20 @@ export default function AdminOrders() {
           {exportCsvQuery.isFetching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
           Export CSV
         </Button>
+        </div>
+        <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border/60 bg-muted/20 p-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <span className="text-xs font-medium text-muted-foreground">Export filters:</span>
+          <Input aria-label="Export start date" type="date" value={exportDateFrom} onChange={(event) => setExportDateFrom(event.target.value)} className="h-9 w-full sm:w-40" />
+          <span className="hidden text-xs text-muted-foreground sm:inline">to</span>
+          <Input aria-label="Export end date" type="date" value={exportDateTo} onChange={(event) => setExportDateTo(event.target.value)} className="h-9 w-full sm:w-40" />
+          <Select value={exportCategory} onValueChange={setExportCategory}>
+            <SelectTrigger className="h-9 w-full sm:w-48"><SelectValue placeholder="Product category" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Product Categories</SelectItem>
+              {productCategories.map((category) => <SelectItem key={category} value={category}>{category}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {isLoading ? (

@@ -1,9 +1,11 @@
 import { Toaster } from "@/components/ui/sonner";
+import { useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { useAuth } from "./_core/hooks/useAuth";
 
 // Customer pages
 import Home from "./pages/Home";
@@ -66,6 +68,19 @@ function Router() {
   );
 }
 
+function ResumePendingCheckout() {
+  const { isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (loading || !isAuthenticated) return;
+    if (sessionStorage.getItem("pending_checkout_after_login") !== "true") return;
+    sessionStorage.removeItem("pending_checkout_after_login");
+    if (window.location.pathname !== "/checkout") window.location.replace("/checkout");
+  }, [isAuthenticated, loading]);
+
+  return null;
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -73,6 +88,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <ResumePendingCheckout />
           <ChatbotWidget />
         </TooltipProvider>
       </ThemeProvider>

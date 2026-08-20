@@ -78,3 +78,8 @@
 - [x] Create a product detail page with a detailed multi-image gallery, purchase controls, and related products
 - [x] Add translated order-status filters to the My Orders page
 - [x] Add a protected CSV export action to the admin Orders page
+
+## Checkout & Reporting Enhancements
+- [x] Add an admin-only Test Midtrans Connection action with clear success and failure feedback
+- [x] Persist product quantities from product detail through checkout and order creation
+- [x] Add date-range and product-category filters to the admin Orders CSV export

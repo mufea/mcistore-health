@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
-import { Building2, Globe, Loader2, Package, Save, Settings } from "lucide-react";
+import { Building2, Globe, Loader2, Package, PlugZap, Save, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 
@@ -51,6 +51,14 @@ export default function AdminSettings() {
   const updateMutation = trpc.settings.bulkUpdate.useMutation({
     onSuccess: () => { utils.settings.adminGetAll.invalidate(); utils.settings.getPublic.invalidate(); toast.success("Settings saved successfully"); },
     onError: (e) => toast.error(e.message),
+  });
+
+  const testMidtransMutation = trpc.payment.testMidtransConnection.useMutation({
+    onSuccess: (result) => {
+      if (result.success) toast.success(result.message);
+      else toast.error(result.message);
+    },
+    onError: (error) => toast.error(error.message),
   });
 
   const save = () => {
@@ -212,6 +220,22 @@ export default function AdminSettings() {
                 </p>
               </div>
             )}
+            <div className="rounded-lg border border-border/60 bg-muted/20 p-3 sm:flex sm:items-center sm:justify-between sm:gap-4">
+              <div>
+                <p className="text-sm font-medium text-foreground">Test Midtrans Connection</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Save your Midtrans credentials first. The test makes a read-only API request and does not create a transaction.</p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-3 w-full gap-2 sm:mt-0 sm:w-auto"
+                onClick={() => testMidtransMutation.mutate()}
+                disabled={testMidtransMutation.isPending || updateMutation.isPending}
+              >
+                {testMidtransMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlugZap className="h-4 w-4" />}
+                {testMidtransMutation.isPending ? "Testing Connection…" : "Test Connection"}
+              </Button>
+            </div>
           </div>
         </div>
 

@@ -6,7 +6,7 @@ import {
   updateOrderByMidtransId,
   updateOrderStatus,
 } from "../db";
-import { publicProcedure, router } from "../_core/trpc";
+import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 
 async function getMidtransConfig() {
   const serverKey = await getSetting("midtrans_server_key");
@@ -118,6 +118,61 @@ export const paymentRouter = router({
     const clientKey = await getSetting("midtrans_client_key");
     const isProduction = (await getSetting("midtrans_is_production")) === "true";
     return { clientKey: clientKey ?? "", isProduction };
+  }),
+
+  // Admin-only credential test. A read-only request for a deliberately unknown order
+  // verifies that the Midtrans API is reachable without creating a transaction.
+  testMidtransConnection: adminProcedure.mutation(async () => {
+    const config = await getMidtransConfig();
+    const merchantId = await getSetting("midtrans_merchant_id");
+    const environment = config.isProduction ? "production" : "sandbox";
+
+    if (!merchantId || !config.serverKey || !config.clientKey) {
+      return {
+        success: false,
+        environment,
+        message: "Merchant ID, Server Key, and Client Key must be saved before testing Midtrans.",
+      };
+    }
+
+    const auth = Buffer.from(`${config.serverKey}:`).toString("base64");
+    const probeOrderId = `MCI-CONNECTION-CHECK-${Date.now()}`;
+
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/${probeOrderId}/status`, {
+        headers: { Authorization: `Basic ${auth}` },
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        return {
+          success: false,
+          environment,
+          message: "Midtrans rejected the saved Server Key. Check the selected environment and credentials.",
+        };
+      }
+
+      // 404 is the expected response for the deliberately unknown order ID. Other
+      // non-auth client responses still demonstrate a reachable, authenticated API.
+      if (response.status < 500) {
+        return {
+          success: true,
+          environment,
+          message: `Connected to the Midtrans ${environment} API successfully.`,
+        };
+      }
+
+      return {
+        success: false,
+        environment,
+        message: "Midtrans is temporarily unavailable. Please try again shortly.",
+      };
+    } catch {
+      return {
+        success: false,
+        environment,
+        message: "Unable to reach Midtrans. Check the network connection and try again.",
+      };
+    }
   }),
 
   // Check payment status

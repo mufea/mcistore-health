@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
-import { ArrowLeft, Check, Loader2, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Minus, Plus, ShoppingBag, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -22,6 +23,21 @@ function getStoredCart(): number[] {
   }
 }
 
+function getStoredQuantities(): Record<number, number> {
+  try {
+    const stored = sessionStorage.getItem("pending_quantities");
+    const value = stored ? JSON.parse(stored) : {};
+    return Object.entries(value).reduce<Record<number, number>>((result, [id, quantity]) => {
+      const productId = Number(id);
+      const amount = Number(quantity);
+      if (Number.isInteger(productId) && Number.isInteger(amount) && amount > 0) result[productId] = amount;
+      return result;
+    }, {});
+  } catch {
+    return {};
+  }
+}
+
 export default function ProductDetail() {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
@@ -29,6 +45,7 @@ export default function ProductDetail() {
   const { user, isAuthenticated } = useAuth();
   const detail = translations.productDetail;
   const productId = Number(params.id);
+  const [quantity, setQuantity] = useState(1);
   const segment = isAuthenticated ? (user?.segment ?? "standard") : "standard";
 
   const { data: product, isLoading } = trpc.products.getById.useQuery(
@@ -44,33 +61,38 @@ export default function ProductDetail() {
     .slice(0, 4);
 
   const requestSignIn = () => {
-    sessionStorage.setItem("product_return_path", window.location.pathname);
+    sessionStorage.setItem("pending_checkout_after_login", "true");
     window.location.href = getLoginUrl();
+  };
+
+  const persistProductSelection = () => {
+    if (!product) return;
+    const cart = getStoredCart();
+    if (!cart.includes(product.id)) {
+      sessionStorage.setItem("pending_cart", JSON.stringify([...cart, product.id]));
+    }
+    const quantities = getStoredQuantities();
+    sessionStorage.setItem("pending_quantities", JSON.stringify({ ...quantities, [product.id]: quantity }));
   };
 
   const addToCart = () => {
     if (!product) return;
+    persistProductSelection();
     if (!isAuthenticated) {
       requestSignIn();
       return;
-    }
-    const cart = getStoredCart();
-    if (!cart.includes(product.id)) {
-      sessionStorage.setItem("pending_cart", JSON.stringify([...cart, product.id]));
     }
     toast.success(t(detail.addedToCart, lang));
   };
 
   const buyNow = () => {
     if (!product) return;
+    persistProductSelection();
     if (!isAuthenticated) {
       requestSignIn();
       return;
     }
-    const cart = getStoredCart();
-    const nextCart = cart.includes(product.id) ? cart : [...cart, product.id];
-    sessionStorage.setItem("pending_cart", JSON.stringify(nextCart));
-    navigate(`/checkout?products=${product.id}&segment=${segment}`);
+    navigate(`/checkout?products=${product.id}&segment=${segment}&quantities=${encodeURIComponent(`${product.id}:${quantity}`)}`);
   };
 
   if (isLoading) {
@@ -157,6 +179,15 @@ export default function ProductDetail() {
               )}
 
               <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="inline-flex h-11 items-center justify-between rounded-lg border border-border bg-background p-1 sm:w-32">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!inStock || quantity <= 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Decrease quantity">
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className="min-w-6 text-center text-sm font-semibold" aria-label={`${t(detail.quantity, lang)}: ${quantity}`}>{quantity}</span>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!inStock || quantity >= stock} onClick={() => setQuantity((value) => Math.min(stock, value + 1))} aria-label="Increase quantity">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
                 <Button className="h-11 flex-1" variant="outline" onClick={addToCart} disabled={!inStock}>
                   <ShoppingBag className="mr-2 h-4 w-4" />{isAuthenticated ? t(detail.addToCart, lang) : t(detail.signInToAdd, lang)}
                 </Button>

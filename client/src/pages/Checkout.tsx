@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { type Language, t, translations } from "@/lib/i18n";
 import CheckoutStepper from "@/components/CheckoutStepper";
+import { parseCheckoutQuantities, parseStoredQuantities, resolveCheckoutQuantities } from "@/lib/cartQuantities";
 
 interface Address {
   street: string;
@@ -42,6 +43,16 @@ interface Address {
 }
 
 const emptyAddress: Address = { street: "", apt: "", city: "", province: "", postalCode: "", country: "" };
+
+function getStoredCartIds(): number[] {
+  try {
+    const stored = sessionStorage.getItem("pending_cart");
+    const value = stored ? JSON.parse(stored) : [];
+    return Array.isArray(value) ? value.map(Number).filter((id) => Number.isInteger(id) && id > 0) : [];
+  } catch {
+    return [];
+  }
+}
 
 // ─── Reusable address form ────────────────────────────────────────────────────
 function AddressFields({
@@ -163,7 +174,10 @@ export default function Checkout() {
   const search = useSearch();
   const [, navigate] = useLocation();
   const params = new URLSearchParams(search);
-  const productIds = params.get("products")?.split(",").map(Number).filter(Boolean) ?? [];
+  const queryProductIds = params.get("products")?.split(",").map(Number).filter(Boolean) ?? [];
+  const productIds = queryProductIds.length > 0 ? queryProductIds : getStoredCartIds();
+  const requestedQuantities = parseCheckoutQuantities(params.get("quantities"));
+  const storedQuantities = parseStoredQuantities(sessionStorage.getItem("pending_quantities"));
   const segment = (params.get("segment") as "standard" | "premium" | "vip") ?? "standard";
 
   const { user, isAuthenticated } = useAuth();
@@ -215,10 +229,8 @@ export default function Checkout() {
   }, [profile, profileAddressApplied]);
 
   useEffect(() => {
-    const qty: Record<number, number> = {};
-    productIds.forEach((id) => { qty[id] = 1; });
-    setQuantities(qty);
-  }, []);
+    setQuantities(resolveCheckoutQuantities(productIds, requestedQuantities, storedQuantities));
+  }, [search]);
 
   // ── Unauthenticated gate ────────────────────────────────────────────────────
   if (!isAuthenticated) {

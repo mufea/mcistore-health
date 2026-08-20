@@ -6,6 +6,7 @@ import {
   getOrderById,
   getOrderByNumber,
   getOrderItems,
+  getOrderProductCategories,
   getOrdersByUserId,
   getSetting,
   updateOrderStatus,
@@ -139,20 +140,34 @@ export const ordersRouter = router({
 
   // Admin: export the current order report as a UTF-8 CSV file.
   exportCsv: adminProcedure
-    .input(z.object({ status: z.enum(orderStatuses).optional(), search: z.string().trim().optional() }).optional())
+    .input(z.object({
+      status: z.enum(orderStatuses).optional(),
+      search: z.string().trim().optional(),
+      dateFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      category: z.string().trim().min(1).optional(),
+    }).optional())
     .query(async ({ input }) => {
       const normalizedSearch = input?.search?.toLowerCase() ?? "";
-      const orders = (await getAllOrders()).filter((order) => {
+      const ordersWithCategories = await Promise.all((await getAllOrders()).map(async (order) => ({
+        ...order,
+        categories: await getOrderProductCategories(order.id),
+      })));
+      const orders = ordersWithCategories.filter((order) => {
         const statusMatches = !input?.status || order.status === input.status;
         const searchMatches = !normalizedSearch || [order.orderNumber, order.customerName, order.customerEmail]
           .some((value) => value.toLowerCase().includes(normalizedSearch));
-        return statusMatches && searchMatches;
+        const orderDate = order.createdAt.toISOString().slice(0, 10);
+        const fromMatches = !input?.dateFrom || orderDate >= input.dateFrom;
+        const toMatches = !input?.dateTo || orderDate <= input.dateTo;
+        const categoryMatches = !input?.category || order.categories.includes(input.category);
+        return statusMatches && searchMatches && fromMatches && toMatches && categoryMatches;
       });
 
       const headings = [
         "Order Number", "Created At", "Customer Name", "Customer Email", "Customer Phone",
         "Order Status", "Payment Status", "Payment Method", "Shipping Type",
-        "Subtotal", "Shipping Cost", "Total", "City", "Province", "Country",
+        "Subtotal", "Shipping Cost", "Total", "Product Categories", "City", "Province", "Country",
       ];
       const rows = orders.map((order) => [
         order.orderNumber,
@@ -167,6 +182,7 @@ export const ordersRouter = router({
         order.subtotal,
         order.shippingCost,
         order.total,
+        order.categories.join("; "),
         order.city,
         order.province,
         order.country,
