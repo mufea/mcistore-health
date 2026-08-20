@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatReservationCountdown, remainingReservationMs } from "./reservationTimer";
+import { formatReservationCountdown, remainingReservationMs, reservationProgressPercent } from "./reservationTimer";
 
 describe("reservationTimer", () => {
   it("calculates remaining time and never returns a negative value", () => {
@@ -10,5 +10,11 @@ describe("reservationTimer", () => {
   it("formats the countdown with two-digit minutes and seconds", () => {
     expect(formatReservationCountdown(610_000)).toBe("10:10");
     expect(formatReservationCountdown(0)).toBe("00:00");
+  });
+
+  it("clamps reservation progress to the valid percentage range", () => {
+    expect(reservationProgressPercent(300_000)).toBe(50);
+    expect(reservationProgressPercent(900_000)).toBe(100);
+    expect(reservationProgressPercent(-1)).toBe(0);
   });
 });

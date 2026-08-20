@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import CheckoutStepper from "@/components/CheckoutStepper";
-import { formatReservationCountdown, remainingReservationMs } from "@/lib/reservationTimer";
+import { formatReservationCountdown, remainingReservationMs, reservationProgressPercent } from "@/lib/reservationTimer";
 
 declare global {
   interface Window {
@@ -53,6 +53,8 @@ export default function Payment() {
   const reservationActive = order?.reservationStatus === "active" && Boolean(reservationExpiresAt);
   const reservationRemaining = remainingReservationMs(reservationExpiresAt, now);
   const reservationExpired = reservationActive && reservationRemaining === 0;
+  const reservationProgress = reservationProgressPercent(reservationRemaining);
+  const reservationProgressColor = reservationRemaining <= 2 * 60_000 ? "bg-red-500" : "bg-amber-500";
 
   useEffect(() => {
     if (!reservationActive || reservationExpired) return;
@@ -175,6 +177,19 @@ export default function Payment() {
                 <p className="mt-1 font-semibold tabular-nums" aria-label={`${t(translations.checkout.reservationTimeLeft, lang)}: ${formatReservationCountdown(reservationRemaining)}`}>
                   {t(translations.checkout.reservationTimeLeft, lang)}: {formatReservationCountdown(reservationRemaining)}
                 </p>
+                <div
+                  className="mt-2 h-2 w-full overflow-hidden rounded-full bg-amber-200/80"
+                  role="progressbar"
+                  aria-label={t(translations.checkout.reservationTimeLeft, lang)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={reservationProgress}
+                >
+                  <div
+                    className={`h-full rounded-full transition-[width,background-color] duration-1000 ${reservationProgressColor}`}
+                    style={{ width: `${reservationProgress}%` }}
+                  />
+                </div>
               </div>
             </div>
           )}
