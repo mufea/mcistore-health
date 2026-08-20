@@ -12,7 +12,7 @@ import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
-import { isLowStock } from "@/lib/stock";
+import { isLowStock, matchesStockFilter } from "@/lib/stock";
 
 export default function Products() {
   const { lang } = useLanguage();
@@ -20,6 +20,7 @@ export default function Products() {
   const { user, isAuthenticated } = useAuth();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const [lowStockOnly, setLowStockOnly] = useState(false);
 
   const { data: products, isLoading } = trpc.products.list.useQuery({
     segment: isAuthenticated ? (user?.segment ?? "standard") : "standard",
@@ -33,7 +34,7 @@ export default function Products() {
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       (p.description ?? "").toLowerCase().includes(search.toLowerCase());
     const matchCategory = category === "all" || p.category === category;
-    return matchSearch && matchCategory;
+    return matchSearch && matchCategory && matchesStockFilter(p.stock, lowStockOnly);
   });
 
   return (
@@ -74,6 +75,16 @@ export default function Products() {
                 ))}
               </SelectContent>
             </Select>
+            <Button
+              type="button"
+              variant={lowStockOnly ? "default" : "outline"}
+              className="w-full sm:w-auto"
+              onClick={() => setLowStockOnly((current) => !current)}
+              aria-pressed={lowStockOnly}
+            >
+              <AlertTriangle className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t(p.lowStockOnly, lang)}
+            </Button>
           </div>
 
           {isLoading ? (

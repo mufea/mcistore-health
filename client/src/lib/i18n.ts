@@ -175,6 +175,7 @@ export const translations = {
     noProducts:     { en: "No products found matching your criteria.", ar: "لم يتم العثور على منتجات تطابق معاييرك.", zh: "未找到符合您条件的产品。", es: "No se encontraron productos que coincidan con sus criterios.", hi: "आपके मानदंड से मेल खाने वाले कोई उत्पाद नहीं मिले।", id: "No products found matching your criteria." },
     viewProduct:    { en: "View →",                      ar: "عرض ←",                     zh: "查看 →",                es: "Ver →",                        hi: "देखें →", id: "View →" },
     lowStock:       { en: "Low Stock",                   ar: "مخزون منخفض",              zh: "库存紧张",              es: "Stock Bajo",                   hi: "स्टॉक कम", id: "Stok Menipis" },
+    lowStockOnly:   { en: "Limited Stock",               ar: "مخزون محدود",              zh: "库存有限",              es: "Stock Limitado",               hi: "सीमित स्टॉक", id: "Stok Terbatas" },
     backToHome:     { en: "Back to Home",                ar: "العودة للرئيسية",           zh: "返回首页",              es: "Volver al Inicio",            hi: "होम पर वापस", id: "Back to Home" },
   },
 
