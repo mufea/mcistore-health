@@ -141,6 +141,7 @@ export const orders = mysqlTable("orders", {
   // Temporary inventory hold while payment is being completed.
   reservationStatus: mysqlEnum("reservationStatus", ["active", "released", "expired", "fulfilled"]).default("active").notNull(),
   reservationExpiresAt: timestamp("reservationExpiresAt"),
+  reservationExtensions: int("reservationExtensions").default(0).notNull(),
   reservationFinalizedAt: timestamp("reservationFinalizedAt"),
   // Order status
   status: mysqlEnum("status", ["pending", "processing", "shipped", "delivered", "cancelled"]).default("pending").notNull(),

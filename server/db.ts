@@ -308,6 +308,8 @@ export async function createOrder(
 
 type StockReservationItem = { productId: number; quantity: number };
 const RESERVATION_MINUTES = 10;
+const RESERVATION_EXTENSION_MINUTES = 5;
+const RESERVATION_EXTENSION_WINDOW_MS = 2 * 60_000;
 
 function affectedRows(result: unknown): number {
   return Number((result as any)?.[0]?.affectedRows ?? 0);
@@ -368,6 +370,52 @@ export async function reserveStock(items: StockReservationItem[]): Promise<boole
 
 export function reservationExpiry(from = new Date()) {
   return new Date(from.getTime() + RESERVATION_MINUTES * 60_000);
+}
+
+/** Extends an active hold once during its final two minutes, without adding another stock hold. */
+export async function extendOrderStockReservation(orderId: number, now = new Date()) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+
+  await expireStockReservations(now);
+  const order = await getOrderById(orderId);
+  if (!order || order.reservationStatus !== "active" || !order.reservationExpiresAt) {
+    return { ok: false as const, reason: "inactive" as const };
+  }
+  if (order.reservationExtensions >= 1) {
+    return { ok: false as const, reason: "limit" as const };
+  }
+  const remainingMs = order.reservationExpiresAt.getTime() - now.getTime();
+  if (remainingMs <= 0) {
+    return { ok: false as const, reason: "expired" as const };
+  }
+  if (remainingMs > RESERVATION_EXTENSION_WINDOW_MS) {
+    return { ok: false as const, reason: "too_early" as const };
+  }
+
+  // The order already holds its own stock; only an unexpected stock deficit blocks an extension.
+  for (const item of await getOrderItems(orderId)) {
+    const [product] = await db.select().from(products).where(eq(products.id, item.productId)).limit(1);
+    if (!product || !product.isActive || product.stock < item.quantity) {
+      return { ok: false as const, reason: "unavailable" as const };
+    }
+  }
+
+  const expiresAt = new Date(order.reservationExpiresAt.getTime() + RESERVATION_EXTENSION_MINUTES * 60_000);
+  const claimed = await db.update(orders).set({
+    reservationExtensions: 1,
+    reservationExpiresAt: expiresAt,
+  }).where(and(
+    eq(orders.id, orderId),
+    eq(orders.reservationStatus, "active"),
+    eq(orders.reservationExtensions, 0),
+    eq(orders.reservationExpiresAt, order.reservationExpiresAt),
+  ));
+
+  if (affectedRows(claimed) !== 1) {
+    return { ok: false as const, reason: "unavailable" as const };
+  }
+  return { ok: true as const, expiresAt };
 }
 
 /** Releases an active order reservation after cancellation, failure, or expiry. */

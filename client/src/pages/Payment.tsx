@@ -41,6 +41,7 @@ export default function Payment() {
 
   const { data: settings } = trpc.settings.getPublic.useQuery();
   const createTokenMutation = trpc.payment.createMidtransToken.useMutation();
+  const extendReservationMutation = trpc.orders.extendReservation.useMutation();
   const { data: paymentStatus, refetch: refetchStatus } = trpc.payment.checkStatus.useQuery(
     { orderNumber: params.orderNumber ?? "" },
     { enabled: !!params.orderNumber, refetchInterval: 5000 }
@@ -110,6 +111,18 @@ export default function Payment() {
       });
     } catch (err: any) {
       toast.error(err.message ?? t(translations.toast.paymentInitFailed, lang));
+    }
+  };
+
+  const handleExtendReservation = async () => {
+    if (!params.orderNumber) return;
+    try {
+      await extendReservationMutation.mutateAsync({ orderNumber: params.orderNumber });
+      await refetch();
+      setNow(Date.now());
+      toast.success(t(translations.checkout.reservationExtended, lang));
+    } catch (err: any) {
+      toast.error(err.message ?? t(translations.checkout.reservationExpired, lang));
     }
   };
 
@@ -191,6 +204,20 @@ export default function Payment() {
                     style={{ width: `${reservationProgress}%` }}
                   />
                 </div>
+                {reservationNearExpiry && (order.reservationExtensions ?? 0) < 1 && (
+                  <div className="mt-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleExtendReservation}
+                      disabled={extendReservationMutation.isPending}
+                    >
+                      {extendReservationMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                      {t(translations.checkout.extendReservation, lang)}
+                    </Button>
+                    <p className="mt-1 text-xs text-amber-800">{t(translations.checkout.extendReservationHint, lang)}</p>
+                  </div>
+                )}
               </div>
             </div>
           )}

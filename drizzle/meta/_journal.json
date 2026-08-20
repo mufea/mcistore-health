@@ -43,6 +43,13 @@
       "when": 1787214124846,
       "tag": "0005_great_the_hood",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1787218424314,
+      "tag": "0006_wild_husk",
+      "breakpoints": true
     }
   ]
 }

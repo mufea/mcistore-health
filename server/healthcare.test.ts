@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { createOrder, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, releaseOrderStockReservation } from "./db";
+import { createOrder, extendOrderStockReservation, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, releaseOrderStockReservation } from "./db";
 import { applyPaymentReservationOutcome } from "./stockReservation";
 import { availableStock, isReservationExpired } from "./reservationPolicy";
 import { getProductsAfterReservationCleanup } from "./customerStockRead";
@@ -39,6 +39,7 @@ vi.mock("./db", () => ({
   getAllOrders: vi.fn().mockResolvedValue([]),
   getOrdersByUserId: vi.fn().mockResolvedValue([]),
   expireStockReservations: vi.fn().mockResolvedValue(undefined),
+  extendOrderStockReservation: vi.fn(),
   reserveStock: vi.fn().mockResolvedValue(true),
   releaseReservedStock: vi.fn().mockResolvedValue(undefined),
   reservationExpiry: vi.fn().mockReturnValue(new Date("2026-08-20T00:10:00.000Z")),
@@ -539,6 +540,38 @@ describe("manual payment stock reservation lifecycle", () => {
     const caller = appRouter.createCaller(makeAdminCtx());
     await caller.orders.updateStatus({ id: 54, paymentStatus: "refunded" });
     expect(releaseOrderStockReservation).toHaveBeenCalledWith(54);
+  });
+});
+
+describe("orders.extendReservation", () => {
+  it("extends a pending reservation once when the server confirms availability", async () => {
+    const expiresAt = new Date("2026-08-20T08:05:00.000Z");
+    vi.mocked(getOrderByNumber).mockResolvedValueOnce({
+      id: 72,
+      orderNumber: "VW-EXTEND-001",
+      paymentStatus: "pending",
+      status: "pending",
+    } as any);
+    vi.mocked(extendOrderStockReservation).mockResolvedValueOnce({ ok: true, expiresAt });
+
+    const caller = appRouter.createCaller(makeCtx());
+    await expect(caller.orders.extendReservation({ orderNumber: "VW-EXTEND-001" }))
+      .resolves.toEqual({ reservationExpiresAt: expiresAt });
+    expect(extendOrderStockReservation).toHaveBeenCalledWith(72);
+  });
+
+  it("rejects a second extension attempt after the one-time limit", async () => {
+    vi.mocked(getOrderByNumber).mockResolvedValueOnce({
+      id: 73,
+      orderNumber: "VW-EXTEND-LIMIT",
+      paymentStatus: "pending",
+      status: "pending",
+    } as any);
+    vi.mocked(extendOrderStockReservation).mockResolvedValueOnce({ ok: false, reason: "limit" });
+
+    const caller = appRouter.createCaller(makeCtx());
+    await expect(caller.orders.extendReservation({ orderNumber: "VW-EXTEND-LIMIT" }))
+      .rejects.toThrow("already been extended once");
   });
 });
 

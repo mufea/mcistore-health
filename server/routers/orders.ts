@@ -12,6 +12,7 @@ import {
   getProductById,
   getSetting,
   expireStockReservations,
+  extendOrderStockReservation,
   finalizeStockReservation,
   releaseOrderStockReservation,
   releaseReservedStock,
@@ -176,6 +177,32 @@ export const ordersRouter = router({
       if (!order) return null;
       const items = await getOrderItems(order.id);
       return { ...order, items };
+    }),
+
+  // Public: extend an active reservation once during its final two minutes.
+  extendReservation: publicProcedure
+    .input(z.object({ orderNumber: z.string().min(1) }))
+    .mutation(async ({ input }) => {
+      const order = await getOrderByNumber(input.orderNumber);
+      if (!order) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+      }
+      if (order.paymentStatus !== "pending" || order.status !== "pending") {
+        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "This order can no longer extend its reservation." });
+      }
+
+      const result = await extendOrderStockReservation(order.id);
+      if (!result.ok) {
+        const messages = {
+          inactive: "This stock reservation is no longer active.",
+          expired: "This stock reservation has expired. Please return to Checkout.",
+          too_early: "Reservations can only be extended during the final two minutes.",
+          limit: "This reservation has already been extended once.",
+          unavailable: "Stock is no longer available to extend this reservation.",
+        } as const;
+        throw new TRPCError({ code: "PRECONDITION_FAILED", message: messages[result.reason] });
+      }
+      return { reservationExpiresAt: result.expiresAt };
     }),
 
   // Protected: get current user's orders

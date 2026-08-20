@@ -112,3 +112,4 @@
 - [x] Show a real-time reservation countdown and expiry guidance on the Payment page
 - [x] Add an accessible visual progress indicator for the remaining reservation time
 - [x] Add a reduced-motion-safe near-expiry visual alert to the reservation timer
+- [x] Add a stock-aware customer option to extend an active payment reservation
