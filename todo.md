@@ -70,3 +70,11 @@
 - [x] Admin: Meeting Slots management page
 - [x] Admin: Chatbot Conversations history page
 - [x] Wire new routes into App.tsx and admin sidebar
+
+## Payment Flow Maintenance
+- [ ] Standardize checkout and payment settings around the existing Midtrans payment methods, with no Stripe dependency
+
+## Customer Experience & Order Reporting
+- [x] Create a product detail page with a detailed multi-image gallery, purchase controls, and related products
+- [x] Add translated order-status filters to the My Orders page
+- [x] Add a protected CSV export action to the admin Orders page

@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Survey from "./pages/Survey";
 import Recommendations from "./pages/Recommendations";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import Payment from "./pages/Payment";
 import OrderDetail from "./pages/OrderDetail";
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/survey" component={Survey} />
       <Route path="/recommendations" component={Recommendations} />
       <Route path="/products" component={Products} />
+      <Route path="/products/:id" component={ProductDetail} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/payment/:orderNumber" component={Payment} />
       <Route path="/order/:orderNumber" component={OrderDetail} />

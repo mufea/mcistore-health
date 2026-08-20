@@ -6,12 +6,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
-import { Eye, Loader2, Package, Search } from "lucide-react";
+import { Download, Eye, Loader2, Package, Search } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 
-const ORDER_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"];
-const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"];
+const ORDER_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
+const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"] as const;
 
 function StatusBadge({ status, type = "order" }: { status: string; type?: "order" | "payment" }) {
   const orderColors: Record<string, string> = {
@@ -39,7 +39,7 @@ export default function AdminOrders() {
   const utils = trpc.useUtils();
   const { data: orders, isLoading } = trpc.orders.adminList.useQuery();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | (typeof ORDER_STATUSES)[number]>("all");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [detailDialog, setDetailDialog] = useState(false);
   const [newStatus, setNewStatus] = useState("");
@@ -56,6 +56,14 @@ export default function AdminOrders() {
     onError: (e) => toast.error(e.message),
   });
 
+  const exportCsvQuery = trpc.orders.exportCsv.useQuery(
+    {
+      status: statusFilter === "all" ? undefined : statusFilter,
+      search: search || undefined,
+    },
+    { enabled: false }
+  );
+
   const openDetail = (order: any) => {
     setSelectedOrder(order);
     setNewStatus(order.status);
@@ -70,6 +78,30 @@ export default function AdminOrders() {
       status: newStatus as any,
       paymentStatus: newPaymentStatus as any,
     });
+  };
+
+  const exportCsv = async () => {
+    if (filtered.length === 0) {
+      toast.error("No orders available to export.");
+      return;
+    }
+
+    const result = await exportCsvQuery.refetch();
+    if (!result.data) {
+      toast.error("Unable to prepare the CSV export.");
+      return;
+    }
+
+    const blob = new Blob([result.data.content], { type: "text/csv;charset=utf-8" });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = result.data.filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+    toast.success(`${result.data.count} order(s) exported to CSV.`);
   };
 
   const filtered = (orders ?? []).filter((o) => {
@@ -94,7 +126,7 @@ export default function AdminOrders() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search by order #, name, email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as "all" | (typeof ORDER_STATUSES)[number])}>
           <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
@@ -103,6 +135,10 @@ export default function AdminOrders() {
             {ORDER_STATUSES.map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Button variant="outline" className="sm:ml-auto" onClick={exportCsv} disabled={isLoading || exportCsvQuery.isFetching}>
+          {exportCsvQuery.isFetching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+          Export CSV
+        </Button>
       </div>
 
       {isLoading ? (

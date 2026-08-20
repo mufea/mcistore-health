@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
+import { getAllOrders } from "./db";
 
 // ─── Mock DB ──────────────────────────────────────────────────────────────────
 
@@ -345,6 +346,45 @@ describe("orders.adminList", () => {
     const caller = appRouter.createCaller(makeAdminCtx());
     const result = await caller.orders.adminList();
     expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe("orders.exportCsv", () => {
+  it("requires admin role", async () => {
+    const caller = appRouter.createCaller(makeUserCtx());
+    await expect(caller.orders.exportCsv()).rejects.toThrow();
+  });
+
+  it("exports filtered orders as formula-safe UTF-8 CSV", async () => {
+    vi.mocked(getAllOrders).mockResolvedValueOnce([
+      {
+        id: 1,
+        orderNumber: "VW-CSV-001",
+        createdAt: new Date("2026-08-20T00:00:00.000Z"),
+        customerName: "=SUM(1,1)",
+        customerEmail: "customer@example.com",
+        customerPhone: "+62812345678",
+        status: "shipped",
+        paymentStatus: "paid",
+        paymentMethod: "midtrans",
+        shippingType: "national",
+        subtotal: "100000",
+        shippingCost: "10000",
+        total: "110000",
+        city: "Jakarta",
+        province: "DKI Jakarta",
+        country: "Indonesia",
+      },
+    ] as any);
+
+    const caller = appRouter.createCaller(makeAdminCtx());
+    const result = await caller.orders.exportCsv({ status: "shipped" });
+
+    expect(result.filename).toMatch(/^orders-\d{4}-\d{2}-\d{2}\.csv$/);
+    expect(result.count).toBe(1);
+    expect(result.content).toContain("Order Number");
+    expect(result.content).toContain("VW-CSV-001");
+    expect(result.content).toContain("'=SUM(1,1)");
   });
 });
 

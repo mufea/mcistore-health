@@ -30,6 +30,15 @@ const orderItemSchema = z.object({
   subtotal: z.number(),
 });
 
+const orderStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
+
+function escapeCsvCell(value: unknown): string {
+  const text = String(value ?? "");
+  // Prevent spreadsheet formula execution when a CSV is opened in Excel/Sheets.
+  const safeText = /^[=+\-@]/.test(text) ? `'${text}` : text;
+  return `"${safeText.replace(/"/g, '""')}"`;
+}
+
 export const ordersRouter = router({
   // Public: create order
   create: publicProcedure
@@ -127,6 +136,48 @@ export const ordersRouter = router({
     const orders = await getAllOrders();
     return orders;
   }),
+
+  // Admin: export the current order report as a UTF-8 CSV file.
+  exportCsv: adminProcedure
+    .input(z.object({ status: z.enum(orderStatuses).optional(), search: z.string().trim().optional() }).optional())
+    .query(async ({ input }) => {
+      const normalizedSearch = input?.search?.toLowerCase() ?? "";
+      const orders = (await getAllOrders()).filter((order) => {
+        const statusMatches = !input?.status || order.status === input.status;
+        const searchMatches = !normalizedSearch || [order.orderNumber, order.customerName, order.customerEmail]
+          .some((value) => value.toLowerCase().includes(normalizedSearch));
+        return statusMatches && searchMatches;
+      });
+
+      const headings = [
+        "Order Number", "Created At", "Customer Name", "Customer Email", "Customer Phone",
+        "Order Status", "Payment Status", "Payment Method", "Shipping Type",
+        "Subtotal", "Shipping Cost", "Total", "City", "Province", "Country",
+      ];
+      const rows = orders.map((order) => [
+        order.orderNumber,
+        order.createdAt.toISOString(),
+        order.customerName,
+        order.customerEmail,
+        order.customerPhone,
+        order.status,
+        order.paymentStatus,
+        order.paymentMethod,
+        order.shippingType,
+        order.subtotal,
+        order.shippingCost,
+        order.total,
+        order.city,
+        order.province,
+        order.country,
+      ].map(escapeCsvCell).join(","));
+
+      return {
+        filename: `orders-${new Date().toISOString().slice(0, 10)}.csv`,
+        content: `\ufeff${[headings.map(escapeCsvCell).join(","), ...rows].join("\r\n")}`,
+        count: orders.length,
+      };
+    }),
 
   // Admin: get order details
   adminGetById: adminProcedure

@@ -220,6 +220,17 @@ export const translations = {
     noOrders:         { en: "No orders yet",                   ar: "لا توجد طلبات بعد",          zh: "暂无订单",              es: "Sin pedidos aún",              hi: "अभी कोई ऑर्डर नहीं", id: "Belum ada pesanan" },
     noOrdersSub:      { en: "Start your wellness journey today.", ar: "ابدأ رحلتك الصحية اليوم.", zh: "今天开始您的健康之旅。", es: "Comienza tu viaje de bienestar hoy.", hi: "आज अपनी वेलनेस यात्रा शुरू करें।", id: "Mulai perjalanan kesehatan Anda hari ini." },
     takeHealthSurvey: { en: "Take Health Survey",              ar: "ابدأ الاستبيان الصحي",       zh: "参加健康调查",          es: "Realizar Encuesta de Salud",   hi: "स्वास्थ्य सर्वेक्षण लें", id: "Ikuti Survei Kesehatan" },
+    filterByStatus:    { en: "Filter by status",               ar: "التصفية حسب الحالة",        zh: "按状态筛选",            es: "Filtrar por estado",           hi: "स्थिति के अनुसार फ़िल्टर करें", id: "Filter berdasarkan status" },
+    allOrders:         { en: "All",                            ar: "الكل",                     zh: "全部",                es: "Todos",                       hi: "सभी",                         id: "Semua" },
+    pending:           { en: "Pending",                        ar: "قيد الانتظار",             zh: "待处理",               es: "Pendiente",                   hi: "लंबित",                       id: "Menunggu" },
+    processing:        { en: "Processing",                     ar: "قيد المعالجة",             zh: "处理中",               es: "En proceso",                  hi: "Diproses",                    id: "Diproses" },
+    shipped:           { en: "Shipped",                        ar: "تم الشحن",                zh: "已发货",               es: "Enviado",                     hi: "भेजा गया",                   id: "Dikirim" },
+    delivered:         { en: "Delivered",                      ar: "تم التسليم",              zh: "已送达",               es: "Entregado",                   hi: "डिलीवर हुआ",                 id: "Terkirim" },
+    cancelled:         { en: "Cancelled",                      ar: "ملغى",                    zh: "已取消",               es: "Cancelado",                   hi: "रद्द",                         id: "Dibatalkan" },
+    paid:              { en: "Paid",                           ar: "مدفوع",                  zh: "已付款",               es: "Pagado",                      hi: "भुगतान किया गया",            id: "Dibayar" },
+    failed:            { en: "Failed",                         ar: "فشل",                    zh: "失败",                 es: "Fallido",                     hi: "विफल",                       id: "Gagal" },
+    refunded:          { en: "Refunded",                       ar: "تم الاسترداد",            zh: "已退款",               es: "Reembolsado",                 hi: "रिफंड किया गया",             id: "Dikembalikan" },
+    noFilteredOrders:  { en: "No orders match this filter.",  ar: "لا توجد طلبات مطابقة لهذا الفلتر.", zh: "没有符合此筛选条件的订单。", es: "No hay pedidos que coincidan con este filtro.", hi: "इस फ़िल्टर से मेल खाने वाला कोई ऑर्डर नहीं है।", id: "Tidak ada pesanan yang sesuai dengan filter ini." },
   },
 
   // ── Order Detail Page ──
@@ -347,6 +358,26 @@ export const translations = {
     // Chatbot
     chatSendFailed:       { en: "Failed to send message",                 ar: "فشل إرسال الرسالة",                    zh: "发送消息失败",             es: "Error al enviar mensaje",               hi: "संदेश भेजना विफल", id: "Gagal mengirim pesan" },
     meetingBooked:        { en: "Meeting booked successfully!",            ar: "تم حجز الاجتماع بنجاح!",               zh: "会议预订成功！",           es: "¡Reunión reservada con éxito!",          hi: "मीटिंग सफलतापूर्वक बुक हुई!", id: "Pertemuan berhasil dipesan!" },
+  },
+  // ── Product Detail Page ──
+  productDetail: {
+    backToProducts:  { en: "Back to Products",        ar: "العودة إلى المنتجات",     zh: "返回产品",           es: "Volver a Productos",        hi: "उत्पादों पर वापस",       id: "Kembali ke Produk" },
+    quantity:        { en: "Quantity",                ar: "الكمية",                  zh: "数量",               es: "Cantidad",                  hi: "मात्रा",                 id: "Jumlah" },
+    addToCart:       { en: "Add to Cart",             ar: "أضف إلى السلة",           zh: "加入购物车",         es: "Agregar al Carrito",        hi: "कार्ट में जोड़ें",       id: "Tambah ke Keranjang" },
+    buyNow:          { en: "Buy Now",                 ar: "اشتر الآن",               zh: "立即购买",           es: "Comprar Ahora",             hi: "अभी खरीदें",             id: "Beli Sekarang" },
+    inStock:         { en: "In Stock",                ar: "متوفر",                   zh: "有货",               es: "En Stock",                  hi: "स्टॉक में",             id: "Tersedia" },
+    outOfStock:      { en: "Out of Stock",            ar: "نفذ المخزون",             zh: "缺货",               es: "Agotado",                   hi: "स्टॉक से बाहर",          id: "Habis" },
+    productDetails:  { en: "Product Details",         ar: "تفاصيل المنتج",           zh: "产品详情",           es: "Detalles del Producto",     hi: "उत्पाद विवरण",           id: "Detail Produk" },
+    tags:            { en: "Tags",                    ar: "الوسوم",                  zh: "标签",               es: "Etiquetas",                 hi: "टैग",                    id: "Tag" },
+    relatedProducts: { en: "Related Products",        ar: "منتجات ذات صلة",          zh: "相关产品",           es: "Productos Relacionados",    hi: "संबंधित उत्पाद",         id: "Produk Terkait" },
+    notFound:        { en: "Product not found",       ar: "المنتج غير موجود",        zh: "未找到产品",         es: "Producto no encontrado",    hi: "उत्पाद नहीं मिला",       id: "Produk tidak ditemukan" },
+    notFoundDesc:    { en: "This product is unavailable or restricted to your account level.", ar: "هذا المنتج غير متاح أو مقيد لمستوى حسابك.", zh: "此产品不可用或受您的账户级别限制。", es: "Este producto no está disponible o está restringido a su nivel de cuenta.", hi: "यह उत्पाद अनुपलब्ध है या आपके खाते के स्तर तक सीमित है।", id: "Produk ini tidak tersedia atau dibatasi untuk level akun Anda." },
+    signInToAdd:     { en: "Sign in to add to cart",  ar: "سجّل الدخول للإضافة إلى السلة", zh: "登录后加入购物车",  es: "Inicia sesión para agregar al carrito", hi: "कार्ट में जोड़ने के लिए साइन इन करें", id: "Masuk untuk tambah ke keranjang" },
+    exclusive:       { en: "Exclusive",               ar: "حصري",                    zh: "独家",               es: "Exclusivo",                 hi: "एक्सक्लूसिव",            id: "Eksklusif" },
+    featured:        { en: "Featured",                ar: "مميز",                    zh: "精选",               es: "Destacado",                 hi: "विशेष",                  id: "Unggulan" },
+    viewAll:         { en: "View All Products",       ar: "عرض جميع المنتجات",       zh: "查看所有产品",       es: "Ver Todos los Productos",   hi: "सभी उत्पाद देखें",       id: "Lihat Semua Produk" },
+    addedToCart:     { en: "Added to cart!",          ar: "تمت الإضافة إلى السلة!",  zh: "已加入购物车！",     es: "¡Agregado al carrito!",     hi: "कार्ट में जोड़ा गया!",   id: "Ditambahkan ke keranjang!" },
+    stock:           { en: "units available",         ar: "وحدة متاحة",              zh: "件库存",             es: "unidades disponibles",      hi: "इकाइयाँ उपलब्ध",        id: "unit tersedia" },
   },
 } as const;
 

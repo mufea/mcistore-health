@@ -8,8 +8,9 @@ import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import { useState } from "react";
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, label }: { status: string; label: string }) {
   const variants: Record<string, string> = {
     pending: "bg-amber-100 text-amber-700",
     processing: "bg-blue-100 text-blue-700",
@@ -21,7 +22,7 @@ function StatusBadge({ status }: { status: string }) {
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${variants[status] ?? "bg-muted text-muted-foreground"}`}>
-      {status}
+      {label}
     </span>
   );
 }
@@ -30,9 +31,27 @@ export default function MyOrders() {
   const { lang } = useLanguage();
   const m = translations.myOrdersPage;
   const { isAuthenticated } = useAuth();
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "shipped" | "delivered">("all");
   const { data: orders, isLoading } = trpc.orders.myOrders.useQuery(undefined, {
     enabled: isAuthenticated,
   });
+  const statusLabels = {
+    pending: t(m.pending, lang),
+    processing: t(m.processing, lang),
+    shipped: t(m.shipped, lang),
+    delivered: t(m.delivered, lang),
+    cancelled: t(m.cancelled, lang),
+    paid: t(m.paid, lang),
+    failed: t(m.failed, lang),
+    refunded: t(m.refunded, lang),
+  } as const;
+  const filteredOrders = (orders ?? []).filter((order) => statusFilter === "all" || order.status === statusFilter);
+  const filters = [
+    { value: "all" as const, label: t(m.allOrders, lang) },
+    { value: "pending" as const, label: t(m.pending, lang) },
+    { value: "shipped" as const, label: t(m.shipped, lang) },
+    { value: "delivered" as const, label: t(m.delivered, lang) },
+  ];
 
   if (!isAuthenticated) {
     return (
@@ -82,8 +101,29 @@ export default function MyOrders() {
               </Button>
             </div>
           ) : (
+            <>
+              <div className="mb-5 flex flex-wrap items-center gap-2" role="group" aria-label={t(m.filterByStatus, lang)}>
+                <span className="mr-1 text-sm text-muted-foreground">{t(m.filterByStatus, lang)}:</span>
+                {filters.map((filter) => (
+                  <Button
+                    key={filter.value}
+                    type="button"
+                    size="sm"
+                    variant={statusFilter === filter.value ? "default" : "outline"}
+                    className={statusFilter === filter.value ? "bg-primary text-primary-foreground" : "bg-background"}
+                    onClick={() => setStatusFilter(filter.value)}
+                  >
+                    {filter.label}
+                  </Button>
+                ))}
+              </div>
+              {filteredOrders.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-border/70 py-14 text-center text-sm text-muted-foreground">
+                  {t(m.noFilteredOrders, lang)}
+                </div>
+              ) : (
             <div className="space-y-4">
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <Link href={`/order/${order.orderNumber}`} key={order.id}>
                   <div className="bg-card rounded-xl border border-border/60 p-5 card-hover cursor-pointer">
                     <div className="flex items-start justify-between gap-4">
@@ -98,8 +138,8 @@ export default function MyOrders() {
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-1.5">
-                        <StatusBadge status={order.status} />
-                        <StatusBadge status={order.paymentStatus} />
+                        <StatusBadge status={order.status} label={statusLabels[order.status as keyof typeof statusLabels] ?? order.status} />
+                        <StatusBadge status={order.paymentStatus} label={statusLabels[order.paymentStatus as keyof typeof statusLabels] ?? order.paymentStatus} />
                       </div>
                     </div>
                     <div className="mt-3 flex items-center justify-between">
@@ -114,6 +154,8 @@ export default function MyOrders() {
                 </Link>
               ))}
             </div>
+              )}
+            </>
           )}
         </div>
       </div>
