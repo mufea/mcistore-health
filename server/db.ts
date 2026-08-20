@@ -256,6 +256,15 @@ export async function getAllProductsAdmin() {
   return db.select().from(products).orderBy(desc(products.createdAt));
 }
 
+export async function getActiveProductsForSitemap() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({ id: products.id, updatedAt: products.updatedAt })
+    .from(products)
+    .where(eq(products.isActive, true))
+    .orderBy(products.id);
+}
+
 export async function createProduct(data: InsertProduct) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");

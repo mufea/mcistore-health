@@ -9,9 +9,10 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { getOrderByNumber, getSetting, updateOrderByMidtransId, updateOrderStatus } from "../db";
+import { getActiveProductsForSitemap, getOrderByNumber, getSetting, updateOrderByMidtransId, updateOrderStatus } from "../db";
 import { notifyOwner } from "./notification";
 import { applyPaymentReservationOutcome } from "../stockReservation";
+import { buildSitemapXml } from "../sitemap";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -40,6 +41,16 @@ async function startServer() {
 
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+
+  app.get("/sitemap.xml", async (_req, res) => {
+    try {
+      const products = await getActiveProductsForSitemap();
+      res.type("application/xml").set("Cache-Control", "public, max-age=3600").send(buildSitemapXml(products));
+    } catch (error) {
+      console.error("Sitemap generation error:", error);
+      res.status(500).type("text/plain").send("Unable to generate sitemap");
+    }
+  });
 
   // ─── Midtrans Webhook ──────────────────────────────────────────────────────
   app.post("/api/midtrans/webhook", async (req, res) => {

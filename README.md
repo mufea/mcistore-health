@@ -1034,7 +1034,12 @@ const url = `https://${process.env.APP_SUBDOMAIN}.example.com/verify`;
 // Frontend
 const createInvite = trpc.invites.create.useMutation();
 await createInvite.mutateAsync({ eventId: "123", origin: window.location.origin });
-
 // Backend - use input.origin to build the URL
 const inviteUrl = `${input.origin}/events/${eventId}/join?token=${token}`;
 ```
+
+---
+
+## SEO Indexing
+
+`/robots.txt` is served from `client/public/robots.txt` and directs crawlers to the canonical sitemap at `https://mci-store.com/sitemap.xml`. The sitemap is generated dynamically by the server rather than stored as a static XML file, so it includes the current public storefront routes and every active product detail URL. Private account, checkout, order, and admin routes are excluded from crawling.

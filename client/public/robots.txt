@@ -1,0 +1,15 @@
+# MCI Store - Trusted Health Partner
+User-agent: *
+Allow: /
+
+# Keep private, account-specific, transactional, and administrative pages out of search results.
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /payment/
+Disallow: /order/
+Disallow: /my-orders
+Disallow: /profile
+Disallow: /recommendations
+Disallow: /track-order
+
+Sitemap: https://mci-store.com/sitemap.xml

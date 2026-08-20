@@ -132,3 +132,6 @@
 - [x] Add regression coverage for paid-order stock finalization and audit-history creation
 - [x] Verify sequential paid-order finalizations preserve stock totals and stock-history audit rows
 - [x] Exercise the production stock-finalization path with an injected transaction and audit assertions
+- [x] Add valid robots.txt and a dynamic sitemap.xml endpoint for public MCI Store pages
+- [x] Include active public product-detail URLs in the sitemap and review indexable public routes
+- [x] Document the dynamic sitemap.xml endpoint and validate its server response
