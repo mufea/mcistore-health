@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import CheckoutStepper from "@/components/CheckoutStepper";
-import { formatReservationCountdown, remainingReservationMs, reservationProgressPercent } from "@/lib/reservationTimer";
+import { formatReservationCountdown, isReservationNearExpiry, remainingReservationMs, reservationProgressPercent } from "@/lib/reservationTimer";
 
 declare global {
   interface Window {
@@ -54,7 +54,8 @@ export default function Payment() {
   const reservationRemaining = remainingReservationMs(reservationExpiresAt, now);
   const reservationExpired = reservationActive && reservationRemaining === 0;
   const reservationProgress = reservationProgressPercent(reservationRemaining);
-  const reservationProgressColor = reservationRemaining <= 2 * 60_000 ? "bg-red-500" : "bg-amber-500";
+  const reservationNearExpiry = isReservationNearExpiry(reservationRemaining);
+  const reservationProgressColor = reservationNearExpiry ? "bg-red-500" : "bg-amber-500";
 
   useEffect(() => {
     if (!reservationActive || reservationExpired) return;
@@ -170,7 +171,7 @@ export default function Payment() {
           </div>
 
           {reservationActive && !reservationExpired && (
-            <div className="mb-5 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <div className={`mb-5 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 ${reservationNearExpiry ? "reservation-near-expiry" : ""}`}>
               <Clock3 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
               <div>
                 <p>{t(translations.checkout.reservationNotice, lang)}</p>
@@ -186,7 +187,7 @@ export default function Payment() {
                   aria-valuenow={reservationProgress}
                 >
                   <div
-                    className={`h-full rounded-full transition-[width,background-color] duration-1000 ${reservationProgressColor}`}
+                    className={`reservation-progress-fill h-full rounded-full ${reservationProgressColor} ${reservationNearExpiry ? "reservation-progress-near-expiry" : ""}`}
                     style={{ width: `${reservationProgress}%` }}
                   />
                 </div>

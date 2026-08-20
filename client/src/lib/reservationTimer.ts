@@ -15,3 +15,7 @@ export function reservationProgressPercent(remainingMs: number, durationMs = 10 
   if (durationMs <= 0) return 0;
   return Math.round(Math.min(100, Math.max(0, (remainingMs / durationMs) * 100)));
 }
+
+export function isReservationNearExpiry(remainingMs: number, warningMs = 2 * 60_000) {
+  return remainingMs > 0 && remainingMs <= warningMs;
+}

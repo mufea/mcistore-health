@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatReservationCountdown, remainingReservationMs, reservationProgressPercent } from "./reservationTimer";
+import { formatReservationCountdown, isReservationNearExpiry, remainingReservationMs, reservationProgressPercent } from "./reservationTimer";
 
 describe("reservationTimer", () => {
   it("calculates remaining time and never returns a negative value", () => {
@@ -16,5 +16,11 @@ describe("reservationTimer", () => {
     expect(reservationProgressPercent(300_000)).toBe(50);
     expect(reservationProgressPercent(900_000)).toBe(100);
     expect(reservationProgressPercent(-1)).toBe(0);
+  });
+
+  it("identifies the last two minutes without flagging an expired reservation", () => {
+    expect(isReservationNearExpiry(120_000)).toBe(true);
+    expect(isReservationNearExpiry(120_001)).toBe(false);
+    expect(isReservationNearExpiry(0)).toBe(false);
   });
 });
