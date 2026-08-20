@@ -72,7 +72,7 @@
 - [x] Wire new routes into App.tsx and admin sidebar
 
 ## Payment Flow Maintenance
-- [ ] Standardize checkout and payment settings around the existing Midtrans payment methods, with no Stripe dependency
+- [x] Standardize checkout and payment settings around the existing Midtrans payment methods, with no Stripe dependency
 
 ## Customer Experience & Order Reporting
 - [x] Create a product detail page with a detailed multi-image gallery, purchase controls, and related products
