@@ -127,3 +127,8 @@
 - [x] Add direct Buy Now actions for each selected alternative in the comparison table
 - [x] Show a floating total for multiple alternative products added to the cart
 - [x] Show a translated Habis warning badge for products with zero available stock
+- [x] Add an admin stock-change history for tracking product inventory adjustments
+- [x] Restore atomic stock decrements during paid-order finalization while preserving stock-history entries
+- [x] Add regression coverage for paid-order stock finalization and audit-history creation
+- [x] Verify sequential paid-order finalizations preserve stock totals and stock-history audit rows
+- [x] Exercise the production stock-finalization path with an injected transaction and audit assertions

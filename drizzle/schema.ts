@@ -104,6 +104,23 @@ export const products = mysqlTable("products", {
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = typeof products.$inferInsert;
 
+// ─── Stock History ────────────────────────────────────────────────────────────
+
+export const stockHistory = mysqlTable("stock_history", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull(),
+  previousStock: int("previousStock").notNull(),
+  newStock: int("newStock").notNull(),
+  change: int("change").notNull(),
+  reason: mysqlEnum("reason", ["admin_adjustment", "order_fulfilled"]).notNull(),
+  changedByUserId: int("changedByUserId"),
+  changedByName: varchar("changedByName", { length: 255 }),
+  orderId: int("orderId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StockHistory = typeof stockHistory.$inferSelect;
+
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
 export const orders = mysqlTable("orders", {

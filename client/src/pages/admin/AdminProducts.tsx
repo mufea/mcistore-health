@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { trpc } from "@/lib/trpc";
-import { Edit, ImagePlus, Leaf, Loader2, Plus, Search, Star, Trash2, X } from "lucide-react";
+import { Edit, History, ImagePlus, Leaf, Loader2, Plus, Search, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 
@@ -27,6 +27,11 @@ export default function AdminProducts() {
   const [dialog, setDialog] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
+  const [historyTarget, setHistoryTarget] = useState<{ id: number; name: string } | null>(null);
+  const { data: stockHistory, isLoading: isLoadingHistory } = trpc.products.stockHistory.useQuery(
+    { productId: historyTarget?.id ?? 1 },
+    { enabled: Boolean(historyTarget) }
+  );
 
   // Form state
   const [name, setName] = useState("");
@@ -50,7 +55,7 @@ export default function AdminProducts() {
     onError: (e) => toast.error(e.message),
   });
   const updateMutation = trpc.products.update.useMutation({
-    onSuccess: () => { utils.products.adminList.invalidate(); setDialog(false); toast.success("Product updated"); },
+    onSuccess: () => { utils.products.adminList.invalidate(); utils.products.stockHistory.invalidate(); setDialog(false); toast.success("Product updated"); },
     onError: (e) => toast.error(e.message),
   });
   const deleteMutation = trpc.products.delete.useMutation({
@@ -264,6 +269,9 @@ export default function AdminProducts() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => setHistoryTarget({ id: product.id, name: product.name })} title="View stock history" aria-label={`View stock history for ${product.name}`}>
+                          <History className="h-3.5 w-3.5" />
+                        </Button>
                         <Button size="sm" variant="ghost" onClick={() => openEdit(product)}><Edit className="h-3.5 w-3.5" /></Button>
                         <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget({ id: product.id, name: product.name })}>
                           <Trash2 className="h-3.5 w-3.5" />
@@ -425,6 +433,52 @@ export default function AdminProducts() {
               {editing ? "Save Changes" : "Create Product"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Stock History */}
+      <Dialog open={!!historyTarget} onOpenChange={(open) => { if (!open) setHistoryTarget(null); }}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Stock History — {historyTarget?.name}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">A record of manual stock adjustments and inventory fulfilled through paid orders.</p>
+          {isLoadingHistory ? (
+            <div className="flex items-center justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          ) : !stockHistory?.length ? (
+            <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              No stock changes have been recorded for this product yet.
+            </div>
+          ) : (
+            <div className="max-h-[55vh] overflow-auto rounded-lg border border-border/60">
+              <table className="w-full min-w-[640px] text-sm">
+                <thead className="sticky top-0 bg-muted/90 backdrop-blur">
+                  <tr className="border-b border-border/60">
+                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Date & Time</th>
+                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Change</th>
+                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Stock</th>
+                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Source</th>
+                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Updated By</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/40">
+                  {stockHistory.map((entry) => {
+                    const increased = entry.change > 0;
+                    const source = entry.reason === "admin_adjustment" ? "Admin adjustment" : `Order #${entry.orderId ?? "—"}`;
+                    return (
+                      <tr key={entry.id} className="hover:bg-muted/20">
+                        <td className="p-3 text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</td>
+                        <td className="p-3"><span className={`font-semibold ${increased ? "text-emerald-700" : "text-destructive"}`}>{increased ? "+" : ""}{entry.change}</span></td>
+                        <td className="p-3"><span className="font-medium">{entry.previousStock}</span><span className="mx-1 text-muted-foreground">→</span><span className="font-semibold">{entry.newStock}</span></td>
+                        <td className="p-3"><Badge variant="outline" className="font-normal">{source}</Badge></td>
+                        <td className="p-3 text-muted-foreground">{entry.changedByName ?? "System"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 

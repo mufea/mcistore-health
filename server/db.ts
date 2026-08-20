@@ -9,6 +9,7 @@ import {
   orders,
   products,
   settings,
+  stockHistory,
   surveyPages,
   surveyQuestions,
   surveyResponses,
@@ -16,6 +17,7 @@ import {
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { getProducts as getCustomerProducts } from "./productRead";
+import { finalizePaidOrderInventory, type PaidOrderStockItem, type StockFinalizationStore } from "./stockHistory";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -263,7 +265,53 @@ export async function createProduct(data: InsertProduct) {
 export async function updateProduct(id: number, data: Partial<InsertProduct>) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
-  await db.update(products).set(data).where(eq(products.id, id));
+  await db.transaction(async (tx) => {
+    const existing = await tx.select({ stock: products.stock }).from(products).where(eq(products.id, id)).limit(1);
+    if (!existing[0]) throw new Error("Product not found");
+
+    await tx.update(products).set(data).where(eq(products.id, id));
+    if (data.stock !== undefined && data.stock !== existing[0].stock) {
+      await tx.insert(stockHistory).values({
+        productId: id,
+        previousStock: existing[0].stock,
+        newStock: data.stock,
+        change: data.stock - existing[0].stock,
+        reason: "admin_adjustment",
+      });
+    }
+  });
+}
+
+export async function updateProductWithStockAudit(
+  id: number,
+  data: Partial<InsertProduct>,
+  actor: { userId: number; name?: string | null }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.transaction(async (tx) => {
+    const existing = await tx.select({ stock: products.stock }).from(products).where(eq(products.id, id)).limit(1);
+    if (!existing[0]) throw new Error("Product not found");
+
+    await tx.update(products).set(data).where(eq(products.id, id));
+    if (data.stock !== undefined && data.stock !== existing[0].stock) {
+      await tx.insert(stockHistory).values({
+        productId: id,
+        previousStock: existing[0].stock,
+        newStock: data.stock,
+        change: data.stock - existing[0].stock,
+        reason: "admin_adjustment",
+        changedByUserId: actor.userId,
+        changedByName: actor.name ?? null,
+      });
+    }
+  });
+}
+
+export async function getStockHistory(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(stockHistory).where(eq(stockHistory.productId, productId)).orderBy(desc(stockHistory.createdAt), desc(stockHistory.id)).limit(100);
 }
 
 export async function deleteProduct(id: number) {
@@ -431,23 +479,56 @@ export async function releaseOrderStockReservation(orderId: number) {
   return true;
 }
 
-/** Converts an active hold into sold inventory exactly once after payment succeeds. */
-export async function finalizeStockReservation(orderId: number) {
+type StockFinalizationDependencies = {
+  getOrderItems: (orderId: number) => Promise<PaidOrderStockItem[]>;
+  runInTransaction: (orderId: number, work: (store: StockFinalizationStore) => Promise<void>) => Promise<boolean>;
+};
+
+async function createProductionStockFinalizationDependencies(): Promise<StockFinalizationDependencies> {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
-  const claim = await db.update(orders).set({
-    reservationStatus: "fulfilled",
-    reservationFinalizedAt: new Date(),
-  }).where(and(eq(orders.id, orderId), eq(orders.reservationStatus, "active")));
-  if (affectedRows(claim) === 0) return false;
+  return {
+    getOrderItems,
+    runInTransaction: async (orderId, work) => db.transaction(async (tx) => {
+      const claim = await tx.update(orders).set({
+        reservationStatus: "fulfilled",
+        reservationFinalizedAt: new Date(),
+      }).where(and(eq(orders.id, orderId), eq(orders.reservationStatus, "active")));
+      if (affectedRows(claim) === 0) return false;
 
-  for (const item of await getOrderItems(orderId)) {
-    await db.update(products).set({
-      stock: sql`GREATEST(${products.stock} - ${item.quantity}, 0)`,
-      reservedStock: sql`GREATEST(${products.reservedStock} - ${item.quantity}, 0)`,
-    }).where(eq(products.id, item.productId));
-  }
-  return true;
+      await work({
+        // The row lock serializes concurrent paid-order finalizations and manual edits.
+        getLockedStock: async (productId) => {
+          const currentProduct = await tx
+            .select({ stock: products.stock })
+            .from(products)
+            .where(eq(products.id, productId))
+            .for("update")
+            .limit(1);
+          return currentProduct[0]?.stock;
+        },
+        decrementStock: async (productId, quantity) => {
+          await tx.update(products).set({
+            stock: sql`GREATEST(${products.stock} - ${quantity}, 0)`,
+            reservedStock: sql`GREATEST(${products.reservedStock} - ${quantity}, 0)`,
+          }).where(eq(products.id, productId));
+        },
+        createHistory: async (entry) => {
+          await tx.insert(stockHistory).values(entry);
+        },
+      });
+      return true;
+    }),
+  };
+}
+
+/** Converts an active hold into sold inventory exactly once after payment succeeds. */
+export async function finalizeStockReservation(orderId: number, dependencies?: StockFinalizationDependencies) {
+  const activeDependencies = dependencies ?? await createProductionStockFinalizationDependencies();
+  const items = await activeDependencies.getOrderItems(orderId);
+  return activeDependencies.runInTransaction(orderId, async (store) => {
+    await finalizePaidOrderInventory(items, orderId, store);
+  });
 }
 
 export async function getOrderByNumber(orderNumber: string) {

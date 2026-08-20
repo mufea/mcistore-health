@@ -5,7 +5,8 @@ import {
   getAllProductsAdmin,
   getProductById,
   getProducts,
-  updateProduct,
+  getStockHistory,
+  updateProductWithStockAudit,
 } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
@@ -52,6 +53,10 @@ export const productsRouter = router({
     return getAllProductsAdmin();
   }),
 
+  stockHistory: adminProcedure
+    .input(z.object({ productId: z.number().int().positive() }))
+    .query(async ({ input }) => getStockHistory(input.productId)),
+
   // Admin: create product
   create: adminProcedure
     .input(
@@ -96,9 +101,9 @@ export const productsRouter = router({
         recommendationTags: z.array(z.string()).optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { id, ...data } = input;
-      await updateProduct(id, data as any);
+      await updateProductWithStockAudit(id, data as any, { userId: ctx.user.id, name: ctx.user.name });
       return { success: true };
     }),
 

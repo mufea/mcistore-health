@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { createOrder, extendOrderStockReservation, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, releaseOrderStockReservation } from "./db";
+import { createOrder, extendOrderStockReservation, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, getStockHistory, releaseOrderStockReservation, updateProductWithStockAudit } from "./db";
 import { applyPaymentReservationOutcome } from "./stockReservation";
 import { availableStock, isReservationExpired } from "./reservationPolicy";
 import { getProductsAfterReservationCleanup } from "./customerStockRead";
@@ -29,7 +29,8 @@ vi.mock("./db", () => ({
   getProductById: vi.fn().mockResolvedValue(undefined),
   getAllProductsAdmin: vi.fn().mockResolvedValue([]),
   createProduct: vi.fn().mockResolvedValue(undefined),
-  updateProduct: vi.fn().mockResolvedValue(undefined),
+  updateProductWithStockAudit: vi.fn().mockResolvedValue(undefined),
+  getStockHistory: vi.fn().mockResolvedValue([]),
   deleteProduct: vi.fn().mockResolvedValue(undefined),
   createOrder: vi.fn().mockResolvedValue({ id: 1, orderNumber: "VW-TEST-001" }),
   getOrderByNumber: vi.fn().mockResolvedValue(undefined),
@@ -255,6 +256,23 @@ describe("products admin procedures", () => {
   it("adminList requires admin role", async () => {
     const caller = appRouter.createCaller(makeUserCtx());
     await expect(caller.products.adminList()).rejects.toThrow();
+  });
+
+  it("records the admin actor when stock is adjusted", async () => {
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await caller.products.update({ id: 9, stock: 24 });
+    expect(updateProductWithStockAudit).toHaveBeenCalledWith(9, { stock: 24 }, { userId: 1, name: "Admin User" });
+  });
+
+  it("returns stock history to admins only", async () => {
+    vi.mocked(getStockHistory).mockResolvedValueOnce([
+      { id: 1, productId: 9, previousStock: 20, newStock: 24, change: 4, reason: "admin_adjustment", changedByUserId: 1, changedByName: "Admin User", orderId: null, createdAt: new Date("2026-08-20T10:00:00.000Z") },
+    ] as any);
+    const adminCaller = appRouter.createCaller(makeAdminCtx());
+    await expect(adminCaller.products.stockHistory({ productId: 9 })).resolves.toHaveLength(1);
+
+    const userCaller = appRouter.createCaller(makeUserCtx());
+    await expect(userCaller.products.stockHistory({ productId: 9 })).rejects.toThrow();
   });
 });
 
