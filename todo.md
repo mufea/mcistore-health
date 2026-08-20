@@ -120,3 +120,5 @@
 - [x] Add a translated low-stock-only filter to the product catalog
 - [x] Show in-stock similar-product recommendations when a product detail is out of stock
 - [x] Add need-based filters to in-stock alternative product recommendations
+- [x] Keep translated alternative search available even when alternatives have no tags
+- [x] Cover text filtering of untagged alternatives in tests

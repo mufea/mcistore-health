@@ -1,5 +1,7 @@
 export type AlternativeCandidate = {
   id: number;
+  name: string;
+  description?: string | null;
   category: string;
   stock: number;
   isFeatured: boolean;
@@ -27,4 +29,18 @@ export function getAlternativeNeeds(products: AlternativeCandidate[]) {
 
 export function filterAlternativesByNeed<T extends AlternativeCandidate>(products: T[], need: string) {
   return need === "all" ? products : products.filter((product) => product.tags?.includes(need));
+}
+
+export function filterAlternativesByText<T extends AlternativeCandidate>(products: T[], query: string) {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  if (!normalizedQuery) return products;
+
+  return products.filter((product) =>
+    [product.name, product.description ?? "", ...(product.tags ?? [])]
+      .some((value) => value.toLocaleLowerCase().includes(normalizedQuery))
+  );
+}
+
+export function shouldShowAlternativeSearch(isOutOfStock: boolean, alternativeCount: number) {
+  return isOutOfStock && alternativeCount > 0;
 }

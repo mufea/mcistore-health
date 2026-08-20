@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
-import { ArrowLeft, Check, Loader2, Minus, Plus, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Minus, Plus, Search, ShoppingBag, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
-import { filterAlternativesByNeed, getAlternativeNeeds, getInStockAlternatives } from "@/lib/productAlternatives";
+import { filterAlternativesByNeed, filterAlternativesByText, getAlternativeNeeds, getInStockAlternatives, shouldShowAlternativeSearch } from "@/lib/productAlternatives";
 
 function getStoredCart(): number[] {
   try {
@@ -48,6 +49,7 @@ export default function ProductDetail() {
   const productId = Number(params.id);
   const [quantity, setQuantity] = useState(1);
   const [alternativeNeed, setAlternativeNeed] = useState("all");
+  const [alternativeSearch, setAlternativeSearch] = useState("");
   const segment = isAuthenticated ? (user?.segment ?? "standard") : "standard";
 
   const { data: product, isLoading } = trpc.products.getById.useQuery(
@@ -66,8 +68,9 @@ export default function ProductDetail() {
     : [];
   const recommendations = inStock ? related : availableAlternatives;
   const alternativeNeeds = !inStock ? getAlternativeNeeds(availableAlternatives) : [];
+  const showAlternativeSearch = shouldShowAlternativeSearch(!inStock, availableAlternatives.length);
   const filteredRecommendations = !inStock
-    ? filterAlternativesByNeed(recommendations, alternativeNeed)
+    ? filterAlternativesByText(filterAlternativesByNeed(recommendations, alternativeNeed), alternativeSearch)
     : recommendations;
   const recommendationTitle = inStock ? t(detail.relatedProducts, lang) : t(detail.availableAlternatives, lang);
 
@@ -216,17 +219,25 @@ export default function ProductDetail() {
                   <div className="gold-line mb-3" />
                   <h2 className="font-serif text-3xl font-light text-foreground">{recommendationTitle}</h2>
                   {!inStock && <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t(detail.alternativesHint, lang)}</p>}
-                  {!inStock && alternativeNeeds.length > 0 && (
-                    <div className="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label={t(detail.filterByNeed, lang)}>
-                      <Button size="sm" variant={alternativeNeed === "all" ? "default" : "outline"} onClick={() => setAlternativeNeed("all")} aria-pressed={alternativeNeed === "all"}>
-                        {t(detail.allNeeds, lang)}
-                      </Button>
-                      {alternativeNeeds.map((need) => (
-                        <Button key={need} size="sm" variant={alternativeNeed === need ? "default" : "outline"} onClick={() => setAlternativeNeed(need)} aria-pressed={alternativeNeed === need}>
-                          {need}
-                        </Button>
-                      ))}
-                    </div>
+                  {showAlternativeSearch && (
+                    <>
+                      <div className="relative mt-4 max-w-sm">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                        <Input value={alternativeSearch} onChange={(event) => setAlternativeSearch(event.target.value)} className="pl-9" placeholder={t(detail.searchAlternatives, lang)} aria-label={t(detail.searchAlternatives, lang)} />
+                      </div>
+                      {alternativeNeeds.length > 0 && (
+                        <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label={t(detail.filterByNeed, lang)}>
+                          <Button size="sm" variant={alternativeNeed === "all" ? "default" : "outline"} onClick={() => setAlternativeNeed("all")} aria-pressed={alternativeNeed === "all"}>
+                            {t(detail.allNeeds, lang)}
+                          </Button>
+                          {alternativeNeeds.map((need) => (
+                            <Button key={need} size="sm" variant={alternativeNeed === need ? "default" : "outline"} onClick={() => setAlternativeNeed(need)} aria-pressed={alternativeNeed === need}>
+                              {need}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
                 <Button asChild variant="ghost" size="sm" className="text-primary">
@@ -248,7 +259,7 @@ export default function ProductDetail() {
                 ))}
                 </div>
               ) : (
-                <p className="rounded-lg border border-dashed border-border p-5 text-sm text-muted-foreground">{t(detail.noAlternativesForNeed, lang)}</p>
+                <p className="rounded-lg border border-dashed border-border p-5 text-sm text-muted-foreground">{alternativeSearch.trim() ? t(detail.noAlternativesForSearch, lang) : t(detail.noAlternativesForNeed, lang)}</p>
               )}
             </section>
           )}
