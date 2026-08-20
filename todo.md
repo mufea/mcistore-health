@@ -86,3 +86,4 @@
 
 ## Admin Sidebar Cleanup
 - [x] Remove the duplicate X button from the admin sidebar while preserving required navigation controls
+- [x] Remove the duplicate X button from the mobile navigation drawer while retaining its required close control

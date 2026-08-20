@@ -20,7 +20,6 @@ import {
   ShoppingBag,
   Stethoscope,
   User,
-  X,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useCallback, useState } from "react";
@@ -175,9 +174,6 @@ export default function Navbar() {
                   </div>
                   <span className="font-serif text-base font-semibold text-foreground">{siteName}</span>
                 </div>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={closeMobile}>
-                  <X className="h-4 w-4" />
-                </Button>
               </div>
 
               {/* User info (if signed in) */}
