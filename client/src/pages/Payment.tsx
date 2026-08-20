@@ -12,6 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import CheckoutStepper from "@/components/CheckoutStepper";
 import { formatReservationCountdown, isReservationNearExpiry, remainingReservationMs, reservationProgressPercent } from "@/lib/reservationTimer";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 declare global {
   interface Window {
@@ -57,6 +58,7 @@ export default function Payment() {
   const reservationProgress = reservationProgressPercent(reservationRemaining);
   const reservationNearExpiry = isReservationNearExpiry(reservationRemaining);
   const reservationProgressColor = reservationNearExpiry ? "bg-red-500" : "bg-amber-500";
+  const extensionUnavailable = order?.extensionStockAvailable === false;
 
   useEffect(() => {
     if (!reservationActive || reservationExpired) return;
@@ -206,15 +208,30 @@ export default function Payment() {
                 </div>
                 {reservationNearExpiry && (order.reservationExtensions ?? 0) < 1 && (
                   <div className="mt-3">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleExtendReservation}
-                      disabled={extendReservationMutation.isPending}
-                    >
-                      {extendReservationMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                      {t(translations.checkout.extendReservation, lang)}
-                    </Button>
+                    {extensionUnavailable ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex" tabIndex={0} aria-label={t(translations.checkout.extendReservationUnavailable, lang)}>
+                            <Button size="sm" variant="outline" disabled>
+                              {t(translations.checkout.extendReservation, lang)}
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" sideOffset={6}>
+                          {t(translations.checkout.extendReservationUnavailable, lang)}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleExtendReservation}
+                        disabled={extendReservationMutation.isPending}
+                      >
+                        {extendReservationMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                        {t(translations.checkout.extendReservation, lang)}
+                      </Button>
+                    )}
                     <p className="mt-1 text-xs text-amber-800">{t(translations.checkout.extendReservationHint, lang)}</p>
                   </div>
                 )}

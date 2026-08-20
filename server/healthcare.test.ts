@@ -573,6 +573,21 @@ describe("orders.extendReservation", () => {
     await expect(caller.orders.extendReservation({ orderNumber: "VW-EXTEND-LIMIT" }))
       .rejects.toThrow("already been extended once");
   });
+
+  it("reports unavailable extension stock when an order item is no longer available", async () => {
+    vi.mocked(getOrderByNumber).mockResolvedValueOnce({
+      id: 74,
+      orderNumber: "VW-EXTEND-STOCK",
+      reservationStatus: "active",
+      reservationExtensions: 0,
+    } as any);
+    vi.mocked(getOrderItems).mockResolvedValueOnce([{ productId: 7, quantity: 2 }] as any);
+    vi.mocked(getProductById).mockResolvedValueOnce({ id: 7, stock: 1, isActive: true } as any);
+
+    const caller = appRouter.createCaller(makeCtx());
+    const order = await caller.orders.getByNumber({ orderNumber: "VW-EXTEND-STOCK" });
+    expect(order?.extensionStockAvailable).toBe(false);
+  });
 });
 
 describe("lazy reservation expiry policy", () => {

@@ -176,7 +176,14 @@ export const ordersRouter = router({
       const order = await getOrderByNumber(input.orderNumber);
       if (!order) return null;
       const items = await getOrderItems(order.id);
-      return { ...order, items };
+      const canConsiderExtension = order.reservationStatus === "active" && order.reservationExtensions < 1;
+      const extensionStockAvailable = canConsiderExtension
+        ? (await Promise.all(items.map(async (item) => {
+            const product = await getProductById(item.productId);
+            return Boolean(product?.isActive && product.stock >= item.quantity);
+          }))).every(Boolean)
+        : undefined;
+      return { ...order, items, extensionStockAvailable };
     }),
 
   // Public: extend an active reservation once during its final two minutes.
