@@ -10,6 +10,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import {
   ArrowRight,
@@ -306,15 +317,33 @@ export default function Navbar() {
                       );
                     })}
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="mb-2 h-8 w-full gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={clearMobileCart}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    {t(translations.nav.clearCart, lang)}
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="mb-2 h-8 w-full gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        {t(translations.nav.clearCart, lang)}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t(translations.nav.clearCartTitle, lang)}</AlertDialogTitle>
+                        <AlertDialogDescription>{t(translations.nav.clearCartDescription, lang)}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t(translations.nav.cancel, lang)}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={clearMobileCart}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {t(translations.nav.clearCart, lang)}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   <Link href={checkoutHref} onClick={closeMobile}>
                     <div className="flex items-center justify-between rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
                       {t(translations.nav.goToCheckout, lang)}

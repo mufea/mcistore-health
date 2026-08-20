@@ -29,6 +29,9 @@ export const translations = {
     goToCheckout:  { en: "Go to Checkout", ar: "الانتقال للدفع", zh: "前往结账", es: "Ir a Pagar", hi: "चेकआउट पर जाएँ", id: "Lanjut ke Checkout" },
     removeFromCart:{ en: "Remove from cart", ar: "إزالة من السلة", zh: "从购物车移除", es: "Eliminar del carrito", hi: "कार्ट से हटाएं", id: "Hapus dari keranjang" },
     clearCart:     { en: "Clear Cart", ar: "إفراغ السلة", zh: "清空购物车", es: "Vaciar Carrito", hi: "कार्ट खाली करें", id: "Kosongkan Keranjang" },
+    clearCartTitle: { en: "Clear your cart?", ar: "إفراغ سلة التسوق؟", zh: "清空购物车？", es: "¿Vaciar tu carrito?", hi: "कार्ट खाली करें?", id: "Kosongkan keranjang?" },
+    clearCartDescription: { en: "All items and quantities will be removed. This action cannot be undone.", ar: "ستتم إزالة جميع المنتجات والكميات. لا يمكن التراجع عن هذا الإجراء.", zh: "所有商品和数量都将被移除。此操作无法撤销。", es: "Se eliminarán todos los artículos y cantidades. Esta acción no se puede deshacer.", hi: "सभी आइटम और मात्राएँ हटा दी जाएँगी। यह कार्रवाई पूर्ववत नहीं की जा सकती।", id: "Semua item dan kuantitas akan dihapus. Tindakan ini tidak dapat dibatalkan." },
+    cancel:        { en: "Cancel", ar: "إلغاء", zh: "取消", es: "Cancelar", hi: "रद्द करें", id: "Batal" },
   },
 
   // ── Hero Section ──
