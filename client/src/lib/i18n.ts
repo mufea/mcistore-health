@@ -80,6 +80,7 @@ export const translations = {
     sectionTitle: { en: "Featured Products",          ar: "المنتجات المميزة",         zh: "精选产品",              es: "Productos Destacados",        hi: "विशेष उत्पाद", id: "Produk Unggulan" },
     sectionSub:   { en: "Handpicked for your wellness journey", ar: "منتقاة بعناية لرحلتك الصحية", zh: "为您的健康之旅精心挑选", es: "Seleccionados a mano para tu viaje de bienestar", hi: "आपकी वेलनेस यात्रा के लिए हाथ से चुने गए", id: "Dipilih khusus untuk perjalanan kesehatan Anda" },
     viewAll:      { en: "View All Products",          ar: "عرض جميع المنتجات",        zh: "查看所有产品",          es: "Ver Todos los Productos",     hi: "सभी उत्पाद देखें", id: "Lihat Semua Produk" },
+    outOfStock:   { en: "Out of Stock",               ar: "نفد المخزون",              zh: "缺货",                  es: "Agotado",                    hi: "स्टॉक समाप्त", id: "Habis" },
   },
 
   // ── How It Works ──
@@ -176,6 +177,7 @@ export const translations = {
     viewProduct:    { en: "View →",                      ar: "عرض ←",                     zh: "查看 →",                es: "Ver →",                        hi: "देखें →", id: "View →" },
     lowStock:       { en: "Low Stock",                   ar: "مخزون منخفض",              zh: "库存紧张",              es: "Stock Bajo",                   hi: "स्टॉक कम", id: "Stok Menipis" },
     lowStockOnly:   { en: "Limited Stock",               ar: "مخزون محدود",              zh: "库存有限",              es: "Stock Limitado",               hi: "सीमित स्टॉक", id: "Stok Terbatas" },
+    outOfStock:     { en: "Out of Stock",                 ar: "نفد المخزون",              zh: "缺货",                  es: "Agotado",                      hi: "स्टॉक समाप्त", id: "Habis" },
     backToHome:     { en: "Back to Home",                ar: "العودة للرئيسية",           zh: "返回首页",              es: "Volver al Inicio",            hi: "होम पर वापस", id: "Back to Home" },
   },
 
@@ -213,7 +215,7 @@ export const translations = {
     addToCart:        { en: "Add to Cart",                     ar: "أضف إلى السلة",             zh: "加入购物车",            es: "Agregar al Carrito",           hi: "कार्ट में जोड़ें", id: "Tambah ke Keranjang" },
     addedToCart:      { en: "Added to Cart",                   ar: "تمت الإضافة إلى السلة",     zh: "已加入购物车",          es: "Agregado al Carrito",          hi: "कार्ट में जोड़ा गया", id: "Added to Cart" },
     inStock:          { en: "In Stock",                        ar: "متوفر",                     zh: "有货",                  es: "En Stock",                     hi: "स्टॉक में", id: "Tersedia" },
-    outOfStock:       { en: "Out of Stock",                    ar: "نفذ المخزون",               zh: "缺货",                  es: "Agotado",                      hi: "स्टॉक से बाहर", id: "Out of Stock" },
+    outOfStock:       { en: "Out of Stock",                    ar: "نفد المخزون",               zh: "缺货",                  es: "Agotado",                      hi: "स्टॉक समाप्त", id: "Habis" },
     featured:         { en: "Featured",                        ar: "مميز",                      zh: "精选",                  es: "Destacado",                    hi: "विशेष", id: "Featured" },
     itemsSelected:    { en: "items selected",                  ar: "عناصر محددة",               zh: "件已选",                es: "artículos seleccionados",      hi: "आइटम चुने गए", id: "items selected" },
     itemSelected:     { en: "item selected",                   ar: "عنصر محدد",                 zh: "件已选",                es: "artículo seleccionado",        hi: "आइटम चुना गया", id: "item selected" },

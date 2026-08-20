@@ -211,11 +211,12 @@ export default function ProductDetail() {
               <h1 className="font-serif text-3xl font-light leading-tight text-foreground sm:text-4xl">{product.name}</h1>
               <p className="mt-4 text-3xl font-semibold text-primary">IDR {Number(product.price).toLocaleString("id-ID")}</p>
 
-              <div className="mt-4 flex items-center gap-2 text-sm">
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
                 <span className={`inline-flex h-2.5 w-2.5 rounded-full ${inStock ? "bg-emerald-500" : "bg-red-500"}`} />
                 <span className={inStock ? "font-medium text-emerald-700" : "font-medium text-red-700"}>
                   {inStock ? t(detail.inStock, lang) : t(detail.outOfStock, lang)}
                 </span>
+                {!inStock && <Badge className="border-0 bg-red-700 text-xs text-white shadow-sm">{t(detail.outOfStock, lang)}</Badge>}
                 {inStock && <span className="text-muted-foreground">· {stock} {t(detail.stock, lang)}</span>}
               </div>
 

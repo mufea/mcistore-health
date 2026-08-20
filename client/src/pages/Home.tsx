@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { ArrowRight, CheckCircle, Heart, Leaf, Shield, Sparkles, Star } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle, Heart, Leaf, Shield, Sparkles, Star } from "lucide-react";
 import { Link } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -232,7 +232,7 @@ export default function Home() {
               {featured.map((product) => (
                 <Link href={`/products/${product.id}`} key={product.id}>
                   <div className="group bg-card rounded-2xl border border-border/60 overflow-hidden card-hover cursor-pointer h-full">
-                    <div className="aspect-square bg-muted/50 flex items-center justify-center overflow-hidden">
+                    <div className="relative aspect-square bg-muted/50 flex items-center justify-center overflow-hidden">
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
@@ -242,6 +242,14 @@ export default function Home() {
                       ) : (
                         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                           <Leaf className="h-8 w-8 text-primary/50" />
+                        </div>
+                      )}
+                      {product.stock <= 0 && (
+                        <div className="absolute bottom-2 left-2 z-10">
+                          <Badge className="border-0 bg-red-700 text-xs text-white shadow-sm" aria-label={t(translations.products.outOfStock, lang)}>
+                            <AlertTriangle className="mr-1 h-3 w-3" aria-hidden="true" />
+                            {t(translations.products.outOfStock, lang)}
+                          </Badge>
                         </div>
                       )}
                     </div>

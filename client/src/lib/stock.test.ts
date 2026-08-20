@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { isLowStock, LOW_STOCK_THRESHOLD, matchesStockFilter } from "./stock";
+import { isLowStock, isOutOfStock, LOW_STOCK_THRESHOLD, matchesStockFilter } from "./stock";
+
+describe("isOutOfStock", () => {
+  it("flags zero or negative availability only", () => {
+    expect(isOutOfStock(0)).toBe(true);
+    expect(isOutOfStock(-1)).toBe(true);
+    expect(isOutOfStock(1)).toBe(false);
+  });
+});
 
 describe("isLowStock", () => {
   it("flags only positive availability at or below the default threshold", () => {

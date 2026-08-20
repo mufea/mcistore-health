@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
-import { ArrowRight, Crown, Leaf, Loader2, Lock, ShoppingCart, Sparkles, Star } from "lucide-react";
+import { AlertTriangle, ArrowRight, Crown, Leaf, Loader2, Lock, ShoppingCart, Sparkles, Star } from "lucide-react";
 import { useSearch, useLocation } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
@@ -173,6 +173,14 @@ export default function Recommendations() {
                         {product.isFeatured && (
                           <div className="absolute top-2 left-2">
                             <Badge variant="secondary" className="text-xs">{t(r.featured, lang)}</Badge>
+                          </div>
+                        )}
+                        {product.stock <= 0 && (
+                          <div className="absolute bottom-2 left-2">
+                            <Badge className="border-0 bg-red-700 text-xs text-white shadow-sm" aria-label={t(r.outOfStock, lang)}>
+                              <AlertTriangle className="mr-1 h-3 w-3" aria-hidden="true" />
+                              {t(r.outOfStock, lang)}
+                            </Badge>
                           </div>
                         )}
                       </div>
