@@ -9,3 +9,14 @@ export function toggleComparedProduct(selectedIds: number[], productId: number) 
 export function canSelectForComparison(selectedIds: number[], productId: number) {
   return selectedIds.includes(productId) || selectedIds.length < MAX_COMPARISON_PRODUCTS;
 }
+
+export function addComparedProductToCart(
+  cart: number[],
+  quantities: Record<number, number>,
+  productId: number
+) {
+  return {
+    cart: cart.includes(productId) ? cart : [...cart, productId],
+    quantities: { ...quantities, [productId]: quantities[productId] ?? 1 },
+  };
+}

@@ -14,7 +14,7 @@ import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { filterAlternativesByNeed, filterAlternativesByText, getAlternativeNeeds, getInStockAlternatives, shouldShowAlternativeSearch } from "@/lib/productAlternatives";
-import { canSelectForComparison, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
+import { addComparedProductToCart, canSelectForComparison, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
 
 function getStoredCart(): number[] {
   try {
@@ -97,6 +97,17 @@ export default function ProductDetail() {
   const addToCart = () => {
     if (!product) return;
     persistProductSelection();
+    if (!isAuthenticated) {
+      requestSignIn();
+      return;
+    }
+    toast.success(t(detail.addedToCart, lang));
+  };
+
+  const addAlternativeToCart = (alternativeId: number) => {
+    const result = addComparedProductToCart(getStoredCart(), getStoredQuantities(), alternativeId);
+    sessionStorage.setItem("pending_cart", JSON.stringify(result.cart));
+    sessionStorage.setItem("pending_quantities", JSON.stringify(result.quantities));
     if (!isAuthenticated) {
       requestSignIn();
       return;
@@ -275,6 +286,7 @@ export default function ProductDetail() {
                         <tr><th className="px-4 py-3 font-medium text-muted-foreground">{t(detail.category, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3">{item.category}</td>)}</tr>
                         <tr><th className="px-4 py-3 font-medium text-muted-foreground">{t(detail.tags, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3">{item.tags?.join(", ") || "—"}</td>)}</tr>
                         <tr><th className="px-4 py-3 align-top font-medium text-muted-foreground">{t(detail.description, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3 leading-6">{item.description || "—"}</td>)}</tr>
+                        <tr><th className="px-4 py-3 font-medium text-muted-foreground">{t(detail.addToCart, lang)}</th>{comparisonProducts.map((item) => <td key={item.id} className="px-4 py-3"><Button size="sm" className="w-full" onClick={() => addAlternativeToCart(item.id)} disabled={item.stock <= 0}><ShoppingBag className="mr-2 h-4 w-4" />{isAuthenticated ? t(detail.addToCart, lang) : t(detail.signInToAdd, lang)}</Button></td>)}</tr>
                       </tbody>
                     </table>
                   </div>

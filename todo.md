@@ -123,3 +123,4 @@
 - [x] Keep translated alternative search available even when alternatives have no tags
 - [x] Cover text filtering of untagged alternatives in tests
 - [x] Add a side-by-side comparison experience for selected available alternatives
+- [x] Add direct Add to Cart actions for each selected alternative in the comparison table
