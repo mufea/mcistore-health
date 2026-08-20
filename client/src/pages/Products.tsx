@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Crown, Loader2, Search } from "lucide-react";
+import { AlertTriangle, Crown, Loader2, Search } from "lucide-react";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import { useState } from "react";
 import { Link } from "wouter";
@@ -12,6 +12,7 @@ import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import { isLowStock } from "@/lib/stock";
 
 export default function Products() {
   const { lang } = useLanguage();
@@ -104,6 +105,14 @@ export default function Products() {
                           <Badge className="text-xs bg-amber-500 text-white border-0">
                             <Crown className="h-3 w-3 mr-1" />
                             {product.targetSegment}
+                          </Badge>
+                        </div>
+                      )}
+                      {isLowStock(product.stock) && (
+                        <div className="absolute bottom-2 left-2 z-10">
+                          <Badge className="border-0 bg-red-600 text-xs text-white shadow-sm" aria-label={`${t(p.lowStock, lang)}: ${product.stock}`}>
+                            <AlertTriangle className="mr-1 h-3 w-3" aria-hidden="true" />
+                            {t(p.lowStock, lang)} · {product.stock}
                           </Badge>
                         </div>
                       )}

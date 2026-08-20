@@ -114,3 +114,6 @@
 - [x] Add a reduced-motion-safe near-expiry visual alert to the reservation timer
 - [x] Add a stock-aware customer option to extend an active payment reservation
 - [x] Disable the extension action with an accessible unavailable-stock tooltip
+
+## Product Stock Visibility
+- [x] Show a translated low-stock indicator on product cards when available stock is five units or fewer
