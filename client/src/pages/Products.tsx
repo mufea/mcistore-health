@@ -6,22 +6,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { AlertTriangle, Crown, Loader2, Search } from "lucide-react";
 import ProductImageGallery from "@/components/ProductImageGallery";
-import { useState } from "react";
-import { Link } from "wouter";
+import { useEffect, useState } from "react";
+import { Link, useSearch } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
 import ProductBreadcrumb from "@/components/ProductBreadcrumb";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { isLowStock, isOutOfStock, matchesStockFilter } from "@/lib/stock";
+import { getCatalogSearchTerm } from "@/lib/productSearch";
 
 export default function Products() {
   const { lang } = useLanguage();
   const p = translations.productsPage;
   const { user, isAuthenticated } = useAuth();
-  const [search, setSearch] = useState("");
+  const routeSearch = useSearch();
+  const catalogSearch = getCatalogSearchTerm(routeSearch);
+  const [search, setSearch] = useState(catalogSearch);
   const [category, setCategory] = useState("all");
   const [lowStockOnly, setLowStockOnly] = useState(false);
+
+  useEffect(() => {
+    setSearch(catalogSearch);
+  }, [catalogSearch]);
 
   const { data: products, isLoading } = trpc.products.list.useQuery({
     segment: isAuthenticated ? (user?.segment ?? "standard") : "standard",

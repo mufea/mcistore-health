@@ -150,3 +150,6 @@
 - [x] Add semantic breadcrumb navigation to product catalog and product detail pages
 - [x] Add accurate JSON-LD Product schema to product detail pages and initial HTML responses
 - [x] Add accurate JSON-LD Organization schema to the home page and its initial HTML response
+- [x] Add a home-page product search that routes queries to the catalog and expose a WebSite SearchAction schema
+- [x] Verify the home-page search form renders with an accessible label and submit control
+- [x] Verify a home-page search routes to the catalog with the matching filtered product

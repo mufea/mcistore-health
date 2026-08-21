@@ -1,13 +1,16 @@
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
-import { AlertTriangle, ArrowRight, CheckCircle, Heart, Leaf, Shield, Sparkles, Star } from "lucide-react";
-import { Link } from "wouter";
+import { AlertTriangle, ArrowRight, CheckCircle, Heart, Leaf, Search, Shield, Sparkles, Star } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { buildOrganizationJsonLd, serializeOrganizationJsonLd } from "@/lib/organizationSchema";
-import { useEffect } from "react";
+import { buildCatalogSearchPath } from "@/lib/productSearch";
+import { buildWebsiteJsonLd, serializeWebsiteJsonLd } from "@/lib/websiteSchema";
+import { useEffect, useState } from "react";
 
 /** Full-width inner wrapper — no max-width cap, generous horizontal padding */
 function FullWide({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -19,6 +22,8 @@ function FullWide({ children, className = "" }: { children: React.ReactNode; cla
 }
 
 export default function Home() {
+  const [, navigate] = useLocation();
+  const [productSearch, setProductSearch] = useState("");
   useEffect(() => {
     const existingSchema = document.querySelector<HTMLScriptElement>('script[data-organization-schema="true"]');
     const previousSchema = existingSchema?.textContent;
@@ -31,6 +36,25 @@ export default function Home() {
       document.head.appendChild(schemaElement);
     }
     schemaElement.textContent = serializeOrganizationJsonLd(buildOrganizationJsonLd());
+
+    return () => {
+      if (createdSchema) schemaElement.remove();
+      else schemaElement.textContent = previousSchema ?? "";
+    };
+  }, []);
+
+  useEffect(() => {
+    const existingSchema = document.querySelector<HTMLScriptElement>('script[data-website-schema="true"]');
+    const previousSchema = existingSchema?.textContent;
+    const schemaElement = existingSchema ?? document.createElement("script");
+    const createdSchema = !existingSchema;
+
+    if (createdSchema) {
+      schemaElement.type = "application/ld+json";
+      schemaElement.dataset.websiteSchema = "true";
+      document.head.appendChild(schemaElement);
+    }
+    schemaElement.textContent = serializeWebsiteJsonLd(buildWebsiteJsonLd());
 
     return () => {
       if (createdSchema) schemaElement.remove();
@@ -148,6 +172,30 @@ export default function Home() {
                   <Link href="/products">{t(translations.hero.ctaProducts, lang)}</Link>
                 </Button>
               </div>
+              <form
+                role="search"
+                className="mt-5 flex max-w-xl gap-2"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  navigate(buildCatalogSearchPath(productSearch));
+                }}
+              >
+                <label htmlFor="home-product-search" className="sr-only">{t(translations.hero.searchLabel, lang)}</label>
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                  <Input
+                    id="home-product-search"
+                    type="search"
+                    value={productSearch}
+                    onChange={(event) => setProductSearch(event.target.value)}
+                    placeholder={t(translations.hero.searchPlaceholder, lang)}
+                    className="h-11 bg-background/90 pl-9 shadow-sm"
+                  />
+                </div>
+                <Button type="submit" variant="outline" className="h-11 shrink-0">
+                  {t(translations.hero.searchButton, lang)}
+                </Button>
+              </form>
               <div className="mt-10 flex items-center gap-8">
                 {[
                   { label: t(translations.hero.stat1Label, lang), value: "10,000+" },
