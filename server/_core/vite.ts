@@ -5,10 +5,11 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
-import { renderHtmlWithProductHead, type ProductHeadLookup } from "../productHead";
+import { type ProductHeadLookup } from "../productHead";
+import { renderHtmlWithRouteStructuredData } from "../organizationHead";
 
 export async function applyRouteMetadata(template: string, requestUrl: string, getProduct?: ProductHeadLookup) {
-  return renderHtmlWithProductHead(template, requestUrl, getProduct);
+  return renderHtmlWithRouteStructuredData(template, requestUrl, getProduct);
 }
 
 export function createHtmlFallbackHandler(templatePath: string, getProduct?: ProductHeadLookup) {

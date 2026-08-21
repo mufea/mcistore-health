@@ -6,6 +6,8 @@ import { Link } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import { buildOrganizationJsonLd, serializeOrganizationJsonLd } from "@/lib/organizationSchema";
+import { useEffect } from "react";
 
 /** Full-width inner wrapper — no max-width cap, generous horizontal padding */
 function FullWide({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -17,6 +19,25 @@ function FullWide({ children, className = "" }: { children: React.ReactNode; cla
 }
 
 export default function Home() {
+  useEffect(() => {
+    const existingSchema = document.querySelector<HTMLScriptElement>('script[data-organization-schema="true"]');
+    const previousSchema = existingSchema?.textContent;
+    const schemaElement = existingSchema ?? document.createElement("script");
+    const createdSchema = !existingSchema;
+
+    if (createdSchema) {
+      schemaElement.type = "application/ld+json";
+      schemaElement.dataset.organizationSchema = "true";
+      document.head.appendChild(schemaElement);
+    }
+    schemaElement.textContent = serializeOrganizationJsonLd(buildOrganizationJsonLd());
+
+    return () => {
+      if (createdSchema) schemaElement.remove();
+      else schemaElement.textContent = previousSchema ?? "";
+    };
+  }, []);
+
   const { lang } = useLanguage();
   const { data: settings } = trpc.settings.getPublic.useQuery();
   const { data: featuredProducts } = trpc.products.list.useQuery({ segment: "standard" });

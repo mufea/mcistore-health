@@ -149,3 +149,4 @@
 - [x] Add a unique canonical URL to each product detail page and its initial HTML response
 - [x] Add semantic breadcrumb navigation to product catalog and product detail pages
 - [x] Add accurate JSON-LD Product schema to product detail pages and initial HTML responses
+- [x] Add accurate JSON-LD Organization schema to the home page and its initial HTML response
