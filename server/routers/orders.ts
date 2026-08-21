@@ -18,6 +18,7 @@ import {
   releaseReservedStock,
   reservationExpiry,
   reserveStock,
+  updateOrderInternalNote,
   updateOrderStatus,
 } from "../db";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "../_core/trpc";
@@ -48,6 +49,11 @@ function escapeCsvCell(value: unknown): string {
   // Prevent spreadsheet formula execution when a CSV is opened in Excel/Sheets.
   const safeText = /^[=+\-@]/.test(text) ? `'${text}` : text;
   return `"${safeText.replace(/"/g, '""')}"`;
+}
+
+function withoutAdminInternalNote<T extends { adminInternalNote?: unknown }>(order: T) {
+  const { adminInternalNote: _adminInternalNote, ...publicOrder } = order;
+  return publicOrder;
 }
 
 export const ordersRouter = router({
@@ -190,7 +196,7 @@ export const ordersRouter = router({
             return Boolean(product?.isActive && product.stock >= item.quantity);
           }))).every(Boolean)
         : undefined;
-      return { ...order, items, extensionStockAvailable };
+      return { ...withoutAdminInternalNote(order), items, extensionStockAvailable };
     }),
 
   // Public: extend an active reservation once during its final two minutes.
@@ -222,7 +228,7 @@ export const ordersRouter = router({
   // Protected: get current user's orders
   myOrders: protectedProcedure.query(async ({ ctx }) => {
     const orders = await getOrdersByUserId(ctx.user.id);
-    return orders;
+    return orders.map(withoutAdminInternalNote);
   }),
 
   // Admin: get all orders
@@ -296,6 +302,15 @@ export const ordersRouter = router({
       if (!order) return null;
       const items = await getOrderItems(order.id);
       return { ...order, items };
+    }),
+
+  updateInternalNote: adminProcedure
+    .input(z.object({ id: z.number().int(), note: z.string().trim().max(2000) }))
+    .mutation(async ({ input }) => {
+      const order = await getOrderById(input.id);
+      if (!order) throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+      await updateOrderInternalNote(input.id, input.note || null);
+      return { success: true };
     }),
 
   // Admin: update order status

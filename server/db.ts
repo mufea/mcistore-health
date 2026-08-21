@@ -600,6 +600,12 @@ export async function updateOrderStatus(
   await db.update(orders).set(data).where(eq(orders.id, id));
 }
 
+export async function updateOrderInternalNote(id: number, adminInternalNote: string | null) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(orders).set({ adminInternalNote }).where(eq(orders.id, id));
+}
+
 export async function updateOrderByMidtransId(
   midtransOrderId: string,
   data: Partial<{

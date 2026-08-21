@@ -173,3 +173,4 @@
 - [x] Add an accessible remove-item action to the Checkout order summary with synchronized cart totals
 - [x] Add an accessible confirmation dialog before removing a Checkout item
 - [x] Add persistent per-item special instructions to Checkout orders
+- [x] Add admin-only internal notes to order details without exposing them to customers

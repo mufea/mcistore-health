@@ -168,6 +168,7 @@ export const orders = mysqlTable("orders", {
   // Survey response link
   surveyResponseId: int("surveyResponseId"),
   notes: text("notes"),
+  adminInternalNote: text("adminInternalNote"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

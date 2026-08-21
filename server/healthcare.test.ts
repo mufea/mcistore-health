@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { createOrder, extendOrderStockReservation, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, getStockHistory, releaseOrderStockReservation, updateProductWithStockAudit } from "./db";
+import { createOrder, extendOrderStockReservation, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, getStockHistory, releaseOrderStockReservation, updateOrderInternalNote, updateProductWithStockAudit } from "./db";
 import { applyPaymentReservationOutcome } from "./stockReservation";
 import { availableStock, isReservationExpired } from "./reservationPolicy";
 import { getProductsAfterReservationCleanup } from "./customerStockRead";
@@ -46,6 +46,7 @@ vi.mock("./db", () => ({
   reservationExpiry: vi.fn().mockReturnValue(new Date("2026-08-20T00:10:00.000Z")),
   releaseOrderStockReservation: vi.fn().mockResolvedValue(true),
   finalizeStockReservation: vi.fn().mockResolvedValue(true),
+  updateOrderInternalNote: vi.fn().mockResolvedValue(undefined),
   updateOrderStatus: vi.fn().mockResolvedValue(undefined),
   updateOrderByMidtransId: vi.fn().mockResolvedValue(undefined),
   getSetting: vi.fn().mockResolvedValue(null),
@@ -364,6 +365,13 @@ describe("orders.getByNumber", () => {
     const result = await caller.orders.getByNumber({ orderNumber: "VW-NONEXISTENT" });
     expect(result).toBeNull();
   });
+
+  it("does not expose an admin internal note on the public order response", async () => {
+    vi.mocked(getOrderByNumber).mockResolvedValueOnce({ id: 27, orderNumber: "VW-PRIVATE", reservationStatus: "released", adminInternalNote: "Internal staff note" } as any);
+    const caller = appRouter.createCaller(makeCtx());
+    const result = await caller.orders.getByNumber({ orderNumber: "VW-PRIVATE" });
+    expect(result).not.toHaveProperty("adminInternalNote");
+  });
 });
 
 describe("orders.adminList", () => {
@@ -376,6 +384,20 @@ describe("orders.adminList", () => {
     const caller = appRouter.createCaller(makeAdminCtx());
     const result = await caller.orders.adminList();
     expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe("orders.updateInternalNote", () => {
+  it("requires admin access", async () => {
+    const caller = appRouter.createCaller(makeUserCtx());
+    await expect(caller.orders.updateInternalNote({ id: 7, note: "Internal only" })).rejects.toThrow();
+  });
+
+  it("stores a trimmed internal note for an existing order", async () => {
+    vi.mocked(getOrderById).mockResolvedValueOnce({ id: 7, orderNumber: "VW-NOTE" } as any);
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await expect(caller.orders.updateInternalNote({ id: 7, note: "  Handle with care  " })).resolves.toEqual({ success: true });
+    expect(updateOrderInternalNote).toHaveBeenCalledWith(7, "Handle with care");
   });
 });
 

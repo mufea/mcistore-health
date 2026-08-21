@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import OrderInternalNoteEditor from "@/components/OrderInternalNoteEditor";
 import { trpc } from "@/lib/trpc";
 import { Download, Eye, Loader2, Package, Search } from "lucide-react";
 import { toast } from "sonner";
@@ -47,6 +48,7 @@ export default function AdminOrders() {
   const [detailDialog, setDetailDialog] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [newPaymentStatus, setNewPaymentStatus] = useState("");
+  const [adminInternalNote, setAdminInternalNote] = useState("");
   const { data: selectedOrderDetails } = trpc.orders.adminGetById.useQuery(
     { id: selectedOrder?.id ?? 0 },
     { enabled: detailDialog && Boolean(selectedOrder?.id) },
@@ -61,6 +63,18 @@ export default function AdminOrders() {
       toast.success("Order updated");
     },
     onError: (e) => toast.error(e.message),
+  });
+
+  const updateInternalNoteMutation = trpc.orders.updateInternalNote.useMutation({
+    onSuccess: () => {
+      utils.orders.adminList.invalidate();
+      if (selectedOrder) {
+        utils.orders.adminGetById.invalidate({ id: selectedOrder.id });
+        setSelectedOrder((previous: any) => ({ ...previous, adminInternalNote }));
+      }
+      toast.success("Internal note saved");
+    },
+    onError: (error) => toast.error(error.message),
   });
 
   const { data: products } = trpc.products.adminList.useQuery();
@@ -81,7 +95,13 @@ export default function AdminOrders() {
     setSelectedOrder(order);
     setNewStatus(order.status);
     setNewPaymentStatus(order.paymentStatus);
+    setAdminInternalNote(order.adminInternalNote ?? "");
     setDetailDialog(true);
+  };
+
+  const saveInternalNote = () => {
+    if (!selectedOrder) return;
+    updateInternalNoteMutation.mutate({ id: selectedOrder.id, note: adminInternalNote });
   };
 
   const saveStatus = () => {
@@ -302,6 +322,13 @@ export default function AdminOrders() {
                   </div>
                 </div>
               </div>
+
+              <OrderInternalNoteEditor
+                value={adminInternalNote}
+                onChange={setAdminInternalNote}
+                onSave={saveInternalNote}
+                isSaving={updateInternalNoteMutation.isPending}
+              />
 
               {/* Status Update */}
               <div>
