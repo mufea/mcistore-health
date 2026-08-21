@@ -170,3 +170,4 @@
 - [x] Add integration coverage for the actual auto-suggest Add to Cart button action callbacks and persisted state
 - [x] Add UI interaction coverage for Add to Cart button clicks and translated stock feedback
 - [x] Show an explicit translated out-of-stock explanation for disabled auto-suggest cart actions
+- [x] Add an accessible remove-item action to the Checkout order summary with synchronized cart totals

@@ -31,7 +31,9 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { type Language, t, translations } from "@/lib/i18n";
 import CheckoutStepper from "@/components/CheckoutStepper";
-import { parseCheckoutQuantities, parseStoredQuantities, resolveCheckoutQuantities } from "@/lib/cartQuantities";
+import CheckoutRemoveItemButton from "@/components/CheckoutRemoveItemButton";
+import { formatCheckoutQuantities, parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, resolveCheckoutQuantities } from "@/lib/cartQuantities";
+import { removeCheckoutProduct } from "@/lib/checkoutCartRemoval";
 
 interface Address {
   street: string;
@@ -43,16 +45,6 @@ interface Address {
 }
 
 const emptyAddress: Address = { street: "", apt: "", city: "", province: "", postalCode: "", country: "" };
-
-function getStoredCartIds(): number[] {
-  try {
-    const stored = sessionStorage.getItem("pending_cart");
-    const value = stored ? JSON.parse(stored) : [];
-    return Array.isArray(value) ? value.map(Number).filter((id) => Number.isInteger(id) && id > 0) : [];
-  } catch {
-    return [];
-  }
-}
 
 // ─── Reusable address form ────────────────────────────────────────────────────
 function AddressFields({
@@ -174,8 +166,9 @@ export default function Checkout() {
   const search = useSearch();
   const [, navigate] = useLocation();
   const params = new URLSearchParams(search);
+  const hasQueryProducts = params.has("products");
   const queryProductIds = params.get("products")?.split(",").map(Number).filter(Boolean) ?? [];
-  const productIds = queryProductIds.length > 0 ? queryProductIds : getStoredCartIds();
+  const initialProductIds = hasQueryProducts ? queryProductIds : parseStoredCartIds(sessionStorage.getItem("pending_cart"));
   const requestedQuantities = parseCheckoutQuantities(params.get("quantities"));
   const storedQuantities = parseStoredQuantities(sessionStorage.getItem("pending_quantities"));
   const segment = (params.get("segment") as "standard" | "premium" | "vip") ?? "standard";
@@ -193,13 +186,14 @@ export default function Checkout() {
   const [sameAsUser, setSameAsUser] = useState(true);
   const [shippingType, setShippingType] = useState<"national" | "international">("national");
   const [paymentMethod, setPaymentMethod] = useState<"bank_transfer" | "midtrans">("bank_transfer");
+  const [checkoutProductIds, setCheckoutProductIds] = useState<number[]>(initialProductIds);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [summaryOpen, setSummaryOpen] = useState(false); // mobile order summary toggle
 
   const { data: allProducts } = trpc.products.list.useQuery({ segment });
   const createOrderMutation = trpc.orders.create.useMutation();
 
-  const selectedProducts = (allProducts ?? []).filter((p) => productIds.includes(p.id));
+  const selectedProducts = (allProducts ?? []).filter((p) => checkoutProductIds.includes(p.id));
 
   // Pre-fill personal info from session
   useEffect(() => {
@@ -229,7 +223,8 @@ export default function Checkout() {
   }, [profile, profileAddressApplied]);
 
   useEffect(() => {
-    setQuantities(resolveCheckoutQuantities(productIds, requestedQuantities, storedQuantities));
+    setCheckoutProductIds(initialProductIds);
+    setQuantities(resolveCheckoutQuantities(initialProductIds, requestedQuantities, storedQuantities));
   }, [search]);
 
   // ── Unauthenticated gate ────────────────────────────────────────────────────
@@ -265,13 +260,43 @@ export default function Checkout() {
     (sum, p) => sum + Number(p.price) * (quantities[p.id] ?? 1),
     0
   );
-  const total = subtotal + shippingCost;
+  const effectiveShippingCost = selectedProducts.length > 0 ? shippingCost : 0;
+  const total = subtotal + effectiveShippingCost;
   const effectiveShipping = sameAsUser ? userAddress : shippingAddress;
 
   const updateUserAddr = (field: keyof Address, value: string) =>
     setUserAddress((prev) => ({ ...prev, [field]: value }));
   const updateShippingAddr = (field: keyof Address, value: string) =>
     setShippingAddress((prev) => ({ ...prev, [field]: value }));
+
+  const handleRemoveProduct = (productId: number) => {
+    const result = removeCheckoutProduct(
+      checkoutProductIds,
+      quantities,
+      parseStoredCartIds(sessionStorage.getItem("pending_cart")),
+      parseStoredQuantities(sessionStorage.getItem("pending_quantities")),
+      productId,
+    );
+
+    setCheckoutProductIds(result.checkoutProductIds);
+    setQuantities(result.checkoutQuantities);
+    sessionStorage.setItem("pending_cart", JSON.stringify(result.storedCartIds));
+    sessionStorage.setItem("pending_quantities", JSON.stringify(result.storedQuantities));
+
+    if (hasQueryProducts) {
+      const nextParams = new URLSearchParams(search);
+      if (result.checkoutProductIds.length === 0) {
+        nextParams.set("products", "");
+        nextParams.delete("quantities");
+      } else {
+        nextParams.set("products", result.checkoutProductIds.join(","));
+        nextParams.set("quantities", formatCheckoutQuantities(result.checkoutProductIds, result.checkoutQuantities));
+      }
+      navigate(`/checkout${nextParams.size > 0 ? `?${nextParams.toString()}` : ""}`);
+    }
+
+    toast.success(t(translations.checkout.itemRemoved, lang));
+  };
 
   const isValid = () => {
     if (!name || !email || !phone) return false;
@@ -383,11 +408,26 @@ export default function Checkout() {
                       </button>
                     </div>
                   </div>
-                  <span className="text-sm font-medium text-foreground flex-shrink-0">
-                    IDR {(Number(product.price) * (quantities[product.id] ?? 1)).toLocaleString("id-ID")}
-                  </span>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <span className="text-sm font-medium text-foreground">
+                      IDR {(Number(product.price) * (quantities[product.id] ?? 1)).toLocaleString("id-ID")}
+                    </span>
+                    <CheckoutRemoveItemButton
+                      itemName={product.name}
+                      label={t(translations.checkout.removeItem, lang)}
+                      onRemove={() => handleRemoveProduct(product.id)}
+                    />
+                  </div>
                 </div>
               ))}
+              {selectedProducts.length === 0 && (
+                <div className="py-4 text-center">
+                  <p className="text-sm font-medium text-foreground">{t(translations.checkout.cartEmpty, lang)}</p>
+                  <Button type="button" variant="link" className="mt-1 h-auto px-0 text-sm" onClick={() => navigate("/products")}>
+                    {t(translations.checkout.backToProducts, lang)}
+                  </Button>
+                </div>
+              )}
             </div>
             <Separator className="my-3" />
             <div className="space-y-1.5 text-sm">
@@ -397,7 +437,7 @@ export default function Checkout() {
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>{t(translations.checkout.shipping, lang)}</span>
-                <span>IDR {shippingCost.toLocaleString("id-ID")}</span>
+                <span>IDR {effectiveShippingCost.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between font-semibold text-foreground pt-1">
                 <span>{t(translations.checkout.total, lang)}</span>
@@ -727,11 +767,26 @@ export default function Checkout() {
                           </button>
                         </div>
                       </div>
-                      <span className="text-sm font-medium text-foreground flex-shrink-0">
-                        IDR {(Number(product.price) * (quantities[product.id] ?? 1)).toLocaleString("id-ID")}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <span className="text-sm font-medium text-foreground">
+                          IDR {(Number(product.price) * (quantities[product.id] ?? 1)).toLocaleString("id-ID")}
+                        </span>
+                        <CheckoutRemoveItemButton
+                          itemName={product.name}
+                          label={t(translations.checkout.removeItem, lang)}
+                          onRemove={() => handleRemoveProduct(product.id)}
+                        />
+                      </div>
                     </div>
                   ))}
+                  {selectedProducts.length === 0 && (
+                    <div className="py-3 text-center">
+                      <p className="text-sm font-medium text-foreground">{t(translations.checkout.cartEmpty, lang)}</p>
+                      <Button type="button" variant="link" className="mt-1 h-auto px-0 text-sm" onClick={() => navigate("/products")}>
+                        {t(translations.checkout.backToProducts, lang)}
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <Separator className="my-4" />
@@ -743,7 +798,7 @@ export default function Checkout() {
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>{t(translations.checkout.shipping, lang)}</span>
-                    <span>IDR {shippingCost.toLocaleString("id-ID")}</span>
+                  <span>IDR {effectiveShippingCost.toLocaleString("id-ID")}</span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between font-semibold text-foreground text-base">

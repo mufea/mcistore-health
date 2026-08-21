@@ -15,6 +15,10 @@ export function parseCheckoutQuantities(raw: string | null | undefined): Product
   }, {});
 }
 
+export function formatCheckoutQuantities(productIds: number[], quantities: ProductQuantities): string {
+  return productIds.map((productId) => `${productId}:${quantities[productId] ?? 1}`).join(",");
+}
+
 export function parseStoredCartIds(raw: string | null | undefined): number[] {
   try {
     const parsed = raw ? JSON.parse(raw) : [];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canIncreaseCartQuantity, clearCart, parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, removeCartItem, resolveCheckoutQuantities, updateCartItemQuantity } from "./cartQuantities";
+import { canIncreaseCartQuantity, clearCart, formatCheckoutQuantities, parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, removeCartItem, resolveCheckoutQuantities, updateCartItemQuantity } from "./cartQuantities";
 
 describe("checkout quantity resolution", () => {
   it("uses query quantities before persisted cart quantities", () => {
@@ -20,6 +20,10 @@ describe("checkout quantity resolution", () => {
     );
 
     expect(resolved).toEqual({ 101: 1, 202: 1 });
+  });
+
+  it("serializes remaining product quantities for a Checkout URL", () => {
+    expect(formatCheckoutQuantities([101, 202], { 101: 3, 202: 1 })).toBe("101:3,202:1");
   });
 
   it("reads only valid, unique product IDs from persisted cart storage", () => {
