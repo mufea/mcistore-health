@@ -3,7 +3,13 @@ export type SuggestibleProduct = {
   name: string;
   category: string;
   description?: string | null;
+  imageUrl?: string | null;
+  images?: Array<{ url: string }> | null;
 };
+
+export function getProductSuggestionImage(product: SuggestibleProduct) {
+  return product.images?.find((image) => Boolean(image.url))?.url || product.imageUrl || null;
+}
 
 export function getProductSuggestions<T extends SuggestibleProduct>(products: T[], query: string, limit = 5): T[] {
   const normalizedQuery = query.trim().toLocaleLowerCase();

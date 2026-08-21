@@ -2,14 +2,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
-import { AlertTriangle, ArrowRight, CheckCircle, Heart, Leaf, Search, Shield, Sparkles, Star } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle, Heart, ImageOff, Leaf, Search, Shield, Sparkles, Star } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { buildOrganizationJsonLd, serializeOrganizationJsonLd } from "@/lib/organizationSchema";
 import { buildCatalogSearchPath } from "@/lib/productSearch";
-import { getProductSuggestions } from "@/lib/productSuggestions";
+import { getProductSuggestionImage, getProductSuggestions, type SuggestibleProduct } from "@/lib/productSuggestions";
 import { getSuggestionState } from "@/lib/homeSuggestions";
 import { buildWebsiteJsonLd, serializeWebsiteJsonLd } from "@/lib/websiteSchema";
 import { useEffect, useRef, useState } from "react";
@@ -21,6 +21,23 @@ function FullWide({ children, className = "" }: { children: React.ReactNode; cla
       {children}
     </div>
   );
+}
+
+function SuggestionThumbnail({ product }: { product: SuggestibleProduct }) {
+  const imageUrl = getProductSuggestionImage(product);
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => setImageFailed(false), [imageUrl]);
+
+  if (!imageUrl || imageFailed) {
+    return (
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted text-muted-foreground" aria-hidden="true">
+        <ImageOff className="h-4 w-4" />
+      </span>
+    );
+  }
+
+  return <img src={imageUrl} alt="" className="h-10 w-10 shrink-0 rounded-md border border-border/60 object-cover" onError={() => setImageFailed(true)} />;
 }
 
 export default function Home() {
@@ -268,7 +285,8 @@ export default function Home() {
                                 onMouseDown={(event) => event.preventDefault()}
                                 onClick={() => goToSuggestion(product.id)}
                               >
-                                <span className="truncate font-medium">{product.name}</span>
+                                <SuggestionThumbnail product={product} />
+                                <span className="min-w-0 flex-1 truncate font-medium">{product.name}</span>
                                 <span className="shrink-0 text-xs text-muted-foreground">{product.category}</span>
                               </button>
                             </li>
