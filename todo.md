@@ -135,3 +135,14 @@
 - [x] Add valid robots.txt and a dynamic sitemap.xml endpoint for public MCI Store pages
 - [x] Include active public product-detail URLs in the sitemap and review indexable public routes
 - [x] Document the dynamic sitemap.xml endpoint and validate its server response
+- [x] Add unique dynamic title and meta description for each product detail page
+- [x] Serve product-specific title and description in the initial product HTML response for crawlers
+- [x] Verify raw product-detail HTML includes its unique title and description metadata
+- [x] Add an integration test for server-rendered product metadata on the raw product HTML response
+- [x] Verify an HTTP product-detail response returns product-specific metadata before hydration
+- [x] Verify the real app response with an active public product from the database
+- [x] Verify the production app HTML renderer with an active public product fixture
+- [x] Identify an available catalog product for real-app metadata verification
+- [x] Re-verify an active product page now that catalog data is available
+- [x] Match a database-confirmed active product to its raw application HTML metadata
+- [x] Verify the database product description matches the normalized and truncated raw HTML meta description

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { ArrowLeft, Check, Loader2, Minus, Plus, Search, ShoppingBag, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { filterAlternativesByNeed, filterAlternativesByText, getAlternativeNeeds, getInStockAlternatives, shouldShowAlternativeSearch } from "@/lib/productAlternatives";
 import { addComparedProductToCart, buildAlternativeCheckoutPath, buildMultiProductCheckoutPath, canSelectForComparison, getAlternativeCartSummary, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
+import { buildProductMetadata } from "@/lib/productMetadata";
 
 function getStoredCart(): number[] {
   try {
@@ -81,6 +82,29 @@ export default function ProductDetail() {
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
   const alternativeCart = getAlternativeCartSummary(availableAlternatives, alternativeCartIds, alternativeCartQuantities);
   const recommendationTitle = inStock ? t(detail.relatedProducts, lang) : t(detail.availableAlternatives, lang);
+
+  useEffect(() => {
+    if (!product) return;
+    const metadata = buildProductMetadata(product);
+    const previousTitle = document.title;
+    const existingDescription = document.querySelector('meta[name="description"]');
+    const previousDescription = existingDescription?.getAttribute("content");
+    const descriptionElement = existingDescription ?? document.createElement("meta");
+    const createdDescription = !existingDescription;
+
+    if (createdDescription) {
+      descriptionElement.setAttribute("name", "description");
+      document.head.appendChild(descriptionElement);
+    }
+    document.title = metadata.title;
+    descriptionElement.setAttribute("content", metadata.description);
+
+    return () => {
+      document.title = previousTitle;
+      if (createdDescription) descriptionElement.remove();
+      else if (previousDescription !== null && previousDescription !== undefined) descriptionElement.setAttribute("content", previousDescription);
+    };
+  }, [product?.id, product?.name, product?.description, product?.category]);
 
   const requestSignIn = () => {
     sessionStorage.setItem("pending_checkout_after_login", "true");

@@ -5,6 +5,23 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
+import { renderHtmlWithProductHead, type ProductHeadLookup } from "../productHead";
+
+export async function applyRouteMetadata(template: string, requestUrl: string, getProduct?: ProductHeadLookup) {
+  return renderHtmlWithProductHead(template, requestUrl, getProduct);
+}
+
+export function createHtmlFallbackHandler(templatePath: string, getProduct?: ProductHeadLookup) {
+  return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+      const template = await fs.promises.readFile(templatePath, "utf-8");
+      const page = await applyRouteMetadata(template, req.originalUrl, getProduct);
+      res.status(200).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(page);
+    } catch (error) {
+      next(error);
+    }
+  };
+}
 
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
@@ -38,6 +55,7 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`
       );
+      template = await applyRouteMetadata(template, url);
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
@@ -61,7 +79,5 @@ export function serveStatic(app: Express) {
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
-  });
+  app.use("*", createHtmlFallbackHandler(path.resolve(distPath, "index.html")));
 }
