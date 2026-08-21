@@ -153,3 +153,8 @@
 - [x] Add a home-page product search that routes queries to the catalog and expose a WebSite SearchAction schema
 - [x] Verify the home-page search form renders with an accessible label and submit control
 - [x] Verify a home-page search routes to the catalog with the matching filtered product
+- [x] Add accessible product auto-suggest results to the home-page search input
+- [x] Verify product suggestions appear automatically for a matching home-page query
+- [x] Verify keyboard selection opens the suggested product detail page
+- [x] Show loading and error states so empty suggestions are only reported after a successful product query
+- [x] Close the auto-suggest popover on blur or outside click while preserving keyboard interaction

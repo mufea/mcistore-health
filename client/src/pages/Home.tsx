@@ -9,8 +9,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { buildOrganizationJsonLd, serializeOrganizationJsonLd } from "@/lib/organizationSchema";
 import { buildCatalogSearchPath } from "@/lib/productSearch";
+import { getProductSuggestions } from "@/lib/productSuggestions";
+import { getSuggestionState } from "@/lib/homeSuggestions";
 import { buildWebsiteJsonLd, serializeWebsiteJsonLd } from "@/lib/websiteSchema";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /** Full-width inner wrapper — no max-width cap, generous horizontal padding */
 function FullWide({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -24,6 +26,9 @@ function FullWide({ children, className = "" }: { children: React.ReactNode; cla
 export default function Home() {
   const [, navigate] = useLocation();
   const [productSearch, setProductSearch] = useState("");
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const existingSchema = document.querySelector<HTMLScriptElement>('script[data-organization-schema="true"]');
     const previousSchema = existingSchema?.textContent;
@@ -64,9 +69,30 @@ export default function Home() {
 
   const { lang } = useLanguage();
   const { data: settings } = trpc.settings.getPublic.useQuery();
-  const { data: featuredProducts } = trpc.products.list.useQuery({ segment: "standard" });
+  const { data: featuredProducts, isLoading: productsLoading, isError: productsError } = trpc.products.list.useQuery({ segment: "standard" });
 
   const featured = (featuredProducts ?? []).filter((p) => p.isFeatured).slice(0, 4);
+  const suggestions = getProductSuggestions(featuredProducts ?? [], productSearch);
+  const showSuggestions = suggestionsOpen && productSearch.trim().length >= 2;
+  const suggestionState = getSuggestionState({ query: productSearch, isLoading: productsLoading, isError: productsError, count: suggestions.length });
+
+  useEffect(() => {
+    if (!suggestionsOpen) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!searchContainerRef.current?.contains(event.target as Node)) {
+        setSuggestionsOpen(false);
+        setActiveSuggestionIndex(-1);
+      }
+    };
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [suggestionsOpen]);
+
+  const goToSuggestion = (productId: number) => {
+    setSuggestionsOpen(false);
+    setActiveSuggestionIndex(-1);
+    navigate(`/products/${productId}`);
+  };
 
   const features = [
     {
@@ -177,20 +203,88 @@ export default function Home() {
                 className="mt-5 flex max-w-xl gap-2"
                 onSubmit={(event) => {
                   event.preventDefault();
+                  if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
+                    goToSuggestion(suggestions[activeSuggestionIndex].id);
+                    return;
+                  }
                   navigate(buildCatalogSearchPath(productSearch));
                 }}
               >
                 <label htmlFor="home-product-search" className="sr-only">{t(translations.hero.searchLabel, lang)}</label>
-                <div className="relative flex-1">
+                <div
+                  ref={searchContainerRef}
+                  className="relative flex-1"
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+                      setSuggestionsOpen(false);
+                      setActiveSuggestionIndex(-1);
+                    }
+                  }}
+                >
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                   <Input
                     id="home-product-search"
                     type="search"
                     value={productSearch}
-                    onChange={(event) => setProductSearch(event.target.value)}
+                    onChange={(event) => {
+                      setProductSearch(event.target.value);
+                      setSuggestionsOpen(true);
+                      setActiveSuggestionIndex(-1);
+                    }}
+                    onFocus={() => setSuggestionsOpen(true)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape") {
+                        setSuggestionsOpen(false);
+                        setActiveSuggestionIndex(-1);
+                      } else if (suggestionState === "results" && event.key === "ArrowDown") {
+                        event.preventDefault();
+                        setActiveSuggestionIndex((index) => Math.min(index + 1, suggestions.length - 1));
+                      } else if (suggestionState === "results" && event.key === "ArrowUp") {
+                        event.preventDefault();
+                        setActiveSuggestionIndex((index) => Math.max(index - 1, -1));
+                      }
+                    }}
                     placeholder={t(translations.hero.searchPlaceholder, lang)}
                     className="h-11 bg-background/90 pl-9 shadow-sm"
+                    aria-autocomplete="list"
+                    aria-expanded={showSuggestions}
+                    aria-controls="home-product-suggestions"
+                    aria-activedescendant={activeSuggestionIndex >= 0 ? `home-product-suggestion-${suggestions[activeSuggestionIndex]?.id}` : undefined}
                   />
+                  {showSuggestions && (
+                    <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 overflow-hidden rounded-xl border border-border/70 bg-popover text-popover-foreground shadow-lg">
+                      <p className="px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t(translations.hero.suggestionsLabel, lang)}</p>
+                      {suggestionState === "loading" ? (
+                        <p role="status" className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.suggestionsLoading, lang)}</p>
+                      ) : suggestionState === "error" ? (
+                        <p role="alert" className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.suggestionsError, lang)}</p>
+                      ) : suggestionState === "results" ? (
+                        <ul id="home-product-suggestions" role="listbox" className="pb-1">
+                          {suggestions.map((product, index) => (
+                            <li key={product.id} id={`home-product-suggestion-${product.id}`} role="option" aria-selected={index === activeSuggestionIndex}>
+                              <button
+                                type="button"
+                                className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors ${index === activeSuggestionIndex ? "bg-accent text-accent-foreground" : "hover:bg-accent/70"}`}
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => goToSuggestion(product.id)}
+                              >
+                                <span className="truncate font-medium">{product.name}</span>
+                                <span className="shrink-0 text-xs text-muted-foreground">{product.category}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.noSuggestions, lang)}</p>
+                      )}
+                      <button
+                        type="submit"
+                        className="flex w-full border-t border-border/60 px-3 py-2.5 text-left text-sm font-medium text-primary hover:bg-accent/70"
+                      >
+                        {t(translations.hero.viewAllResults, lang)}
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <Button type="submit" variant="outline" className="h-11 shrink-0">
                   {t(translations.hero.searchButton, lang)}
