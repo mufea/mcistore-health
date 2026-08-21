@@ -162,3 +162,11 @@
 - [x] Verify a matching auto-suggest item renders its stored product thumbnail
 - [x] Display formatted IDR prices on every auto-suggest product item
 - [x] Verify a matching auto-suggest item displays the expected formatted IDR price
+- [x] Add a stock-aware Add to Cart action to each auto-suggest product item
+- [x] Verify an in-stock suggestion renders an accessible Add to Cart control
+- [x] Reuse safe cart parsers and add regression coverage for malformed stored cart data
+- [x] Verify authenticated and unauthenticated auto-suggest Add to Cart persistence flows
+- [x] Verify stock-limit and out-of-stock auto-suggest actions preserve cart state and return translated feedback
+- [x] Add integration coverage for the actual auto-suggest Add to Cart button action callbacks and persisted state
+- [x] Add UI interaction coverage for Add to Cart button clicks and translated stock feedback
+- [x] Show an explicit translated out-of-stock explanation for disabled auto-suggest cart actions

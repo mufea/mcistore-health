@@ -13,6 +13,9 @@ import { formatSuggestionPrice, getProductSuggestionImage, getProductSuggestions
 import { getSuggestionState } from "@/lib/homeSuggestions";
 import { buildWebsiteJsonLd, serializeWebsiteJsonLd } from "@/lib/websiteSchema";
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
+import SuggestionAddToCartButton from "@/components/SuggestionAddToCartButton";
 
 /** Full-width inner wrapper — no max-width cap, generous horizontal padding */
 function FullWide({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -42,6 +45,7 @@ function SuggestionThumbnail({ product }: { product: SuggestibleProduct }) {
 
 export default function Home() {
   const [, navigate] = useLocation();
+  const { isAuthenticated } = useAuth();
   const [productSearch, setProductSearch] = useState("");
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
@@ -278,10 +282,10 @@ export default function Home() {
                       ) : suggestionState === "results" ? (
                         <ul id="home-product-suggestions" role="listbox" className="pb-1">
                           {suggestions.map((product, index) => (
-                            <li key={product.id} id={`home-product-suggestion-${product.id}`} role="option" aria-selected={index === activeSuggestionIndex}>
+                            <li key={product.id} id={`home-product-suggestion-${product.id}`} role="option" aria-selected={index === activeSuggestionIndex} className={`flex items-center gap-2 px-3 py-2.5 transition-colors ${index === activeSuggestionIndex ? "bg-accent text-accent-foreground" : "hover:bg-accent/70"}`}>
                               <button
                                 type="button"
-                                className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors ${index === activeSuggestionIndex ? "bg-accent text-accent-foreground" : "hover:bg-accent/70"}`}
+                                className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left text-sm"
                                 onMouseDown={(event) => event.preventDefault()}
                                 onClick={() => goToSuggestion(product.id)}
                               >
@@ -292,6 +296,19 @@ export default function Home() {
                                   <span className="block text-xs font-semibold text-primary">{formatSuggestionPrice(product.price)}</span>
                                 </span>
                               </button>
+                              <SuggestionAddToCartButton
+                                product={product}
+                                isAuthenticated={isAuthenticated}
+                                onAdded={() => {
+                                  setSuggestionsOpen(false);
+                                  setActiveSuggestionIndex(-1);
+                                }}
+                                onRequireSignIn={() => {
+                                  setSuggestionsOpen(false);
+                                  setActiveSuggestionIndex(-1);
+                                  window.location.href = getLoginUrl();
+                                }}
+                              />
                             </li>
                           ))}
                         </ul>

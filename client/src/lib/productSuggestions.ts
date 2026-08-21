@@ -3,6 +3,7 @@ export type SuggestibleProduct = {
   name: string;
   category: string;
   price: string | number;
+  stock: number;
   description?: string | null;
   imageUrl?: string | null;
   images?: Array<{ url: string }> | null;
