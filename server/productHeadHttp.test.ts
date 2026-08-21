@@ -43,6 +43,7 @@ describe("product-detail HTTP metadata", () => {
     expect(html).toContain("<title>Cardio Care Plus | MCI Store</title>");
     expect(html).toContain('content="Targeted nutritional support for daily cardiovascular wellness."');
     expect(html).toContain('<link rel="canonical" href="https://mci-store.com/products/77" />');
+    expect(html).toContain('data-product-schema="true"');
     expect(html).not.toContain("Trusted Health Partner");
   });
 });

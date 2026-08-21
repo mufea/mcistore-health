@@ -17,6 +17,7 @@ import { t, translations } from "@/lib/i18n";
 import { filterAlternativesByNeed, filterAlternativesByText, getAlternativeNeeds, getInStockAlternatives, shouldShowAlternativeSearch } from "@/lib/productAlternatives";
 import { addComparedProductToCart, buildAlternativeCheckoutPath, buildMultiProductCheckoutPath, canSelectForComparison, getAlternativeCartSummary, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
 import { buildProductCanonicalUrl, buildProductMetadata } from "@/lib/productMetadata";
+import { buildProductJsonLd, serializeProductJsonLd } from "@/lib/productSchema";
 
 function getStoredCart(): number[] {
   try {
@@ -96,6 +97,10 @@ export default function ProductDetail() {
     const previousCanonical = existingCanonical?.getAttribute("href");
     const canonicalElement = existingCanonical ?? document.createElement("link");
     const createdCanonical = !existingCanonical;
+    const existingSchema = document.querySelector<HTMLScriptElement>('script[data-product-schema="true"]');
+    const previousSchema = existingSchema?.textContent;
+    const schemaElement = existingSchema ?? document.createElement("script");
+    const createdSchema = !existingSchema;
 
     if (createdDescription) {
       descriptionElement.setAttribute("name", "description");
@@ -108,6 +113,12 @@ export default function ProductDetail() {
       document.head.appendChild(canonicalElement);
     }
     canonicalElement.setAttribute("href", buildProductCanonicalUrl(product.id));
+    if (createdSchema) {
+      schemaElement.type = "application/ld+json";
+      schemaElement.dataset.productSchema = "true";
+      document.head.appendChild(schemaElement);
+    }
+    schemaElement.textContent = serializeProductJsonLd(buildProductJsonLd(product));
 
     return () => {
       document.title = previousTitle;
@@ -115,6 +126,8 @@ export default function ProductDetail() {
       else if (previousDescription !== null && previousDescription !== undefined) descriptionElement.setAttribute("content", previousDescription);
       if (createdCanonical) canonicalElement.remove();
       else if (previousCanonical !== null && previousCanonical !== undefined) canonicalElement.setAttribute("href", previousCanonical);
+      if (createdSchema) schemaElement.remove();
+      else schemaElement.textContent = previousSchema ?? "";
     };
   }, [product?.id, product?.name, product?.description, product?.category]);
 

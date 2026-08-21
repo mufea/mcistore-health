@@ -148,3 +148,4 @@
 - [x] Verify the database product description matches the normalized and truncated raw HTML meta description
 - [x] Add a unique canonical URL to each product detail page and its initial HTML response
 - [x] Add semantic breadcrumb navigation to product catalog and product detail pages
+- [x] Add accurate JSON-LD Product schema to product detail pages and initial HTML responses

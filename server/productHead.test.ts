@@ -4,6 +4,7 @@ vi.mock("./db", () => ({ getProductById: vi.fn() }));
 
 import { getProductById } from "./db";
 import { getProductHeadMetadata, injectProductHeadMetadata, renderHtmlWithProductHead } from "./productHead";
+import { buildProductJsonLd } from "../shared/productSchema";
 
 describe("injectProductHeadMetadata", () => {
   it("resolves active public product metadata for a product-detail request", async () => {
@@ -12,26 +13,33 @@ describe("injectProductHeadMetadata", () => {
       name: "Daily Omega",
       description: "Support for daily wellness.",
       category: "Supplement",
+      price: "150000.00",
+      stock: 3,
       isActive: true,
       targetSegment: "all",
     } as any);
 
-    await expect(getProductHeadMetadata("/products/14?campaign=search")).resolves.toEqual({
+    await expect(getProductHeadMetadata("/products/14?campaign=search")).resolves.toMatchObject({
       title: "Daily Omega | MCI Store",
       description: "Support for daily wellness.",
       canonicalUrl: "https://mci-store.com/products/14",
+      productSchema: { "@type": "Product", offers: { availability: "https://schema.org/InStock" } },
     });
   });
 
   it("replaces generic head tags with escaped product-specific metadata", () => {
     const page = injectProductHeadMetadata(
       '<head><title>MCI Store - Trusted Health Partner</title><meta name="description" content="Generic" /></head>',
-      { title: 'Vitamin "C" | MCI Store', description: "Wellness & immune support", canonicalUrl: "https://mci-store.com/products/9" }
+      {
+        title: 'Vitamin "C" | MCI Store', description: "Wellness & immune support", canonicalUrl: "https://mci-store.com/products/9",
+        productSchema: buildProductJsonLd({ id: 9, name: 'Vitamin "C"', description: "Wellness & immune support", category: "Wellness", price: 50000, stock: 3 }),
+      }
     );
 
     expect(page).toContain("<title>Vitamin &quot;C&quot; | MCI Store</title>");
     expect(page).toContain('content="Wellness &amp; immune support"');
     expect(page).toContain('<link rel="canonical" href="https://mci-store.com/products/9" />');
+    expect(page).toContain('data-product-schema="true"');
     expect(page).not.toContain("Trusted Health Partner");
   });
 
@@ -44,6 +52,8 @@ describe("injectProductHeadMetadata", () => {
         name: "Calm Night Formula",
         description: "Night-time wellness support.",
         category: "Wellness",
+        price: "85000.00",
+        stock: 0,
         isActive: true,
         targetSegment: "standard",
       } as any)
@@ -52,5 +62,6 @@ describe("injectProductHeadMetadata", () => {
     expect(rawHtml).toContain("<title>Calm Night Formula | MCI Store</title>");
     expect(rawHtml).toContain('content="Night-time wellness support."');
     expect(rawHtml).toContain('<link rel="canonical" href="https://mci-store.com/products/55" />');
+    expect(rawHtml).toContain('"availability":"https://schema.org/OutOfStock"');
   });
 });
