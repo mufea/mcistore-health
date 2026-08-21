@@ -15,7 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { filterAlternativesByNeed, filterAlternativesByText, getAlternativeNeeds, getInStockAlternatives, shouldShowAlternativeSearch } from "@/lib/productAlternatives";
 import { addComparedProductToCart, buildAlternativeCheckoutPath, buildMultiProductCheckoutPath, canSelectForComparison, getAlternativeCartSummary, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
-import { buildProductMetadata } from "@/lib/productMetadata";
+import { buildProductCanonicalUrl, buildProductMetadata } from "@/lib/productMetadata";
 
 function getStoredCart(): number[] {
   try {
@@ -91,6 +91,10 @@ export default function ProductDetail() {
     const previousDescription = existingDescription?.getAttribute("content");
     const descriptionElement = existingDescription ?? document.createElement("meta");
     const createdDescription = !existingDescription;
+    const existingCanonical = document.querySelector('link[rel="canonical"]');
+    const previousCanonical = existingCanonical?.getAttribute("href");
+    const canonicalElement = existingCanonical ?? document.createElement("link");
+    const createdCanonical = !existingCanonical;
 
     if (createdDescription) {
       descriptionElement.setAttribute("name", "description");
@@ -98,11 +102,18 @@ export default function ProductDetail() {
     }
     document.title = metadata.title;
     descriptionElement.setAttribute("content", metadata.description);
+    if (createdCanonical) {
+      canonicalElement.setAttribute("rel", "canonical");
+      document.head.appendChild(canonicalElement);
+    }
+    canonicalElement.setAttribute("href", buildProductCanonicalUrl(product.id));
 
     return () => {
       document.title = previousTitle;
       if (createdDescription) descriptionElement.remove();
       else if (previousDescription !== null && previousDescription !== undefined) descriptionElement.setAttribute("content", previousDescription);
+      if (createdCanonical) canonicalElement.remove();
+      else if (previousCanonical !== null && previousCanonical !== undefined) canonicalElement.setAttribute("href", previousCanonical);
     };
   }, [product?.id, product?.name, product?.description, product?.category]);
 

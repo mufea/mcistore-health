@@ -1,4 +1,5 @@
 const SITE_NAME = "MCI Store";
+const CANONICAL_ORIGIN = "https://mci-store.com";
 const MAX_DESCRIPTION_LENGTH = 160;
 
 export type ProductMetadataSource = {
@@ -19,4 +20,8 @@ export function buildProductMetadata(product: ProductMetadataSource) {
     title: `${product.name} | ${SITE_NAME}`,
     description,
   };
+}
+
+export function buildProductCanonicalUrl(productId: number) {
+  return `${CANONICAL_ORIGIN}/products/${productId}`;
 }

@@ -1,1 +1,1 @@
-export { buildProductMetadata, type ProductMetadataSource } from "@shared/productMetadata";
+export { buildProductCanonicalUrl, buildProductMetadata, type ProductMetadataSource } from "@shared/productMetadata";

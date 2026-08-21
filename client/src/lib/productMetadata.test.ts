@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildProductMetadata } from "./productMetadata";
+import { buildProductCanonicalUrl, buildProductMetadata } from "./productMetadata";
 
 describe("buildProductMetadata", () => {
   it("creates a unique product title and normalized description", () => {
@@ -14,5 +14,9 @@ describe("buildProductMetadata", () => {
     expect(metadata.description).toHaveLength(160);
     expect(metadata.description.endsWith("…")).toBe(true);
     expect(buildProductMetadata({ name: "Vital Tea", category: "Herbal Tea" }).description).toContain("Vital Tea");
+  });
+
+  it("uses the preferred storefront domain for a product canonical URL", () => {
+    expect(buildProductCanonicalUrl(42)).toBe("https://mci-store.com/products/42");
   });
 });
