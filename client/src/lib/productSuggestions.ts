@@ -2,6 +2,7 @@ export type SuggestibleProduct = {
   id: number;
   name: string;
   category: string;
+  price: string | number;
   description?: string | null;
   imageUrl?: string | null;
   images?: Array<{ url: string }> | null;
@@ -9,6 +10,11 @@ export type SuggestibleProduct = {
 
 export function getProductSuggestionImage(product: SuggestibleProduct) {
   return product.images?.find((image) => Boolean(image.url))?.url || product.imageUrl || null;
+}
+
+export function formatSuggestionPrice(price: string | number) {
+  const numericPrice = Number(price);
+  return Number.isFinite(numericPrice) ? `IDR ${numericPrice.toLocaleString("id-ID")}` : "IDR —";
 }
 
 export function getProductSuggestions<T extends SuggestibleProduct>(products: T[], query: string, limit = 5): T[] {

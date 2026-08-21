@@ -160,3 +160,5 @@
 - [x] Close the auto-suggest popover on blur or outside click while preserving keyboard interaction
 - [x] Add product thumbnails with an accessible fallback to auto-suggest items
 - [x] Verify a matching auto-suggest item renders its stored product thumbnail
+- [x] Display formatted IDR prices on every auto-suggest product item
+- [x] Verify a matching auto-suggest item displays the expected formatted IDR price

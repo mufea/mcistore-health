@@ -9,7 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { buildOrganizationJsonLd, serializeOrganizationJsonLd } from "@/lib/organizationSchema";
 import { buildCatalogSearchPath } from "@/lib/productSearch";
-import { getProductSuggestionImage, getProductSuggestions, type SuggestibleProduct } from "@/lib/productSuggestions";
+import { formatSuggestionPrice, getProductSuggestionImage, getProductSuggestions, type SuggestibleProduct } from "@/lib/productSuggestions";
 import { getSuggestionState } from "@/lib/homeSuggestions";
 import { buildWebsiteJsonLd, serializeWebsiteJsonLd } from "@/lib/websiteSchema";
 import { useEffect, useRef, useState } from "react";
@@ -287,7 +287,10 @@ export default function Home() {
                               >
                                 <SuggestionThumbnail product={product} />
                                 <span className="min-w-0 flex-1 truncate font-medium">{product.name}</span>
-                                <span className="shrink-0 text-xs text-muted-foreground">{product.category}</span>
+                                <span className="shrink-0 text-right">
+                                  <span className="block text-xs text-muted-foreground">{product.category}</span>
+                                  <span className="block text-xs font-semibold text-primary">{formatSuggestionPrice(product.price)}</span>
+                                </span>
                               </button>
                             </li>
                           ))}
