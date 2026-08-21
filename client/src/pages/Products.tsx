@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
+import ProductBreadcrumb from "@/components/ProductBreadcrumb";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { isLowStock, isOutOfStock, matchesStockFilter } from "@/lib/stock";
@@ -42,6 +43,11 @@ export default function Products() {
       <div className="py-12">
         <div className="container">
           <BackToHome className="mb-8" />
+          <ProductBreadcrumb
+            homeLabel={t(translations.nav.home, lang)}
+            productsLabel={t(translations.nav.products, lang)}
+            className="mb-5"
+          />
 
           {/* Header */}
           <div className="mb-10">

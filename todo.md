@@ -147,3 +147,4 @@
 - [x] Match a database-confirmed active product to its raw application HTML metadata
 - [x] Verify the database product description matches the normalized and truncated raw HTML meta description
 - [x] Add a unique canonical URL to each product detail page and its initial HTML response
+- [x] Add semantic breadcrumb navigation to product catalog and product detail pages

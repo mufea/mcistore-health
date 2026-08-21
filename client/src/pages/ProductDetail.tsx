@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import MainLayout from "@/components/MainLayout";
 import BackToHome from "@/components/BackToHome";
+import ProductBreadcrumb from "@/components/ProductBreadcrumb";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -220,6 +221,12 @@ export default function ProductDetail() {
     <MainLayout>
       <main className="py-8 sm:py-12">
         <div className="container">
+          <ProductBreadcrumb
+            homeLabel={t(translations.nav.home, lang)}
+            productsLabel={t(translations.nav.products, lang)}
+            currentLabel={product.name}
+            className="mb-5"
+          />
           <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
             <Button asChild variant="ghost" size="sm" className="-ml-2 text-muted-foreground hover:text-foreground">
               <Link href="/products"><ArrowLeft className="mr-2 h-4 w-4" />{t(detail.backToProducts, lang)}</Link>
