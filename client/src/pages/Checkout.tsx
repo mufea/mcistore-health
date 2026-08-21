@@ -415,6 +415,10 @@ export default function Checkout() {
                     <CheckoutRemoveItemButton
                       itemName={product.name}
                       label={t(translations.checkout.removeItem, lang)}
+                      confirmTitle={t(translations.checkout.confirmRemoveTitle, lang)}
+                      confirmDescription={t(translations.checkout.confirmRemoveDesc, lang)}
+                      cancelLabel={t(translations.checkout.cancel, lang)}
+                      confirmLabel={t(translations.checkout.removeItem, lang)}
                       onRemove={() => handleRemoveProduct(product.id)}
                     />
                   </div>
@@ -774,6 +778,10 @@ export default function Checkout() {
                         <CheckoutRemoveItemButton
                           itemName={product.name}
                           label={t(translations.checkout.removeItem, lang)}
+                          confirmTitle={t(translations.checkout.confirmRemoveTitle, lang)}
+                          confirmDescription={t(translations.checkout.confirmRemoveDesc, lang)}
+                          cancelLabel={t(translations.checkout.cancel, lang)}
+                          confirmLabel={t(translations.checkout.removeItem, lang)}
                           onRemove={() => handleRemoveProduct(product.id)}
                         />
                       </div>

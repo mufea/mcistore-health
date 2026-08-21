@@ -171,3 +171,4 @@
 - [x] Add UI interaction coverage for Add to Cart button clicks and translated stock feedback
 - [x] Show an explicit translated out-of-stock explanation for disabled auto-suggest cart actions
 - [x] Add an accessible remove-item action to the Checkout order summary with synchronized cart totals
+- [x] Add an accessible confirmation dialog before removing a Checkout item
