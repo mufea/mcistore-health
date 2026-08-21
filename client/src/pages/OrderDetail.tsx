@@ -185,10 +185,11 @@ export default function OrderDetail() {
                     <div className="w-8 h-8 rounded-md bg-muted/50 flex items-center justify-center">
                       <Package className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{item.productName}</p>
-                      <p className="text-xs text-muted-foreground">{t(o.qty, lang)}: {item.quantity}</p>
-                    </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{item.productName}</p>
+                        <p className="text-xs text-muted-foreground">{t(o.qty, lang)}: {item.quantity}</p>
+                        {item.itemNote && <p className="mt-1 text-xs text-muted-foreground"><span className="font-medium text-foreground">{t(translations.checkout.itemNote, lang)}:</span> {item.itemNote}</p>}
+                      </div>
                   </div>
                   <span className="text-sm font-medium">IDR {Number(item.subtotal).toLocaleString("id-ID")}</span>
                 </div>

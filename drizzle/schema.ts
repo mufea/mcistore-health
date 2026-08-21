@@ -183,6 +183,7 @@ export const orderItems = mysqlTable("order_items", {
   productPrice: decimal("productPrice", { precision: 12, scale: 2 }).notNull(),
   quantity: int("quantity").notNull().default(1),
   subtotal: decimal("subtotal", { precision: 12, scale: 2 }).notNull(),
+  itemNote: text("itemNote"),
 });
 
 export type OrderItem = typeof orderItems.$inferSelect;

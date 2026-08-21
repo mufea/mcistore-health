@@ -32,6 +32,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { type Language, t, translations } from "@/lib/i18n";
 import CheckoutStepper from "@/components/CheckoutStepper";
 import CheckoutRemoveItemButton from "@/components/CheckoutRemoveItemButton";
+import CheckoutItemNoteInput from "@/components/CheckoutItemNoteInput";
 import { formatCheckoutQuantities, parseCheckoutQuantities, parseStoredCartIds, parseStoredQuantities, resolveCheckoutQuantities } from "@/lib/cartQuantities";
 import { removeCheckoutProduct } from "@/lib/checkoutCartRemoval";
 
@@ -188,6 +189,7 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState<"bank_transfer" | "midtrans">("bank_transfer");
   const [checkoutProductIds, setCheckoutProductIds] = useState<number[]>(initialProductIds);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
+  const [itemNotes, setItemNotes] = useState<Record<number, string>>({});
   const [summaryOpen, setSummaryOpen] = useState(false); // mobile order summary toggle
 
   const { data: allProducts } = trpc.products.list.useQuery({ segment });
@@ -280,6 +282,10 @@ export default function Checkout() {
 
     setCheckoutProductIds(result.checkoutProductIds);
     setQuantities(result.checkoutQuantities);
+    setItemNotes((previousNotes) => {
+      const { [productId]: _removed, ...remainingNotes } = previousNotes;
+      return remainingNotes;
+    });
     sessionStorage.setItem("pending_cart", JSON.stringify(result.storedCartIds));
     sessionStorage.setItem("pending_quantities", JSON.stringify(result.storedQuantities));
 
@@ -343,6 +349,7 @@ export default function Checkout() {
           productPrice: Number(p.price),
           quantity: quantities[p.id] ?? 1,
           subtotal: Number(p.price) * (quantities[p.id] ?? 1),
+          itemNote: itemNotes[p.id]?.trim() || undefined,
         })),
       });
       navigate(`/payment/${result.orderNumber}?method=${paymentMethod}`);
@@ -407,6 +414,13 @@ export default function Checkout() {
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
+                    <CheckoutItemNoteInput
+                      itemName={product.name}
+                      label={t(translations.checkout.itemNote, lang)}
+                      value={itemNotes[product.id] ?? ""}
+                      onChange={(value) => setItemNotes((current) => ({ ...current, [product.id]: value }))}
+                      placeholder={t(translations.checkout.itemNotePlaceholder, lang)}
+                    />
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <span className="text-sm font-medium text-foreground">
@@ -743,7 +757,7 @@ export default function Checkout() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground line-clamp-1">{product.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-1">
                           <button
                             className="w-6 h-6 rounded border border-border flex items-center justify-center hover:bg-muted active:scale-95 transition-transform"
                             onClick={() =>
@@ -768,9 +782,16 @@ export default function Checkout() {
                             aria-label="Increase quantity"
                           >
                             <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
+                        </button>
                       </div>
+                      <CheckoutItemNoteInput
+                        itemName={product.name}
+                        label={t(translations.checkout.itemNote, lang)}
+                        value={itemNotes[product.id] ?? ""}
+                        onChange={(value) => setItemNotes((current) => ({ ...current, [product.id]: value }))}
+                        placeholder={t(translations.checkout.itemNotePlaceholder, lang)}
+                      />
+                    </div>
                       <div className="flex shrink-0 items-center gap-1">
                         <span className="text-sm font-medium text-foreground">
                           IDR {(Number(product.price) * (quantities[product.id] ?? 1)).toLocaleString("id-ID")}

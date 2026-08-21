@@ -38,6 +38,7 @@ const orderItemSchema = z.object({
   productPrice: z.number(),
   quantity: z.number().int().min(1),
   subtotal: z.number(),
+  itemNote: z.string().trim().max(500).optional(),
 });
 
 const orderStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
@@ -72,6 +73,10 @@ export const ordersRouter = router({
         result.set(item.productId, (result.get(item.productId) ?? 0) + item.quantity);
         return result;
       }, new Map<number, number>());
+      const requestedNotes = input.items.reduce((result, item) => {
+        if (item.itemNote) result.set(item.productId, item.itemNote);
+        return result;
+      }, new Map<number, string>());
 
       const trustedItems = [] as typeof input.items;
       for (const [productId, quantity] of requestedQuantities) {
@@ -86,12 +91,14 @@ export const ordersRouter = router({
           });
         }
         const price = Number(product.price);
+        const itemNote = requestedNotes.get(productId);
         trustedItems.push({
           productId,
           productName: product.name,
           productPrice: price,
           quantity,
           subtotal: price * quantity,
+          ...(itemNote ? { itemNote } : {}),
         });
       }
 

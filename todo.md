@@ -172,3 +172,4 @@
 - [x] Show an explicit translated out-of-stock explanation for disabled auto-suggest cart actions
 - [x] Add an accessible remove-item action to the Checkout order summary with synchronized cart totals
 - [x] Add an accessible confirmation dialog before removing a Checkout item
+- [x] Add persistent per-item special instructions to Checkout orders

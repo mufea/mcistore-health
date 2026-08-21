@@ -489,6 +489,22 @@ describe("orders.create stock validation", () => {
     );
   });
 
+  it("preserves a trimmed validated special instruction while recalculating trusted product values", async () => {
+    vi.mocked(getProductById).mockResolvedValueOnce({
+      id: 7, name: "Verified Product", price: "125000", stock: 3, isActive: true,
+    } as any);
+    const caller = appRouter.createCaller(makeUserCtx());
+    await caller.orders.create({
+      ...baseOrderInput,
+      items: [{ ...baseOrderInput.items[0], itemNote: "  Please pack separately.  " }],
+    });
+
+    expect(createOrder).toHaveBeenLastCalledWith(
+      expect.any(Object),
+      [expect.objectContaining({ productId: 7, productName: "Verified Product", itemNote: "Please pack separately." })],
+    );
+  });
+
   it("rejects order creation when current stock is insufficient", async () => {
     vi.mocked(getProductById).mockResolvedValueOnce({
       id: 7, name: "Verified Product", price: "125000", stock: 1, isActive: true,

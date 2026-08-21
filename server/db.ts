@@ -333,7 +333,7 @@ export async function deleteProduct(id: number) {
 
 export async function createOrder(
   orderData: InsertOrder,
-  items: { productId: number; productName: string; productPrice: number; quantity: number; subtotal: number }[]
+  items: { productId: number; productName: string; productPrice: number; quantity: number; subtotal: number; itemNote?: string }[]
 ) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
@@ -357,6 +357,7 @@ export async function createOrder(
       productPrice: String(item.productPrice),
       quantity: item.quantity,
       subtotal: String(item.subtotal),
+      itemNote: item.itemNote,
     }))
   );
 

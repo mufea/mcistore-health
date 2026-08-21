@@ -47,6 +47,10 @@ export default function AdminOrders() {
   const [detailDialog, setDetailDialog] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [newPaymentStatus, setNewPaymentStatus] = useState("");
+  const { data: selectedOrderDetails } = trpc.orders.adminGetById.useQuery(
+    { id: selectedOrder?.id ?? 0 },
+    { enabled: detailDialog && Boolean(selectedOrder?.id) },
+  );
 
   const updateStatusMutation = trpc.orders.updateStatus.useMutation({
     onSuccess: () => {
@@ -274,10 +278,13 @@ export default function AdminOrders() {
               <div>
                 <h3 className="text-sm font-semibold mb-2">Order Items</h3>
                 <div className="bg-muted/30 rounded-lg p-3 space-y-2">
-                  {selectedOrder.items?.map((item: any) => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <span>{item.productName} × {item.quantity}</span>
-                      <span className="font-medium">IDR {Number(item.subtotal).toLocaleString("id-ID")}</span>
+                  {(selectedOrderDetails?.items ?? []).map((item: any) => (
+                    <div key={item.id} className="flex justify-between gap-4 text-sm">
+                      <div>
+                        <span>{item.productName} × {item.quantity}</span>
+                        {item.itemNote && <p className="mt-1 text-xs text-muted-foreground"><span className="font-medium text-foreground">Special instructions:</span> {item.itemNote}</p>}
+                      </div>
+                      <span className="font-medium whitespace-nowrap">IDR {Number(item.subtotal).toLocaleString("id-ID")}</span>
                     </div>
                   ))}
                   <Separator />
