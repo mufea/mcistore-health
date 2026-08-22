@@ -20,6 +20,7 @@ import {
 import { Link, useLocation } from "wouter";
 import { useCallback } from "react";
 import BackToHome from "@/components/BackToHome";
+import BrandMark from "@/components/BrandMark";
 
 const navItems = [
   { href: "/admin", label: "Overview", icon: BarChart3 },
@@ -76,9 +77,7 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
         <div className="border-b border-sidebar-border flex-shrink-0 p-5">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center shadow-sm flex-shrink-0">
-                <span className="text-sidebar-primary-foreground text-sm font-bold tracking-tight">MC</span>
-              </div>
+              <BrandMark size="md" className="ring-sidebar-primary/25" />
               <div className="overflow-hidden">
                 <span className="font-bold text-sm text-sidebar-foreground tracking-tight whitespace-nowrap">MCI Store</span>
                 <p className="text-[10px] text-sidebar-foreground/50 leading-none mt-0.5 whitespace-nowrap">Admin Dashboard</p>

@@ -174,3 +174,9 @@
 - [x] Add an accessible confirmation dialog before removing a Checkout item
 - [x] Add persistent per-item special instructions to Checkout orders
 - [x] Add admin-only internal notes to order details without exposing them to customers
+- [x] Verify whether Midtrans and bank-transfer payment flows are configured for production transactions
+- [x] Replace all MCI brand icons and favicon with a more polished, consistent visual identity
+- [x] Verify the new MCI mark is proportionate and legible in the primary navbar branding
+- [x] Update all organization/logo metadata references to the new MCI mark asset
+- [x] Verify the generated MCI mark asset has completed rendering and is not a placeholder
+- [x] Add coverage to prevent outdated brand-logo asset URLs in visual and organization metadata

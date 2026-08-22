@@ -1,4 +1,5 @@
 import { trpc } from "@/lib/trpc";
+import BrandMark from "@/components/BrandMark";
 import { Link } from "wouter";
 
 export default function Footer() {
@@ -11,9 +12,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-xs font-bold tracking-tight">MC</span>
-              </div>
+              <BrandMark size="sm" />
               <span className="font-serif text-lg font-semibold">{settings?.siteName ?? "MCI Store"}</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">

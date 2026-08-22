@@ -1,3 +1,5 @@
+import { MCI_BRAND_MARK_URL } from "./brand";
+
 const CANONICAL_ORIGIN = "https://mci-store.com";
 
 export function buildOrganizationJsonLd() {
@@ -7,7 +9,7 @@ export function buildOrganizationJsonLd() {
     name: "MCI Store",
     alternateName: "MCI Store - Trusted Health Partner",
     url: CANONICAL_ORIGIN,
-    logo: `${CANONICAL_ORIGIN}/manus-storage/favicon-256_fb59f03b.png`,
+    logo: MCI_BRAND_MARK_URL,
     description: "Your journey to optimal health starts here. Discover personalized health products tailored to your unique needs.",
   };
 }

@@ -42,6 +42,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import BrandMark from "@/components/BrandMark";
 import { canIncreaseCartQuantity, clearCart, parseStoredCartIds, parseStoredQuantities, removeCartItem, updateCartItemQuantity } from "@/lib/cartQuantities";
 
 export default function Navbar() {
@@ -135,9 +136,7 @@ export default function Navbar() {
         {/* ── Logo ─────────────────────────────────────────────────────── */}
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-              <span className="text-primary-foreground text-xs font-bold tracking-tight">MC</span>
-            </div>
+            <BrandMark size="md" />
             <span className="font-serif text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
               {siteName}
             </span>
@@ -245,9 +244,7 @@ export default function Navbar() {
               {/* Sheet header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-                    <span className="text-primary-foreground text-[10px] font-bold">MC</span>
-                  </div>
+                  <BrandMark size="sm" />
                   <span className="font-serif text-base font-semibold text-foreground">{siteName}</span>
                 </div>
               </div>
