@@ -136,7 +136,10 @@ export default function Navbar() {
         {/* ── Logo ─────────────────────────────────────────────────────── */}
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
-            <BrandMark size="md" />
+            <BrandMark
+              size="md"
+              className="motion-safe:translate-y-0 motion-safe:scale-100 motion-safe:transition-[transform,box-shadow] motion-safe:duration-200 motion-safe:ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:scale-[1.06] motion-safe:group-hover:shadow-md"
+            />
             <span className="font-serif text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
               {siteName}
             </span>

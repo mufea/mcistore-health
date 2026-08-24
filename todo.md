@@ -180,3 +180,4 @@
 - [x] Update all organization/logo metadata references to the new MCI mark asset
 - [x] Verify the generated MCI mark asset has completed rendering and is not a placeholder
 - [x] Add coverage to prevent outdated brand-logo asset URLs in visual and organization metadata
+- [x] Add a subtle, accessible hover animation to the MCI navbar icon

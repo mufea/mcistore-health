@@ -11,3 +11,11 @@ it("renders the reusable MCI brand mark asset decoratively", () => {
   expect(image?.getAttribute("alt")).toBe("");
   expect(image?.getAttribute("aria-hidden")).toBe("true");
 });
+
+it("forwards motion-safe hover classes for interactive brand placements", () => {
+  const hoverClass = "motion-safe:group-hover:scale-[1.06] motion-safe:group-hover:-translate-y-0.5";
+  const { container } = render(<BrandMark className={hoverClass} />);
+
+  expect(container.firstElementChild?.className).toContain("motion-safe:group-hover:scale-[1.06]");
+  expect(container.firstElementChild?.className).toContain("motion-safe:group-hover:-translate-y-0.5");
+});
