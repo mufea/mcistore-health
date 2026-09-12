@@ -181,3 +181,4 @@
 - [x] Verify the generated MCI mark asset has completed rendering and is not a placeholder
 - [x] Add coverage to prevent outdated brand-logo asset URLs in visual and organization metadata
 - [x] Add a subtle, accessible hover animation to the MCI navbar icon
+- [x] Add a clearly labeled Edit button to each product row in the admin Product section and open the existing product editor

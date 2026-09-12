@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { trpc } from "@/lib/trpc";
-import { Edit, History, ImagePlus, Leaf, Loader2, Plus, Search, Star, Trash2, X } from "lucide-react";
+import { History, ImagePlus, Leaf, Loader2, Plus, Search, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
+import AdminProductEditButton from "@/components/AdminProductEditButton";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Herbal Tea", "Vitamin", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
@@ -272,7 +273,7 @@ export default function AdminProducts() {
                         <Button size="sm" variant="ghost" onClick={() => setHistoryTarget({ id: product.id, name: product.name })} title="View stock history" aria-label={`View stock history for ${product.name}`}>
                           <History className="h-3.5 w-3.5" />
                         </Button>
-                        <Button size="sm" variant="ghost" onClick={() => openEdit(product)}><Edit className="h-3.5 w-3.5" /></Button>
+                        <AdminProductEditButton productName={product.name} onEdit={() => openEdit(product)} />
                         <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget({ id: product.id, name: product.name })}>
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
