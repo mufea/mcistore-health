@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 import AdminProductEditButton from "@/components/AdminProductEditButton";
 import AdminProductStatusToggle from "@/components/AdminProductStatusToggle";
+import { filterAdminProducts, type ProductStatusFilter } from "@/lib/adminProductFilters";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Herbal Tea", "Vitamin", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
@@ -26,6 +27,7 @@ export default function AdminProducts() {
   const utils = trpc.useUtils();
   const { data: products, isLoading } = trpc.products.adminList.useQuery();
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ProductStatusFilter>("all");
   const [dialog, setDialog] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
@@ -188,9 +190,7 @@ export default function AdminProducts() {
     }
   };
 
-  const filtered = (products ?? []).filter((p) =>
-    !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = filterAdminProducts(products ?? [], search, statusFilter);
 
   const segmentColor: Record<string, string> = {
     all: "bg-green-100 text-green-700",
@@ -214,10 +214,25 @@ export default function AdminProducts() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-6 max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      {/* Search and status filter */}
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative w-full sm:max-w-sm sm:flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        </div>
+        <div className="w-full sm:w-48">
+          <Label htmlFor="admin-product-status-filter" className="sr-only">Filter products by status</Label>
+          <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ProductStatusFilter)}>
+            <SelectTrigger id="admin-product-status-filter" aria-label="Filter products by status">
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="active">Active only</SelectItem>
+              <SelectItem value="inactive">Inactive only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {isLoading ? (

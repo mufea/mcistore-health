@@ -183,3 +183,4 @@
 - [x] Add a subtle, accessible hover animation to the MCI navbar icon
 - [x] Add a clearly labeled Edit button to each product row in the admin Product section and open the existing product editor
 - [x] Add a quick accessible status toggle to switch each admin product between Active and Inactive
+- [x] Add an Active/Inactive/All filter dropdown to the admin Product list and combine it with product search
