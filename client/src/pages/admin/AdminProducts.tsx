@@ -13,6 +13,7 @@ import { History, ImagePlus, Leaf, Loader2, Plus, Search, Star, Trash2, X } from
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 import AdminProductEditButton from "@/components/AdminProductEditButton";
+import AdminProductStatusToggle from "@/components/AdminProductStatusToggle";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Herbal Tea", "Vitamin", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
@@ -29,6 +30,7 @@ export default function AdminProducts() {
   const [editing, setEditing] = useState<any>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
   const [historyTarget, setHistoryTarget] = useState<{ id: number; name: string } | null>(null);
+  const [statusUpdatingId, setStatusUpdatingId] = useState<number | null>(null);
   const { data: stockHistory, isLoading: isLoadingHistory } = trpc.products.stockHistory.useQuery(
     { productId: historyTarget?.id ?? 1 },
     { enabled: Boolean(historyTarget) }
@@ -62,6 +64,17 @@ export default function AdminProducts() {
   const deleteMutation = trpc.products.delete.useMutation({
     onSuccess: () => { utils.products.adminList.invalidate(); toast.success("Product deleted"); },
     onError: (e) => toast.error(e.message),
+  });
+  const toggleStatusMutation = trpc.products.update.useMutation({
+    onSuccess: (_data, variables) => {
+      utils.products.adminList.invalidate();
+      setStatusUpdatingId(null);
+      toast.success(variables.isActive ? "Product activated" : "Product deactivated");
+    },
+    onError: (e) => {
+      setStatusUpdatingId(null);
+      toast.error(e.message);
+    },
   });
 
   const openNew = () => {
@@ -147,6 +160,12 @@ export default function AdminProducts() {
       const [main] = next.splice(idx, 1);
       return [main, ...next];
     });
+  };
+
+  const toggleProductStatus = (product: { id: number; isActive: boolean }) => {
+    if (toggleStatusMutation.isPending) return;
+    setStatusUpdatingId(product.id);
+    toggleStatusMutation.mutate({ id: product.id, isActive: !product.isActive });
   };
 
   const save = () => {
@@ -274,6 +293,12 @@ export default function AdminProducts() {
                           <History className="h-3.5 w-3.5" />
                         </Button>
                         <AdminProductEditButton productName={product.name} onEdit={() => openEdit(product)} />
+                        <AdminProductStatusToggle
+                          productName={product.name}
+                          isActive={product.isActive}
+                          isPending={statusUpdatingId === product.id}
+                          onToggle={() => toggleProductStatus(product)}
+                        />
                         <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget({ id: product.id, name: product.name })}>
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>

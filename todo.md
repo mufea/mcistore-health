@@ -182,3 +182,4 @@
 - [x] Add coverage to prevent outdated brand-logo asset URLs in visual and organization metadata
 - [x] Add a subtle, accessible hover animation to the MCI navbar icon
 - [x] Add a clearly labeled Edit button to each product row in the admin Product section and open the existing product editor
+- [x] Add a quick accessible status toggle to switch each admin product between Active and Inactive
