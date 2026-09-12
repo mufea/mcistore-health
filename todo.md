@@ -185,3 +185,4 @@
 - [x] Add a quick accessible status toggle to switch each admin product between Active and Inactive
 - [x] Add an Active/Inactive/All filter dropdown to the admin Product list and combine it with product search
 - [x] Fix the admin Products Edit button rendering and responsive action layout
+- [x] Implement full horizontal scrolling for the admin Products table so every column and action remains reachable on narrow screens

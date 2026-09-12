@@ -248,17 +248,25 @@ export default function AdminProducts() {
           </Button>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border/60 bg-card">
-          <table className="w-full min-w-[980px]">
+        <div
+          className="max-w-full overflow-x-auto overscroll-x-contain rounded-xl border border-border/60 bg-card touch-pan-x"
+          role="region"
+          aria-label="Scrollable product table"
+          tabIndex={0}
+        >
+          <div className="border-b border-border/40 bg-muted/20 px-3 py-2 text-xs text-muted-foreground sm:hidden">
+            Swipe horizontally to view all product columns and actions.
+          </div>
+          <table className="w-full min-w-[1120px]">
             <thead>
               <tr className="border-b border-border/60 bg-muted/30">
-                <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Product</th>
-                <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Category</th>
-                <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Segment</th>
-                <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Price</th>
-                <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Stock</th>
-                <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
-                <th className="sticky right-0 z-10 bg-muted/30 p-4 text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actions</th>
+                <th className="min-w-[250px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Product</th>
+                <th className="min-w-[170px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Category</th>
+                <th className="min-w-[130px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Segment</th>
+                <th className="min-w-[160px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Price</th>
+                <th className="min-w-[110px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Stock</th>
+                <th className="min-w-[130px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
+                <th className="min-w-[370px] p-4 text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
@@ -302,7 +310,7 @@ export default function AdminProducts() {
                         {product.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </td>
-                    <td className="sticky right-0 z-10 whitespace-nowrap bg-card p-4">
+                    <td className="min-w-[370px] whitespace-nowrap p-4">
                       <div className="flex min-w-max flex-wrap items-center justify-end gap-1.5">
                         <Button size="sm" variant="ghost" onClick={() => setHistoryTarget({ id: product.id, name: product.name })} title="View stock history" aria-label={`View stock history for ${product.name}`}>
                           <History className="h-3.5 w-3.5" />
