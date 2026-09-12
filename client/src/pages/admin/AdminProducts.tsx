@@ -248,8 +248,8 @@ export default function AdminProducts() {
           </Button>
         </div>
       ) : (
-        <div className="bg-card rounded-xl border border-border/60 overflow-hidden">
-          <table className="w-full">
+        <div className="overflow-x-auto rounded-xl border border-border/60 bg-card">
+          <table className="w-full min-w-[980px]">
             <thead>
               <tr className="border-b border-border/60 bg-muted/30">
                 <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Product</th>
@@ -258,7 +258,7 @@ export default function AdminProducts() {
                 <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Price</th>
                 <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Stock</th>
                 <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
-                <th className="text-right p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Actions</th>
+                <th className="sticky right-0 z-10 bg-muted/30 p-4 text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
@@ -302,8 +302,8 @@ export default function AdminProducts() {
                         {product.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </td>
-                    <td className="p-4">
-                      <div className="flex items-center justify-end gap-1">
+                    <td className="sticky right-0 z-10 whitespace-nowrap bg-card p-4">
+                      <div className="flex min-w-max flex-wrap items-center justify-end gap-1.5">
                         <Button size="sm" variant="ghost" onClick={() => setHistoryTarget({ id: product.id, name: product.name })} title="View stock history" aria-label={`View stock history for ${product.name}`}>
                           <History className="h-3.5 w-3.5" />
                         </Button>

@@ -12,7 +12,7 @@ export default function AdminProductEditButton({ productName, onEdit }: AdminPro
     <Button
       size="sm"
       variant="outline"
-      className="gap-1.5 px-2"
+      className="inline-flex min-w-[78px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap bg-background px-2 text-foreground hover:bg-muted"
       onClick={onEdit}
       title={`Edit ${productName}`}
       aria-label={`Edit ${productName}`}

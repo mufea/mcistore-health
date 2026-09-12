@@ -71,14 +71,14 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
   return (
     <div className="h-screen flex bg-background overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-60 bg-sidebar-background text-sidebar-foreground flex-shrink-0 flex flex-col">
+      <aside className="w-16 sm:w-60 bg-sidebar-background text-sidebar-foreground flex-shrink-0 flex flex-col">
 
         {/* Logo */}
-        <div className="border-b border-sidebar-border flex-shrink-0 p-5">
+        <div className="border-b border-sidebar-border flex-shrink-0 p-3 sm:p-5">
           <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer">
+            <div className="flex cursor-pointer items-center justify-center gap-2 sm:justify-start">
               <BrandMark size="md" className="ring-sidebar-primary/25" />
-              <div className="overflow-hidden">
+              <div className="hidden overflow-hidden sm:block">
                 <span className="font-bold text-sm text-sidebar-foreground tracking-tight whitespace-nowrap">MCI Store</span>
                 <p className="text-[10px] text-sidebar-foreground/50 leading-none mt-0.5 whitespace-nowrap">Admin Dashboard</p>
               </div>
@@ -94,16 +94,16 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
             const navBtn = (
               <Link href={item.href} key={item.href}>
                 <div
-                  className={`flex items-center gap-3 rounded-lg text-sm font-medium cursor-pointer transition-all ${
-                    "px-3 py-2.5"
-                  } ${
+                    className={`flex items-center justify-center gap-3 rounded-lg text-sm font-medium cursor-pointer transition-all sm:justify-start ${
+                      "px-2 py-2.5 sm:px-3"
+                    } ${
                     isActive
                       ? "bg-sidebar-accent text-sidebar-accent-foreground"
                       : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                   }`}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">{item.label}</span>
+                  <span className="hidden truncate sm:block">{item.label}</span>
                 </div>
               </Link>
             );
@@ -112,19 +112,19 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
         </nav>
 
         {/* Bottom: Back to Website + Log Out */}
-        <div className="p-2 border-t border-sidebar-border space-y-0.5 flex-shrink-0">
+        <div className="flex-shrink-0 space-y-0.5 border-t border-sidebar-border p-1 sm:p-2">
           <Link href="/">
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all">
+            <div className="flex cursor-pointer items-center justify-center gap-3 rounded-lg px-2 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-all hover:bg-sidebar-accent/50 hover:text-sidebar-foreground sm:justify-start sm:px-3">
               <Home className="h-4 w-4" />
-              Back to Website
+              <span className="hidden sm:inline">Back to Website</span>
             </div>
           </Link>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-red-50 hover:text-red-600 transition-all"
+            className="flex w-full items-center justify-center gap-3 rounded-lg px-2 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-all hover:bg-red-50 hover:text-red-600 sm:justify-start sm:px-3"
           >
             <LogOut className="h-4 w-4" />
-            Log Out
+            <span className="hidden sm:inline">Log Out</span>
           </button>
         </div>
       </aside>
