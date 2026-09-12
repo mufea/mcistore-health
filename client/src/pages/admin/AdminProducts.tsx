@@ -249,7 +249,7 @@ export default function AdminProducts() {
         </div>
       ) : (
         <div
-          className="max-w-full overflow-x-auto overscroll-x-contain rounded-xl border border-border/60 bg-card touch-pan-x"
+          className="relative max-h-[calc(100vh-15rem)] max-w-full overflow-auto overscroll-contain rounded-xl border border-border/60 bg-card touch-pan-x"
           role="region"
           aria-label="Scrollable product table"
           tabIndex={0}
@@ -258,7 +258,7 @@ export default function AdminProducts() {
             Swipe horizontally to view all product columns and actions.
           </div>
           <table className="w-full min-w-[1120px]">
-            <thead>
+            <thead className="sticky top-0 z-20 bg-muted/30 shadow-sm">
               <tr className="border-b border-border/60 bg-muted/30">
                 <th className="min-w-[250px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Product</th>
                 <th className="min-w-[170px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Category</th>
