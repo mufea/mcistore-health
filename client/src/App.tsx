@@ -42,7 +42,7 @@ function Router() {
       <Route path="/survey" component={Survey} />
       <Route path="/recommendations" component={Recommendations} />
       <Route path="/products" component={Products} />
-      <Route path="/products/:id" component={ProductDetail} />
+      <Route path="/products/:slug" component={ProductDetail} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/payment/:orderNumber" component={Payment} />
       <Route path="/order/:orderNumber" component={OrderDetail} />

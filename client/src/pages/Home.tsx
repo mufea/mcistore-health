@@ -7,6 +7,7 @@ import { Link, useLocation } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import { buildProductPath } from "@shared/slug";
 import { buildOrganizationJsonLd, serializeOrganizationJsonLd } from "@/lib/organizationSchema";
 import { buildCatalogSearchPath } from "@/lib/productSearch";
 import { formatSuggestionPrice, getProductSuggestionImage, getProductSuggestions, type SuggestibleProduct } from "@/lib/productSuggestions";
@@ -109,10 +110,10 @@ export default function Home() {
     return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
   }, [suggestionsOpen]);
 
-  const goToSuggestion = (productId: number) => {
+  const goToSuggestion = (slug: string) => {
     setSuggestionsOpen(false);
     setActiveSuggestionIndex(-1);
-    navigate(`/products/${productId}`);
+    navigate(buildProductPath(slug));
   };
 
   const features = [
@@ -222,7 +223,7 @@ export default function Home() {
                 onSubmit={(event) => {
                   event.preventDefault();
                   if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
-                    goToSuggestion(suggestions[activeSuggestionIndex].id);
+                    goToSuggestion(suggestions[activeSuggestionIndex].slug);
                     return;
                   }
                   navigate(buildCatalogSearchPath(productSearch));
@@ -284,7 +285,7 @@ export default function Home() {
                                 type="button"
                                 className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left text-sm"
                                 onMouseDown={(event) => event.preventDefault()}
-                                onClick={() => goToSuggestion(product.id)}
+                                onClick={() => goToSuggestion(product.slug)}
                               >
                                 <SuggestionThumbnail product={product} />
                                 <span className="min-w-0 flex-1 truncate font-medium">{product.name}</span>
@@ -428,7 +429,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featured.map((product) => (
-                <Link href={`/products/${product.id}`} key={product.id}>
+                <Link href={buildProductPath(product.slug)} key={product.id}>
                   <div className="group bg-card rounded-2xl border border-border/60 overflow-hidden card-hover cursor-pointer h-full">
                     <div className="relative aspect-square bg-muted/50 flex items-center justify-center overflow-hidden">
                       {product.imageUrl ? (

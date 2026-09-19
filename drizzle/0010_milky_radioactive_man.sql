@@ -1,0 +1,1 @@
+ALTER TABLE `products` ADD `slug` varchar(255);

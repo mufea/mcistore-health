@@ -1,12 +1,12 @@
 import { buildProductCanonicalUrl, buildProductMetadata } from "../shared/productMetadata";
 import { buildProductJsonLd, serializeProductJsonLd } from "../shared/productSchema";
-import { getProductById } from "./db";
+import { getProductById, getProductBySlug } from "./db";
 
 export type ProductHeadMetadata = ReturnType<typeof buildProductMetadata> & {
   canonicalUrl: string;
   productSchema: ReturnType<typeof buildProductJsonLd>;
 };
-export type ProductHeadLookup = typeof getProductById;
+export type ProductHeadLookup = (key: string | number) => Promise<any | undefined>;
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, (character) => ({
@@ -18,16 +18,23 @@ function escapeHtml(value: string) {
   })[character] ?? character);
 }
 
-export async function getProductHeadMetadata(requestUrl: string, getProduct: ProductHeadLookup = getProductById): Promise<ProductHeadMetadata | null> {
+export async function getProductHeadMetadata(requestUrl: string, getProduct?: ProductHeadLookup): Promise<ProductHeadMetadata | null> {
   const pathname = requestUrl.split("?", 1)[0] ?? requestUrl;
-  const match = pathname.match(/^\/products\/(\d+)$/);
-  if (!match) return null;
+  const idMatch = pathname.match(/^\/products\/(\d+)$/);
+  const slugMatch = idMatch ? null : pathname.match(/^\/products\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+  if (!idMatch && !slugMatch) return null;
 
-  const product = await getProduct(Number(match[1]));
+  const lookupKey = slugMatch ? slugMatch[1] : Number(idMatch![1]);
+  const product = getProduct
+    ? await getProduct(lookupKey)
+    : slugMatch
+      ? await getProductBySlug(lookupKey as string)
+      : await getProductById(lookupKey as number);
   if (!product || !product.isActive || !["all", "standard"].includes(product.targetSegment)) return null;
+  const canonicalValue = product.slug || lookupKey;
   return {
     ...buildProductMetadata(product),
-    canonicalUrl: buildProductCanonicalUrl(product.id),
+    canonicalUrl: buildProductCanonicalUrl(canonicalValue),
     productSchema: buildProductJsonLd(product),
   };
 }

@@ -9,7 +9,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { getActiveProductsForSitemap, getOrderByNumber, getSetting, updateOrderByMidtransId, updateOrderStatus } from "../db";
+import { getActiveProductsForSitemap, getOrderByNumber, getProductById, getSetting, updateOrderByMidtransId, updateOrderStatus } from "../db";
 import { notifyOwner } from "./notification";
 import { applyPaymentReservationOutcome } from "../stockReservation";
 import { buildSitemapXml } from "../sitemap";
@@ -49,6 +49,19 @@ async function startServer() {
     } catch (error) {
       console.error("Sitemap generation error:", error);
       res.status(500).type("text/plain").send("Unable to generate sitemap");
+    }
+  });
+
+  app.get("/products/:id(\\d+)", async (req, res, next) => {
+    try {
+      const product = await getProductById(Number(req.params.id));
+      if (!product?.slug) {
+        next();
+        return;
+      }
+      res.redirect(301, `/products/${encodeURIComponent(product.slug)}`);
+    } catch (error) {
+      next(error);
     }
   });
 

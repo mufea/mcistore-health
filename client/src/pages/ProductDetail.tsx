@@ -18,6 +18,7 @@ import { filterAlternativesByNeed, filterAlternativesByText, getAlternativeNeeds
 import { addComparedProductToCart, buildAlternativeCheckoutPath, buildMultiProductCheckoutPath, canSelectForComparison, getAlternativeCartSummary, MAX_COMPARISON_PRODUCTS, toggleComparedProduct } from "@/lib/productComparison";
 import { buildProductCanonicalUrl, buildProductMetadata } from "@/lib/productMetadata";
 import { buildProductJsonLd, serializeProductJsonLd } from "@/lib/productSchema";
+import { buildProductPath } from "@shared/slug";
 
 function getStoredCart(): number[] {
   try {
@@ -45,12 +46,11 @@ function getStoredQuantities(): Record<number, number> {
 }
 
 export default function ProductDetail() {
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ slug: string }>();
   const [, navigate] = useLocation();
   const { lang } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const detail = translations.productDetail;
-  const productId = Number(params.id);
   const [quantity, setQuantity] = useState(1);
   const [alternativeNeed, setAlternativeNeed] = useState("all");
   const [alternativeSearch, setAlternativeSearch] = useState("");
@@ -59,9 +59,9 @@ export default function ProductDetail() {
   const [alternativeCartQuantities, setAlternativeCartQuantities] = useState<Record<number, number>>({});
   const segment = isAuthenticated ? (user?.segment ?? "standard") : "standard";
 
-  const { data: product, isLoading } = trpc.products.getById.useQuery(
-    { id: productId },
-    { enabled: Number.isInteger(productId) && productId > 0 }
+  const { data: product, isLoading } = trpc.products.getBySlug.useQuery(
+    { slug: params.slug ?? "" },
+    { enabled: Boolean(params.slug) }
   );
   const { data: relatedProducts } = trpc.products.list.useQuery({ segment });
 
@@ -112,7 +112,7 @@ export default function ProductDetail() {
       canonicalElement.setAttribute("rel", "canonical");
       document.head.appendChild(canonicalElement);
     }
-    canonicalElement.setAttribute("href", buildProductCanonicalUrl(product.id));
+    canonicalElement.setAttribute("href", buildProductCanonicalUrl(product.slug));
     if (createdSchema) {
       schemaElement.type = "application/ld+json";
       schemaElement.dataset.productSchema = "true";
@@ -129,7 +129,7 @@ export default function ProductDetail() {
       if (createdSchema) schemaElement.remove();
       else schemaElement.textContent = previousSchema ?? "";
     };
-  }, [product?.id, product?.name, product?.description, product?.category]);
+  }, [product?.id, product?.slug, product?.name, product?.description, product?.category]);
 
   const requestSignIn = () => {
     sessionStorage.setItem("pending_checkout_after_login", "true");
@@ -379,7 +379,7 @@ export default function ProductDetail() {
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {filteredRecommendations.map((item) => (
                   <div key={item.id}>
-                    <Link href={`/products/${item.id}`}>
+                    <Link href={buildProductPath(item.slug)}>
                       <article className="group overflow-hidden rounded-xl border border-border/60 bg-card transition-shadow hover:shadow-md">
                       <ProductImageGallery imageUrl={item.imageUrl} images={item.images ?? null} productName={item.name} mode="card" className="aspect-square" />
                       <div className="p-3">

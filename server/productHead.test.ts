@@ -27,6 +27,25 @@ describe("injectProductHeadMetadata", () => {
     });
   });
 
+  it("resolves slug product requests with a slug canonical URL", async () => {
+    await expect(
+      getProductHeadMetadata("/products/omega-balance", async () => ({
+        id: 15,
+        slug: "omega-balance",
+        name: "Omega Balance",
+        description: "Daily wellness support.",
+        category: "Supplement",
+        price: "150000.00",
+        stock: 4,
+        isActive: true,
+        targetSegment: "all",
+      } as any)),
+    ).resolves.toMatchObject({
+      canonicalUrl: "https://mci-store.com/products/omega-balance",
+      productSchema: { url: "https://mci-store.com/products/omega-balance" },
+    });
+  });
+
   it("replaces generic head tags with escaped product-specific metadata", () => {
     const page = injectProductHeadMetadata(
       '<head><title>MCI Store - Trusted Health Partner</title><meta name="description" content="Generic" /></head>',

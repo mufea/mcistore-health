@@ -3,6 +3,8 @@ const CANONICAL_ORIGIN = "https://mci-store.com";
 const MAX_DESCRIPTION_LENGTH = 160;
 
 export type ProductMetadataSource = {
+  id?: number;
+  slug?: string | null;
   name: string;
   description?: string | null;
   category?: string | null;
@@ -22,6 +24,6 @@ export function buildProductMetadata(product: ProductMetadataSource) {
   };
 }
 
-export function buildProductCanonicalUrl(productId: number) {
-  return `${CANONICAL_ORIGIN}/products/${productId}`;
+export function buildProductCanonicalUrl(slugOrId: string | number) {
+  return `${CANONICAL_ORIGIN}/products/${encodeURIComponent(String(slugOrId))}`;
 }

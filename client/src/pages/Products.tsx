@@ -15,6 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
 import { isLowStock, isOutOfStock, matchesStockFilter } from "@/lib/stock";
 import { getCatalogSearchTerm } from "@/lib/productSearch";
+import { buildProductPath } from "@shared/slug";
 
 export default function Products() {
   const { lang } = useLanguage();
@@ -111,7 +112,7 @@ export default function Products() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filtered.map((product, i) => (
-                <Link href={`/products/${product.id}`} key={product.id}>
+                <Link href={buildProductPath(product.slug)} key={product.id}>
                   <div
                     className="group bg-card rounded-xl border border-border/60 overflow-hidden card-hover cursor-pointer animate-slide-up"
                     style={{ animationDelay: `${i * 40}ms` }}

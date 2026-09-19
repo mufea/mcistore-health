@@ -250,6 +250,16 @@ export async function getProductById(id: number) {
   return result[0];
 }
 
+export async function getProductBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await getCustomerProducts(
+    expireStockReservations,
+    () => db.select().from(products).where(eq(products.slug, slug)).limit(1),
+  );
+  return result[0];
+}
+
 export async function getAllProductsAdmin() {
   const db = await getDb();
   if (!db) return [];
@@ -259,7 +269,7 @@ export async function getAllProductsAdmin() {
 export async function getActiveProductsForSitemap() {
   const db = await getDb();
   if (!db) return [];
-  return db.select({ id: products.id, updatedAt: products.updatedAt })
+  return db.select({ id: products.id, slug: products.slug, updatedAt: products.updatedAt })
     .from(products)
     .where(eq(products.isActive, true))
     .orderBy(products.id);

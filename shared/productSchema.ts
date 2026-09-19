@@ -2,6 +2,7 @@ import { buildProductCanonicalUrl } from "./productMetadata";
 
 export type ProductSchemaSource = {
   id: number;
+  slug?: string | null;
   name: string;
   description?: string | null;
   price: string | number;
@@ -16,13 +17,14 @@ export function buildProductJsonLd(product: ProductSchemaSource) {
     (url): url is string => Boolean(url)
   );
   const description = product.description?.replace(/\s+/g, " ").trim() || `${product.name} from MCI Store.`;
+  const productUrl = buildProductCanonicalUrl(product.slug || product.id);
 
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description,
-    url: buildProductCanonicalUrl(product.id),
+    url: productUrl,
     ...(images.length > 0 ? { image: Array.from(new Set(images)) } : {}),
     category: product.category,
     offers: {
@@ -31,7 +33,7 @@ export function buildProductJsonLd(product: ProductSchemaSource) {
       priceCurrency: "IDR",
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
-      url: buildProductCanonicalUrl(product.id),
+      url: productUrl,
     },
   };
 }

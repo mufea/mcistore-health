@@ -1,6 +1,6 @@
 const SITE_URL = "https://mci-store.com";
 
-type SitemapProduct = { id: number; updatedAt: Date };
+type SitemapProduct = { id: number; slug: string; updatedAt: Date };
 
 function escapeXml(value: string) {
   return value.replace(/[<>&'\"]/g, (character) => ({
@@ -24,7 +24,7 @@ export function buildSitemapXml(products: SitemapProduct[], generatedAt = new Da
     sitemapUrl(`${SITE_URL}/survey`, currentDate, "monthly", "0.8"),
   ];
   const productUrls = products.map((product) => sitemapUrl(
-    `${SITE_URL}/products/${product.id}`,
+    `${SITE_URL}/products/${encodeURIComponent(product.slug)}`,
     product.updatedAt.toISOString().slice(0, 10),
     "weekly",
     "0.8"

@@ -83,6 +83,7 @@ export type SurveyResponse = typeof surveyResponses.$inferSelect;
 export const products = mysqlTable("products", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
   description: text("description"),
   price: decimal("price", { precision: 12, scale: 2 }).notNull(),
   category: varchar("category", { length: 128 }).notNull(),

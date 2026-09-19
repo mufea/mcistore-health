@@ -1,15 +1,18 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import {
   createProduct,
   deleteProduct,
   getAllProductsAdmin,
   getProductById,
+  getProductBySlug,
   getProducts,
   getStockHistory,
   updateProductWithStockAudit,
 } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
+import { createProductSlug, slugify } from "@shared/slug";
 
 export const productsRouter = router({
   // Public: list products filtered by user segment
@@ -48,6 +51,25 @@ export const productsRouter = router({
       return { ...product, stock: Math.max(0, product.stock - product.reservedStock) };
     }),
 
+  // Public: get a single product by its stable SEO slug
+  getBySlug: publicProcedure
+    .input(z.object({ slug: z.string().min(1).max(255) }))
+    .query(async ({ input, ctx }) => {
+      const product = await getProductBySlug(input.slug);
+      if (!product || !product.isActive) return null;
+
+      const userSegment = ctx.user?.segment ?? "standard";
+      const segmentOrder = { all: 0, standard: 1, premium: 2, vip: 3 };
+      const userLevel = segmentOrder[userSegment] ?? 1;
+      const productLevel = segmentOrder[product.targetSegment] ?? 0;
+
+      if (product.targetSegment !== "all" && productLevel > userLevel) {
+        return null;
+      }
+
+      return { ...product, stock: Math.max(0, product.stock - product.reservedStock) };
+    }),
+
   // Admin: list all products
   adminList: adminProcedure.query(async () => {
     return getAllProductsAdmin();
@@ -62,6 +84,7 @@ export const productsRouter = router({
     .input(
       z.object({
         name: z.string().min(1),
+        slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
         description: z.string().optional(),
         price: z.string(),
         category: z.string().min(1),
@@ -77,7 +100,10 @@ export const productsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      await createProduct(input as any);
+      const slug = input.slug?.trim() || createProductSlug(input.name);
+      const existing = await getProductBySlug(slug);
+      if (existing) throw new TRPCError({ code: "CONFLICT", message: "A product with this slug already exists" });
+      await createProduct({ ...input, slug } as any);
       return { success: true };
     }),
 
@@ -87,6 +113,7 @@ export const productsRouter = router({
       z.object({
         id: z.number().int(),
         name: z.string().min(1).optional(),
+        slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
         description: z.string().optional(),
         price: z.string().optional(),
         category: z.string().optional(),
@@ -102,7 +129,15 @@ export const productsRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { id, ...data } = input;
+      const { id, slug, ...rest } = input;
+      const normalizedSlug = slug === undefined ? undefined : slugify(slug);
+      if (normalizedSlug) {
+        const existing = await getProductBySlug(normalizedSlug);
+        if (existing && existing.id !== id) {
+          throw new TRPCError({ code: "CONFLICT", message: "A product with this slug already exists" });
+        }
+      }
+      const data = { ...rest, ...(normalizedSlug ? { slug: normalizedSlug } : {}) };
       await updateProductWithStockAudit(id, data as any, { userId: ctx.user.id, name: ctx.user.name });
       return { success: true };
     }),

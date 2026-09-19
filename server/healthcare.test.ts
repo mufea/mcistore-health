@@ -27,6 +27,7 @@ vi.mock("./db", () => ({
   getSurveyResponseById: vi.fn().mockResolvedValue(undefined),
   getProducts: vi.fn().mockResolvedValue([]),
   getProductById: vi.fn().mockResolvedValue(undefined),
+  getProductBySlug: vi.fn().mockResolvedValue(undefined),
   getAllProductsAdmin: vi.fn().mockResolvedValue([]),
   createProduct: vi.fn().mockResolvedValue(undefined),
   updateProductWithStockAudit: vi.fn().mockResolvedValue(undefined),
