@@ -138,27 +138,6 @@ export default function Home() {
     },
   ];
 
-  const testimonials = [
-    {
-      name: "Sarah M.",
-      role: t(translations.testimonials.t1Role, lang),
-      text: t(translations.testimonials.t1Text, lang),
-      rating: 5,
-    },
-    {
-      name: "David L.",
-      role: t(translations.testimonials.t2Role, lang),
-      text: t(translations.testimonials.t2Text, lang),
-      rating: 5,
-    },
-    {
-      name: "Priya K.",
-      role: t(translations.testimonials.t3Role, lang),
-      text: t(translations.testimonials.t3Text, lang),
-      rating: 5,
-    },
-  ];
-
   const heroCardItems = [
     t(translations.hero.cardItem1, lang),
     t(translations.hero.cardItem2, lang),
@@ -181,6 +160,24 @@ export default function Home() {
       step: "03",
       title: t(translations.howItWorks.step3Title, lang),
       description: t(translations.howItWorks.step3Desc, lang),
+    },
+  ];
+
+  const conversionBenefits = [
+    {
+      icon: Heart,
+      title: t(translations.conversion.benefit1Title, lang),
+      description: t(translations.conversion.benefit1Desc, lang),
+    },
+    {
+      icon: Shield,
+      title: t(translations.conversion.benefit2Title, lang),
+      description: t(translations.conversion.benefit2Desc, lang),
+    },
+    {
+      icon: CheckCircle,
+      title: t(translations.conversion.benefit3Title, lang),
+      description: t(translations.conversion.benefit3Desc, lang),
     },
   ];
 
@@ -510,30 +507,51 @@ export default function Home() {
         </FullWide>
       </section>
 
-      {/* ── Testimonials ── */}
-      <section className="py-24 bg-muted/30">
-        <FullWide>
-          <div className="text-center mb-16">
-            <div className="gold-line mx-auto mb-4" />
-            <h2 className="font-serif text-3xl lg:text-5xl font-light text-foreground mb-3">
-              {t(translations.testimonials.sectionTitle, lang)}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial.name} className="bg-card rounded-2xl border border-border/60 p-8 card-hover">
-                <div className="flex gap-1 mb-5">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-[oklch(0.72_0.12_75)] text-[oklch(0.72_0.12_75)]" />
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-5 italic">"{testimonial.text}"</p>
-                <div>
-                  <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
-                  <p className="text-xs text-muted-foreground">{testimonial.role}</p>
-                </div>
+      {/* ── Conversion Section ── */}
+      <section className="relative overflow-hidden bg-primary py-20 text-primary-foreground sm:py-24">
+        <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full border border-primary-foreground/15" />
+        <div className="pointer-events-none absolute -bottom-40 -left-20 h-96 w-96 rounded-full border border-primary-foreground/10" />
+        <FullWide className="relative">
+          <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
+            <div>
+              <Badge className="mb-5 border-primary-foreground/20 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium uppercase tracking-wide text-primary-foreground hover:bg-primary-foreground/15">
+                {t(translations.conversion.eyebrow, lang)}
+              </Badge>
+              <h2 className="max-w-xl font-serif text-4xl font-light leading-tight sm:text-5xl">
+                {t(translations.conversion.title, lang)}
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-primary-foreground/75 sm:text-lg">
+                {t(translations.conversion.description, lang)}
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button asChild size="lg" className="bg-background px-7 text-foreground shadow-lg hover:bg-background/90">
+                  <Link href="/survey">
+                    {t(translations.conversion.primaryCta, lang)}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 bg-transparent px-7 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                  <Link href="/products">{t(translations.conversion.secondaryCta, lang)}</Link>
+                </Button>
               </div>
-            ))}
+              <p className="mt-4 text-xs text-primary-foreground/60">
+                {t(translations.conversion.reassurance, lang)}
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              {conversionBenefits.map((benefit) => (
+                <div key={benefit.title} className="flex gap-4 rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 p-5 backdrop-blur-sm transition-colors hover:bg-primary-foreground/15">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-background/15">
+                    <benefit.icon className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{benefit.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-primary-foreground/70">{benefit.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </FullWide>
       </section>
