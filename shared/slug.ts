@@ -1,3 +1,9 @@
+export const PRODUCT_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export function isValidProductSlug(value: string) {
+  return PRODUCT_SLUG_PATTERN.test(value);
+}
+
 export function slugify(value: string) {
   return value
     .normalize("NFKD")

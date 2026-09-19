@@ -12,7 +12,7 @@ import {
 } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
-import { createProductSlug, slugify } from "@shared/slug";
+import { createProductSlug, PRODUCT_SLUG_PATTERN, slugify } from "@shared/slug";
 
 export const productsRouter = router({
   // Public: list products filtered by user segment
@@ -75,6 +75,15 @@ export const productsRouter = router({
     return getAllProductsAdmin();
   }),
 
+  checkSlug: adminProcedure
+    .input(z.object({ slug: z.string().min(1).max(255), excludeId: z.number().int().positive().optional() }))
+    .query(async ({ input }) => {
+      const existing = await getProductBySlug(input.slug);
+      return {
+        available: !existing || existing.id === input.excludeId,
+      };
+    }),
+
   stockHistory: adminProcedure
     .input(z.object({ productId: z.number().int().positive() }))
     .query(async ({ input }) => getStockHistory(input.productId)),
@@ -84,7 +93,7 @@ export const productsRouter = router({
     .input(
       z.object({
         name: z.string().min(1),
-        slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
+        slug: z.string().trim().min(1).max(255).regex(PRODUCT_SLUG_PATTERN, "Slug must use lowercase letters, numbers, and single hyphens").optional(),
         description: z.string().optional(),
         price: z.string(),
         category: z.string().min(1),
@@ -113,7 +122,7 @@ export const productsRouter = router({
       z.object({
         id: z.number().int(),
         name: z.string().min(1).optional(),
-        slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
+        slug: z.string().trim().min(1).max(255).regex(PRODUCT_SLUG_PATTERN, "Slug must use lowercase letters, numbers, and single hyphens").optional(),
         description: z.string().optional(),
         price: z.string().optional(),
         category: z.string().optional(),

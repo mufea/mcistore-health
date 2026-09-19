@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { createOrder, extendOrderStockReservation, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, getStockHistory, releaseOrderStockReservation, updateOrderInternalNote, updateProductWithStockAudit } from "./db";
+import { createOrder, extendOrderStockReservation, finalizeStockReservation, getAllOrders, getOrderById, getOrderByNumber, getOrderItems, getOrderProductCategories, getProductById, getProductBySlug, getStockHistory, releaseOrderStockReservation, updateOrderInternalNote, updateProductWithStockAudit } from "./db";
 import { applyPaymentReservationOutcome } from "./stockReservation";
 import { availableStock, isReservationExpired } from "./reservationPolicy";
 import { getProductsAfterReservationCleanup } from "./customerStockRead";
@@ -253,6 +253,23 @@ describe("products admin procedures", () => {
       stock: 100,
     });
     expect(result.success).toBe(true);
+  });
+
+  it("rejects malformed slugs before creating a product", async () => {
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await expect(caller.products.create({
+      name: "Malformed Slug Product",
+      slug: "Not A Valid Slug",
+      price: "299000",
+      category: "Supplement",
+    })).rejects.toThrow("Slug must use lowercase letters");
+  });
+
+  it("reports slug availability and allows the current product to keep its slug", async () => {
+    vi.mocked(getProductBySlug).mockResolvedValueOnce({ id: 22 } as any);
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await expect(caller.products.checkSlug({ slug: "omega-balance" })).resolves.toEqual({ available: false });
+    await expect(caller.products.checkSlug({ slug: "omega-balance", excludeId: 22 })).resolves.toEqual({ available: true });
   });
 
   it("adminList requires admin role", async () => {

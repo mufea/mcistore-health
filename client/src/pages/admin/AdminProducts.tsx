@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useMemo, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,7 @@ import { AdminLayout } from "./AdminDashboard";
 import AdminProductEditButton from "@/components/AdminProductEditButton";
 import AdminProductStatusToggle from "@/components/AdminProductStatusToggle";
 import { filterAdminProducts, type ProductStatusFilter } from "@/lib/adminProductFilters";
+import { createProductSlug, isValidProductSlug, slugify } from "@shared/slug";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Herbal Tea", "Vitamin", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
@@ -40,6 +41,8 @@ export default function AdminProducts() {
 
   // Form state
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [slugTouched, setSlugTouched] = useState(false);
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("Supplement");
@@ -54,6 +57,24 @@ export default function AdminProducts() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadImageMutation = trpc.products.uploadImage.useMutation();
+
+  const normalizedSlug = slug.trim();
+  const slugFormatValid = isValidProductSlug(normalizedSlug);
+  const slugCheckInput = useMemo(
+    () => ({ slug: normalizedSlug, excludeId: editing?.id }),
+    [normalizedSlug, editing?.id],
+  );
+  const { data: slugCheck, isFetching: isCheckingSlug } = trpc.products.checkSlug.useQuery(
+    slugCheckInput,
+    { enabled: slugFormatValid, staleTime: 0 },
+  );
+  const slugError = !normalizedSlug
+    ? "Slug is required"
+    : !slugFormatValid
+      ? "Use lowercase letters, numbers, and single hyphens"
+      : slugCheck?.available === false
+        ? "This slug is already used by another product"
+        : null;
 
   const createMutation = trpc.products.create.useMutation({
     onSuccess: () => { utils.products.adminList.invalidate(); setDialog(false); toast.success("Product created"); },
@@ -81,7 +102,7 @@ export default function AdminProducts() {
 
   const openNew = () => {
     setEditing(null);
-    setName(""); setDescription(""); setPrice(""); setCategory("Supplement");
+    setName(""); setSlug(""); setSlugTouched(false); setDescription(""); setPrice(""); setCategory("Supplement");
     setTargetSegment("all"); setStock("100"); setIsFeatured(false); setIsActive(true);
     setImages([]);
     setDialog(true);
@@ -89,7 +110,7 @@ export default function AdminProducts() {
 
   const openEdit = (p: any) => {
     setEditing(p);
-    setName(p.name); setDescription(p.description ?? ""); setPrice(String(p.price));
+    setName(p.name); setSlug(p.slug ?? createProductSlug(p.name, p.id)); setSlugTouched(true); setDescription(p.description ?? ""); setPrice(String(p.price));
     setCategory(p.category); setTargetSegment(p.targetSegment); setStock(String(p.stock));
     setIsFeatured(p.isFeatured); setIsActive(p.isActive);
     // Load existing images: prefer images array, fall back to single imageUrl
@@ -172,10 +193,13 @@ export default function AdminProducts() {
 
   const save = () => {
     if (!name.trim() || !price) return toast.error("Name and price are required");
+    if (slugError || isCheckingSlug || !slugCheck?.available) {
+      return toast.error(slugError ?? "Please wait for slug validation to finish");
+    }
     const readyImages = images.filter((i) => !i.isUploading && i.url);
     const primaryImage = readyImages[0];
     const data = {
-      name, description, price, category,
+      name, slug: normalizedSlug, description, price, category,
       targetSegment: targetSegment as any,
       stock: parseInt(stock),
       imageUrl: primaryImage?.url,
@@ -344,7 +368,30 @@ export default function AdminProducts() {
           <div className="space-y-4 py-2">
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Product Name *</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Premium Omega-3 Supplement" />
+              <Input
+                value={name}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setName(value);
+                  if (!editing && !slugTouched) setSlug(slugify(value));
+                }}
+                placeholder="e.g. Premium Omega-3 Supplement"
+              />
+            </div>
+            <div>
+              <Label htmlFor="admin-product-slug" className="text-sm font-medium mb-1.5 block">URL Slug *</Label>
+              <Input
+                id="admin-product-slug"
+                value={slug}
+                onChange={(e) => { setSlugTouched(true); setSlug(e.target.value.toLowerCase()); }}
+                placeholder="premium-omega-3-supplement"
+                aria-invalid={Boolean(slugError)}
+                aria-describedby="admin-product-slug-help"
+                className={slugError ? "border-destructive focus-visible:ring-destructive" : ""}
+              />
+              <p id="admin-product-slug-help" className={`mt-1 text-xs ${slugError ? "text-destructive" : "text-muted-foreground"}`}>
+                {slugError ?? (isCheckingSlug ? "Checking availability…" : "Available for the product URL")}
+              </p>
             </div>
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Description</Label>
