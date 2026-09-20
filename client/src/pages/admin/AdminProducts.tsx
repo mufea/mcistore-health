@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { trpc } from "@/lib/trpc";
-import { History, ImagePlus, Leaf, Loader2, Plus, Search, Star, Trash2, X } from "lucide-react";
+import { History, ImagePlus, Leaf, Loader2, Plus, RefreshCw, Search, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 import AdminProductEditButton from "@/components/AdminProductEditButton";
@@ -214,6 +214,16 @@ export default function AdminProducts() {
     }
   };
 
+  const generateSlug = () => {
+    if (!name.trim()) {
+      toast.error("Enter a product name first");
+      return;
+    }
+    setSlug(createProductSlug(name));
+    setSlugTouched(true);
+    toast.success("Slug generated from product name");
+  };
+
   const filtered = filterAdminProducts(products ?? [], search, statusFilter);
 
   const segmentColor: Record<string, string> = {
@@ -379,7 +389,20 @@ export default function AdminProducts() {
               />
             </div>
             <div>
-              <Label htmlFor="admin-product-slug" className="text-sm font-medium mb-1.5 block">URL Slug *</Label>
+              <div className="mb-1.5 flex items-center justify-between gap-2">
+                <Label htmlFor="admin-product-slug" className="text-sm font-medium">URL Slug *</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1.5 px-2 text-xs"
+                  onClick={generateSlug}
+                  title="Generate slug from product name"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  Generate Slug
+                </Button>
+              </div>
               <Input
                 id="admin-product-slug"
                 value={slug}
