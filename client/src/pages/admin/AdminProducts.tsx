@@ -15,7 +15,7 @@ import { AdminLayout } from "./AdminDashboard";
 import AdminProductEditButton from "@/components/AdminProductEditButton";
 import AdminProductStatusToggle from "@/components/AdminProductStatusToggle";
 import { filterAdminProducts, type ProductStatusFilter } from "@/lib/adminProductFilters";
-import { createProductSlug, isValidProductSlug, slugify } from "@shared/slug";
+import { buildProductPath, createProductSlug, isValidProductSlug, slugify } from "@shared/slug";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Herbal Tea", "Vitamin", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
@@ -60,6 +60,7 @@ export default function AdminProducts() {
 
   const normalizedSlug = slug.trim();
   const slugFormatValid = isValidProductSlug(normalizedSlug);
+  const productPreviewUrl = slugFormatValid ? `https://mci-store.com${buildProductPath(normalizedSlug)}` : null;
   const slugCheckInput = useMemo(
     () => ({ slug: normalizedSlug, excludeId: editing?.id }),
     [normalizedSlug, editing?.id],
@@ -414,6 +415,21 @@ export default function AdminProducts() {
               />
               <p id="admin-product-slug-help" className={`mt-1 text-xs ${slugError ? "text-destructive" : "text-muted-foreground"}`}>
                 {slugError ?? (isCheckingSlug ? "Checking availability…" : "Available for the product URL")}
+              </p>
+              <p className="mt-2 rounded-md bg-muted/50 px-2.5 py-2 text-xs text-muted-foreground" aria-live="polite">
+                <span className="font-medium text-foreground">Preview URL: </span>
+                {productPreviewUrl ? (
+                  <a
+                    href={productPreviewUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="break-all text-primary underline-offset-2 hover:underline"
+                  >
+                    {productPreviewUrl}
+                  </a>
+                ) : (
+                  <span>Enter a valid slug to preview the product URL</span>
+                )}
               </p>
             </div>
             <div>
