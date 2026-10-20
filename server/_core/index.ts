@@ -160,6 +160,8 @@ async function startServer() {
     })
   );
 
+  app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+ 
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
