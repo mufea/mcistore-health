@@ -41,7 +41,7 @@ function SuggestionThumbnail({ product }: { product: SuggestibleProduct }) {
     );
   }
 
-  return <img src={imageUrl} alt="" className="h-10 w-10 shrink-0 rounded-md border border-border/60 object-cover" onError={() => setImageFailed(true)} />;
+  return <img src={imageUrl} alt={`${product.name} product thumbnail`} className="h-10 w-10 shrink-0 rounded-md border border-border/60 object-cover" onError={() => setImageFailed(true)} />;
 }
 
 export default function Home() {
