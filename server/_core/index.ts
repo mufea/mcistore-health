@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import crypto from "crypto";
+import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
@@ -160,7 +161,7 @@ async function startServer() {
     })
   );
 
-  app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+  app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
  
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
