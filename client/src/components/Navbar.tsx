@@ -54,7 +54,7 @@ export default function Navbar() {
   const { lang } = useLanguage();
 
   const isAdmin = user?.role === "admin";
-  const siteName = settings?.siteName ?? "MCI Store";
+  const siteName = settings?.siteName ?? "MCI One More";
   const cartQuantities = parseStoredQuantities(sessionStorage.getItem("pending_quantities"));
   const cartItemCount = mobileCartIds.reduce((sum, productId) => sum + (cartQuantities[productId] ?? 1), 0);
   const checkoutQuantities = mobileCartIds.map((productId) => `${productId}:${cartQuantities[productId] ?? 1}`).join(",");

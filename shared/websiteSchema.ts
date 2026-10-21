@@ -4,7 +4,7 @@ export function buildWebsiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "MCI Store",
+    name: "MCI One More",
     url: CANONICAL_ORIGIN,
     potentialAction: {
       "@type": "SearchAction",

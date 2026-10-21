@@ -48,7 +48,7 @@ export const translations = {
     tagline:     { en: "Discover personalized health products tailored to your unique needs through our intelligent health assessment.", ar: "اكتشف منتجات صحية مخصصة تناسب احتياجاتك الفريدة من خلال تقييمنا الصحي الذكي.", zh: "通过我们智能的健康评估，发现专为您独特需求定制的个性化健康产品。", es: "Descubre productos de salud personalizados adaptados a tus necesidades únicas a través de nuestra evaluación de salud inteligente.", hi: "हमारे बुद्धिमान स्वास्थ्य मूल्यांकन के माध्यम से अपनी अनूठी जरूरतों के अनुरूप व्यक्तिगत स्वास्थ्य उत्पाद खोजें।", id: "Temukan produk kesehatan yang dipersonalisasi sesuai kebutuhan unik Anda melalui penilaian kesehatan cerdas kami." },
     ctaSurvey:   { en: "Take Health Survey",        ar: "ابدأ الاستبيان الصحي", zh: "参加健康调查",    es: "Realizar Encuesta de Salud", hi: "स्वास्थ्य सर्वेक्षण लें", id: "Ikuti Survei Kesehatan" },
     ctaProducts: { en: "Browse Products",           ar: "تصفح المنتجات",        zh: "浏览产品",        es: "Ver Productos",              hi: "उत्पाद देखें", id: "Jelajahi Produk" },
-    searchLabel: { en: "Search MCI Store products", ar: "ابحث في منتجات متجر MCI", zh: "搜索 MCI Store 产品", es: "Buscar productos de MCI Store", hi: "MCI स्टोर के उत्पाद खोजें", id: "Cari produk MCI Store" },
+    searchLabel: { en: "Search MCI One More products", ar: "ابحث في منتجات MCI One More", zh: "搜索 MCI One More 产品", es: "Buscar productos de MCI One More", hi: "MCI One More के उत्पाद खोजें", id: "Cari produk MCI One More" },
     searchPlaceholder: { en: "Search for health products...", ar: "ابحث عن المنتجات الصحية...", zh: "搜索健康产品...", es: "Buscar productos de salud...", hi: "स्वास्थ्य उत्पाद खोजें...", id: "Cari produk kesehatan..." },
     searchButton: { en: "Search", ar: "بحث", zh: "搜索", es: "Buscar", hi: "खोजें", id: "Cari" },
     suggestionsLabel: { en: "Suggested products", ar: "المنتجات المقترحة", zh: "推荐产品", es: "Productos sugeridos", hi: "सुझाए गए उत्पाद", id: "Produk yang disarankan" },
@@ -71,7 +71,7 @@ export const translations = {
 
   // ── Features Section ──
   features: {
-    sectionTitle: { en: "Why Choose MCI Store",       ar: "لماذا تختار متجر MCI",    zh: "为什么选择MCI商店",    es: "Por Qué Elegir MCI Store",    hi: "MCI Store क्यों चुनें", id: "Mengapa Memilih MCI Store" },
+    sectionTitle: { en: "Why Choose MCI One More",       ar: "لماذا تختار MCI One More",    zh: "为什么选择MCI One More",    es: "Por Qué Elegir MCI One More",    hi: "MCI One More क्यों चुनें", id: "Mengapa Memilih MCI One More" },
     sectionSub:   { en: "Premium wellness, scientifically backed", ar: "رفاهية متميزة مدعومة علمياً", zh: "科学支持的优质健康", es: "Bienestar premium respaldado científicamente", hi: "वैज्ञानिक रूप से समर्थित प्रीमियम वेलनेस", id: "Kebugaran premium, didukung ilmu pengetahuan" },
     f1Title:      { en: "Personalized Health",        ar: "صحة مخصصة",               zh: "个性化健康",            es: "Salud Personalizada",         hi: "व्यक्तिगत स्वास्थ्य", id: "Kesehatan Terpersonalisasi" },
     f1Desc:       { en: "Our intelligent survey maps your unique health profile to the right products.", ar: "يرسم استبياننا الذكي ملفك الصحي الفريد للمنتجات المناسبة.", zh: "我们的智能调查将您独特的健康状况与合适的产品相匹配。", es: "Nuestra encuesta inteligente mapea tu perfil de salud único a los productos correctos.", hi: "हमारा बुद्धिमान सर्वेक्षण आपकी अनूठी स्वास्थ्य प्रोफ़ाइल को सही उत्पादों से जोड़ता है।", id: "Survei cerdas kami memetakan profil kesehatan unik Anda ke produk yang tepat." },
@@ -123,7 +123,7 @@ export const translations = {
   // ── Final CTA ──
   cta: {
     title:    { en: "Ready to Transform Your Health?",  ar: "هل أنت مستعد لتحويل صحتك؟",  zh: "准备好改变您的健康了吗？",  es: "¿Listo para Transformar Tu Salud?",  hi: "अपने स्वास्थ्य को बदलने के लिए तैयार हैं?", id: "Siap Mengubah Kesehatan Anda?" },
-    subtitle: { en: "Join thousands of customers who have discovered their perfect wellness routine with MCI Store.", ar: "انضم إلى آلاف العملاء الذين اكتشفوا روتينهم الصحي المثالي مع متجر MCI.", zh: "加入数千名已通过MCI商店发现完美健康方案的客户。", es: "Únete a miles de clientes que han descubierto su rutina de bienestar perfecta con MCI Store.", hi: "हजारों ग्राहकों से जुड़ें जिन्होंने MCI Store के साथ अपनी परफेक्ट वेलनेस रूटीन खोजी है।", id: "Join thousands of customers who have discovered their perfect wellness routine with MCI Store." },
+    subtitle: { en: "Join thousands of customers who have discovered their perfect wellness routine with MCI One More.", ar: "انضم إلى آلاف العملاء الذين اكتشفوا روتينهم الصحي المثالي مع MCI One More.", zh: "加入数千名已通过MCI One More发现完美健康方案的客户。", es: "Únete a miles de clientes que han descubierto su rutina de bienestar perfecta con MCI One More.", hi: "हजारों ग्राहकों से जुड़ें जिन्होंने MCI One More के साथ अपनी परफेक्ट वेलनेस रूटीन खोजी है।", id: "Join thousands of customers who have discovered their perfect wellness routine with MCI One More." },
     cta:      { en: "Start Your Assessment",            ar: "ابدأ تقييمك",                  zh: "开始您的评估",              es: "Comienza Tu Evaluación",             hi: "अपना मूल्यांकन शुरू करें", id: "Start Your Assessment" },
   },
 
@@ -136,12 +136,12 @@ export const translations = {
     quickBookMeeting:{en: "Book a meeting",           ar: "حجز اجتماع",               zh: "预约会议",              es: "Reservar una reunión",        hi: "मीटिंग बुक करें", id: "Book a meeting" },
     quickProductInfo:{en: "Product info",             ar: "معلومات المنتج",           zh: "产品信息",              es: "Info de producto",            hi: "उत्पाद जानकारी", id: "Product info" },
     welcomeMsg:     {
-      en: (name?: string) => `Hello${name ? ` ${name}` : ""}! 👋 I'm your MCI Store health advisor assistant.\n\nI can help you with:\n- 📦 **Tracking your orders**\n- 📅 **Booking a consultation meeting**\n- 💊 **Product recommendations & info**\n\nHow can I assist you today?`,
-      ar: (name?: string) => `مرحباً${name ? ` ${name}` : ""}! 👋 أنا مساعدك الصحي في متجر MCI.\n\nيمكنني مساعدتك في:\n- 📦 **تتبع طلباتك**\n- 📅 **حجز اجتماع استشاري**\n- 💊 **توصيات المنتجات ومعلوماتها**\n\nكيف يمكنني مساعدتك اليوم؟`,
-      zh: (name?: string) => `您好${name ? ` ${name}` : ""}！👋 我是您的MCI商店健康顾问助手。\n\n我可以帮助您：\n- 📦 **追踪您的订单**\n- 📅 **预约咨询会议**\n- 💊 **产品推荐与信息**\n\n今天我能为您做什么？`,
-      es: (name?: string) => `¡Hola${name ? ` ${name}` : ""}! 👋 Soy tu asistente asesor de salud de MCI Store.\n\nPuedo ayudarte con:\n- 📦 **Rastrear tus pedidos**\n- 📅 **Reservar una reunión de consulta**\n- 💊 **Recomendaciones e información de productos**\n\n¿Cómo puedo ayudarte hoy?`,
-      hi: (name?: string) => `नमस्ते${name ? ` ${name}` : ""}! 👋 मैं आपका MCI Store स्वास्थ्य सलाहकार सहायक हूं।\n\nमैं आपकी मदद कर सकता हूं:\n- 📦 **आपके ऑर्डर ट्रैक करना**\n- 📅 **परामर्श मीटिंग बुक करना**\n- 💊 **उत्पाद सिफारिशें और जानकारी**\n\nआज मैं आपकी कैसे सहायता कर सकता हूं?`,
-      id: (name?: string) => `Halo${name ? ` ${name}` : ""}! 👋 Saya asisten penasihat kesehatan MCI Store Anda.\n\nSaya dapat membantu Anda dengan:\n- 📦 **Melacak pesanan Anda**\n- 📅 **Memesan pertemuan konsultasi**\n- 💊 **Rekomendasi & informasi produk**\n\nBagaimana saya bisa membantu Anda hari ini?`,
+      en: (name?: string) => `Hello${name ? ` ${name}` : ""}! 👋 I'm your MCI One More health advisor assistant.\n\nI can help you with:\n- 📦 **Tracking your orders**\n- 📅 **Booking a consultation meeting**\n- 💊 **Product recommendations & info**\n\nHow can I assist you today?`,
+      ar: (name?: string) => `مرحباً${name ? ` ${name}` : ""}! 👋 أنا مساعدك الصحي في MCI One More.\n\nيمكنني مساعدتك في:\n- 📦 **تتبع طلباتك**\n- 📅 **حجز اجتماع استشاري**\n- 💊 **توصيات المنتجات ومعلوماتها**\n\nكيف يمكنني مساعدتك اليوم؟`,
+      zh: (name?: string) => `您好${name ? ` ${name}` : ""}！👋 我是您的MCI One More健康顾问助手。\n\n我可以帮助您：\n- 📦 **追踪您的订单**\n- 📅 **预约咨询会议**\n- 💊 **产品推荐与信息**\n\n今天我能为您做什么？`,
+      es: (name?: string) => `¡Hola${name ? ` ${name}` : ""}! 👋 Soy tu asistente asesor de salud de MCI One More.\n\nPuedo ayudarte con:\n- 📦 **Rastrear tus pedidos**\n- 📅 **Reservar una reunión de consulta**\n- 💊 **Recomendaciones e información de productos**\n\n¿Cómo puedo ayudarte hoy?`,
+      hi: (name?: string) => `नमस्ते${name ? ` ${name}` : ""}! 👋 मैं आपका MCI One More स्वास्थ्य सलाहकार सहायक हूं।\n\nमैं आपकी मदद कर सकता हूं:\n- 📦 **आपके ऑर्डर ट्रैक करना**\n- 📅 **परामर्श मीटिंग बुक करना**\n- 💊 **उत्पाद सिफारिशें और जानकारी**\n\nआज मैं आपकी कैसे सहायता कर सकता हूं?`,
+      id: (name?: string) => `Halo${name ? ` ${name}` : ""}! 👋 Saya asisten penasihat kesehatan MCI One More Anda.\n\nSaya dapat membantu Anda dengan:\n- 📦 **Melacak pesanan Anda**\n- 📅 **Memesan pertemuan konsultasi**\n- 💊 **Rekomendasi & informasi produk**\n\nBagaimana saya bisa membantu Anda hari ini?`,
     },
     quickTrackMsg:  {
       en: "I want to track my order",

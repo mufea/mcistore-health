@@ -301,7 +301,7 @@ describe("settings.getPublic", () => {
   it("returns default settings when none configured", async () => {
     const caller = appRouter.createCaller(makeCtx());
     const result = await caller.settings.getPublic();
-    expect(result.siteName).toBe("VitaWell Health");
+    expect(result.siteName).toBe("MCI One More");
     expect(result.shippingNationalCost).toBe(50000);
     expect(result.shippingInternationalCost).toBe(250000);
     expect(result.midtransIsProduction).toBe(false);

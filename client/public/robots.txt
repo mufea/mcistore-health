@@ -1,4 +1,4 @@
-# MCI Store - Trusted Health Partner
+# MCI One More - Trusted Health Partner
 User-agent: *
 Allow: /
 

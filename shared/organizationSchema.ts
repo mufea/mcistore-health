@@ -6,8 +6,8 @@ export function buildOrganizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "MCI Store",
-    alternateName: "MCI Store - Trusted Health Partner",
+    name: "MCI One More",
+    alternateName: "MCI One More - Trusted Health Partner",
     url: CANONICAL_ORIGIN,
     logo: MCI_BRAND_MARK_URL,
     description: "Your journey to optimal health starts here. Discover personalized health products tailored to your unique needs.",

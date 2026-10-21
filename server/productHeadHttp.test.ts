@@ -40,7 +40,7 @@ describe("product-detail HTTP metadata", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/html");
-    expect(html).toContain("<title>Cardio Care Plus | MCI Store</title>");
+    expect(html).toContain("<title>Cardio Care Plus | MCI One More</title>");
     expect(html).toContain('content="Targeted nutritional support for daily cardiovascular wellness."');
     expect(html).toContain('<link rel="canonical" href="https://mci-store.com/products/77" />');
     expect(html).toContain('data-product-schema="true"');

@@ -4,7 +4,7 @@ import { buildProductCanonicalUrl, buildProductMetadata } from "./productMetadat
 describe("buildProductMetadata", () => {
   it("creates a unique product title and normalized description", () => {
     expect(buildProductMetadata({ name: "Omega Balance", description: "  Daily   nutritional   support. ", category: "Supplement" })).toEqual({
-      title: "Omega Balance | MCI Store",
+      title: "Omega Balance | MCI One More",
       description: "Daily nutritional support.",
     });
   });

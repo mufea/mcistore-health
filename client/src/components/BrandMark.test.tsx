@@ -8,7 +8,7 @@ it("renders the reusable MCI brand mark asset with descriptive alt text", () => 
   const { container } = render(<BrandMark size="lg" />);
   const image = container.querySelector("img");
   expect(image?.getAttribute("src")).toBe(MCI_BRAND_MARK_URL);
-  expect(image?.getAttribute("alt")).toBe("MCI Store logo");
+  expect(image?.getAttribute("alt")).toBe("MCI One More logo");
   expect(image?.getAttribute("aria-hidden")).toBeNull();
 });
 

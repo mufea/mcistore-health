@@ -13,7 +13,7 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
               <BrandMark size="sm" />
-              <span className="font-serif text-lg font-semibold">{settings?.siteName ?? "MCI Store"}</span>
+              <span className="font-serif text-lg font-semibold">{settings?.siteName ?? "MCI One More"}</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               {settings?.siteTagline ?? "Your journey to optimal health starts here. Discover personalized health products tailored to your unique needs."}
@@ -61,7 +61,7 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} {settings?.siteName ?? "MCI Store"}. All rights reserved.
+            © {new Date().getFullYear()} {settings?.siteName ?? "MCI One More"}. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
             Premium health products for a better life.

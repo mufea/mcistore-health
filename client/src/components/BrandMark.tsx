@@ -19,7 +19,7 @@ export default function BrandMark({ size = "md", className = "" }: BrandMarkProp
     <span className={`inline-flex shrink-0 overflow-hidden rounded-[0.72rem] bg-primary/10 shadow-sm ring-1 ring-primary/15 ${sizeClasses[size]} ${className}`}>
       <img
         src={MCI_BRAND_MARK_URL}
-        alt="MCI Store logo"
+        alt="MCI One More logo"
         className="h-full w-full scale-[1.32] object-cover"
       />
     </span>

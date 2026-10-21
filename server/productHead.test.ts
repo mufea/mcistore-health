@@ -20,7 +20,7 @@ describe("injectProductHeadMetadata", () => {
     } as any);
 
     await expect(getProductHeadMetadata("/products/14?campaign=search")).resolves.toMatchObject({
-      title: "Daily Omega | MCI Store",
+      title: "Daily Omega | MCI One More",
       description: "Support for daily wellness.",
       canonicalUrl: "https://mci-store.com/products/14",
       productSchema: { "@type": "Product", offers: { availability: "https://schema.org/InStock" } },
@@ -48,14 +48,14 @@ describe("injectProductHeadMetadata", () => {
 
   it("replaces generic head tags with escaped product-specific metadata", () => {
     const page = injectProductHeadMetadata(
-      '<head><title>MCI Store - Trusted Health Partner</title><meta name="description" content="Generic" /></head>',
+      '<head><title>MCI One More - Trusted Health Partner</title><meta name="description" content="Generic" /></head>',
       {
-        title: 'Vitamin "C" | MCI Store', description: "Wellness & immune support", canonicalUrl: "https://mci-store.com/products/9",
+        title: 'Vitamin "C" | MCI One More', description: "Wellness & immune support", canonicalUrl: "https://mci-store.com/products/9",
         productSchema: buildProductJsonLd({ id: 9, name: 'Vitamin "C"', description: "Wellness & immune support", category: "Wellness", price: 50000, stock: 3 }),
       }
     );
 
-    expect(page).toContain("<title>Vitamin &quot;C&quot; | MCI Store</title>");
+    expect(page).toContain("<title>Vitamin &quot;C&quot; | MCI One More</title>");
     expect(page).toContain('content="Wellness &amp; immune support"');
     expect(page).toContain('<link rel="canonical" href="https://mci-store.com/products/9" />');
     expect(page).toContain('data-product-schema="true"');
@@ -64,7 +64,7 @@ describe("injectProductHeadMetadata", () => {
 
   it("returns raw product HTML with unique metadata before client hydration", async () => {
     const rawHtml = await renderHtmlWithProductHead(
-      '<!doctype html><html><head><title>MCI Store - Trusted Health Partner</title><meta name="description" content="Generic" /></head><body><div id="root"></div></body></html>',
+      '<!doctype html><html><head><title>MCI One More - Trusted Health Partner</title><meta name="description" content="Generic" /></head><body><div id="root"></div></body></html>',
       "/products/55",
       async () => ({
         id: 55,
@@ -78,7 +78,7 @@ describe("injectProductHeadMetadata", () => {
       } as any)
     );
 
-    expect(rawHtml).toContain("<title>Calm Night Formula | MCI Store</title>");
+    expect(rawHtml).toContain("<title>Calm Night Formula | MCI One More</title>");
     expect(rawHtml).toContain('content="Night-time wellness support."');
     expect(rawHtml).toContain('<link rel="canonical" href="https://mci-store.com/products/55" />');
     expect(rawHtml).toContain('"availability":"https://schema.org/OutOfStock"');
