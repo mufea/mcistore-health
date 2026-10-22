@@ -47,3 +47,8 @@ export function getYouTubeEmbedUrl(value: string): string | null {
   const videoId = getYouTubeVideoId(value);
   return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
 }
+
+export function getYouTubeThumbnailUrl(value: string): string | null {
+  const videoId = getYouTubeVideoId(value);
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+}

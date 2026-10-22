@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getYouTubeEmbedUrl, getYouTubeVideoId, isYouTubeUrl } from "./youtube";
+import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl, getYouTubeVideoId, isYouTubeUrl } from "./youtube";
 
 describe("YouTube URL helpers", () => {
   it("accepts watch and short YouTube links", () => {
@@ -7,6 +7,9 @@ describe("YouTube URL helpers", () => {
     expect(getYouTubeVideoId("https://youtu.be/dQw4w9WgXcQ?t=12")).toBe("dQw4w9WgXcQ");
     expect(getYouTubeEmbedUrl("https://www.youtube.com/shorts/dQw4w9WgXcQ")).toBe(
       "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+    );
+    expect(getYouTubeThumbnailUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).toBe(
+      "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
     );
   });
 

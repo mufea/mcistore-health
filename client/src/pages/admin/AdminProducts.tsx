@@ -16,7 +16,7 @@ import AdminProductEditButton from "@/components/AdminProductEditButton";
 import AdminProductStatusToggle from "@/components/AdminProductStatusToggle";
 import { filterAdminProducts, type ProductStatusFilter } from "@/lib/adminProductFilters";
 import { buildProductPath, createProductSlug, isValidProductSlug, slugify } from "@shared/slug";
-import { isYouTubeUrl } from "@shared/youtube";
+import { getYouTubeThumbnailUrl, isYouTubeUrl } from "@shared/youtube";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Transdermal Patch", "Bioglass", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
@@ -81,6 +81,7 @@ export default function AdminProducts() {
   const videoUrlError = videoUrl.trim() && !isYouTubeUrl(videoUrl)
     ? "Enter a valid YouTube URL"
     : null;
+  const videoThumbnailUrl = videoUrl.trim() && !videoUrlError ? getYouTubeThumbnailUrl(videoUrl) : null;
 
   const createMutation = trpc.products.create.useMutation({
     onSuccess: () => { utils.products.adminList.invalidate(); setDialog(false); toast.success("Product created"); },
@@ -476,6 +477,17 @@ export default function AdminProducts() {
                 <a href={videoUrl.trim()} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-primary underline-offset-2 hover:underline">
                   Open YouTube video
                 </a>
+              )}
+              {videoThumbnailUrl && (
+                <div className="mt-3 max-w-sm overflow-hidden rounded-lg border border-border/60 bg-muted/30">
+                  <img
+                    src={videoThumbnailUrl}
+                    alt="YouTube video thumbnail preview"
+                    loading="lazy"
+                    className="aspect-video w-full object-cover"
+                  />
+                  <p className="px-3 py-2 text-xs text-muted-foreground">Video thumbnail preview</p>
+                </div>
               )}
             </div>
             <div className="grid grid-cols-2 gap-4">
