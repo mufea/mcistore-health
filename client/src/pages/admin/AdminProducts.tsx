@@ -17,7 +17,7 @@ import AdminProductStatusToggle from "@/components/AdminProductStatusToggle";
 import { filterAdminProducts, type ProductStatusFilter } from "@/lib/adminProductFilters";
 import { buildProductPath, createProductSlug, isValidProductSlug, slugify } from "@shared/slug";
 
-const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Herbal Tea", "Vitamin", "Other"];
+const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Transdermal Patch", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 const MAX_IMAGES = 6;
@@ -112,7 +112,7 @@ export default function AdminProducts() {
   const openEdit = (p: any) => {
     setEditing(p);
     setName(p.name); setSlug(p.slug ?? createProductSlug(p.name, p.id)); setSlugTouched(true); setDescription(p.description ?? ""); setPrice(String(p.price));
-    setCategory(p.category); setTargetSegment(p.targetSegment); setStock(String(p.stock));
+    setCategory(CATEGORIES.includes(p.category) ? p.category : "Other"); setTargetSegment(p.targetSegment); setStock(String(p.stock));
     setIsFeatured(p.isFeatured); setIsActive(p.isActive);
     // Load existing images: prefer images array, fall back to single imageUrl
     if (p.images && p.images.length > 0) {
