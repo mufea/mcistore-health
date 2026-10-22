@@ -124,9 +124,6 @@ export default function Navbar() {
 
   const navLinks = [
     { label: t(translations.nav.home, lang),         href: "/" },
-    { label: t(translations.nav.about, lang),        href: "/about" },
-    { label: t(translations.nav.technology, lang),   href: "/technology" },
-    { label: t(translations.nav.faq, lang),          href: "/faq-transdermal" },
     { label: t(translations.nav.healthSurvey, lang), href: "/survey" },
     { label: t(translations.nav.products, lang),     href: "/products" },
     ...(isAuthenticated ? [{ label: t(translations.nav.myOrders, lang), href: "/my-orders" }] : []),

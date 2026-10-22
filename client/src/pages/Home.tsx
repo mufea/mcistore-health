@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
-import { AlertTriangle, ArrowRight, CheckCircle, Heart, ImageOff, Leaf, Search, Shield } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle, Heart, ImageOff, Leaf, Search, Shield, Sparkles, Star } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -90,6 +90,7 @@ export default function Home() {
   }, []);
 
   const { lang } = useLanguage();
+  const { data: settings } = trpc.settings.getPublic.useQuery();
   const { data: featuredProducts, isLoading: productsLoading, isError: productsError } = trpc.products.list.useQuery({ segment: "standard" });
 
   const featured = (featuredProducts ?? []).filter((p) => p.isFeatured).slice(0, 4);
@@ -114,6 +115,36 @@ export default function Home() {
     setActiveSuggestionIndex(-1);
     navigate(buildProductPath(slug));
   };
+
+  const features = [
+    {
+      icon: Heart,
+      title: t(translations.features.f1Title, lang),
+      description: t(translations.features.f1Desc, lang),
+    },
+    {
+      icon: Leaf,
+      title: t(translations.features.f2Title, lang),
+      description: t(translations.features.f2Desc, lang),
+    },
+    {
+      icon: Shield,
+      title: t(translations.features.f3Title, lang),
+      description: t(translations.features.f3Desc, lang),
+    },
+    {
+      icon: Sparkles,
+      title: t(translations.features.f4Title, lang),
+      description: t(translations.features.f4Desc, lang),
+    },
+  ];
+
+  const heroCardItems = [
+    t(translations.hero.cardItem1, lang),
+    t(translations.hero.cardItem2, lang),
+    t(translations.hero.cardItem3, lang),
+    t(translations.hero.cardItem4, lang),
+  ];
 
   const howItWorksSteps = [
     {
@@ -153,124 +184,227 @@ export default function Home() {
 
   return (
     <MainLayout>
-      {/* ── Brochure-inspired cover hero ── */}
-      <section className="relative isolate overflow-hidden bg-[#071f24] text-white">
-        <img src="/manus-storage/cover_9c4157a9.jpg" alt="MCI One More botanical cover" className="absolute inset-0 -z-20 h-full w-full object-cover object-center" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,20,22,.9),rgba(3,20,22,.55),rgba(3,20,22,.2))]" />
-        <FullWide className="relative py-20 sm:py-28 lg:py-36">
-          <div className="max-w-3xl">
-            <Badge className="mb-6 border-white/25 bg-white/10 px-4 py-1.5 text-xs uppercase tracking-[0.22em] text-white backdrop-blur-sm hover:bg-white/15">
-              MCI One More International
-            </Badge>
-            <h1 className="max-w-3xl font-sans text-5xl font-semibold leading-[0.98] tracking-tight sm:text-7xl lg:text-8xl">
-              Feel healthy.
-              <span className="mt-2 block font-serif font-light italic text-[#c6e36c]">Energetic and happy.</span>
-            </h1>
-            <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">
-              New-generation wellness products inspired by nature, designed to help you make one more healthy choice every day.
-            </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg" className="bg-[#c6e36c] px-7 text-[#071f24] hover:bg-[#d8ef8b]">
-                <Link href="/products">Explore the collection <ArrowRight className="ml-2 h-4 w-4" /></Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="border-white/35 bg-white/5 px-7 text-white hover:bg-white/15 hover:text-white">
-                <Link href="/survey">Find your wellness match</Link>
-              </Button>
-            </div>
-            <form
-              role="search"
-              className="mt-8 flex max-w-xl gap-2"
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
-                  goToSuggestion(suggestions[activeSuggestionIndex].slug);
-                  return;
-                }
-                navigate(buildCatalogSearchPath(productSearch));
-              }}
-            >
-              <label htmlFor="home-product-search" className="sr-only">{t(translations.hero.searchLabel, lang)}</label>
-              <div ref={searchContainerRef} className="relative flex-1" onBlur={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-                  setSuggestionsOpen(false);
-                  setActiveSuggestionIndex(-1);
-                }
-              }}>
-                <Search className="absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-white/60" aria-hidden="true" />
-                <Input
-                  id="home-product-search"
-                  type="search"
-                  value={productSearch}
-                  onChange={(event) => { setProductSearch(event.target.value); setSuggestionsOpen(true); setActiveSuggestionIndex(-1); }}
-                  onFocus={() => setSuggestionsOpen(true)}
-                  placeholder="Search products or ingredients..."
-                  className="h-12 border-white/20 bg-white/10 pl-9 text-white placeholder:text-white/55 backdrop-blur-sm"
-                  aria-autocomplete="list"
-                  aria-expanded={showSuggestions}
-                  aria-controls="home-product-suggestions"
-                  aria-activedescendant={activeSuggestionIndex >= 0 ? `home-product-suggestion-${suggestions[activeSuggestionIndex]?.id}` : undefined}
-                />
-                {showSuggestions && (
-                  <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 overflow-hidden rounded-xl border border-border/70 bg-popover text-popover-foreground shadow-lg">
-                    <p className="px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t(translations.hero.suggestionsLabel, lang)}</p>
-                    {suggestionState === "loading" ? <p role="status" className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.suggestionsLoading, lang)}</p> : suggestionState === "error" ? <p role="alert" className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.suggestionsError, lang)}</p> : suggestionState === "results" ? (
-                      <ul id="home-product-suggestions" role="listbox" className="pb-1">
-                        {suggestions.map((product, index) => (
-                          <li key={product.id} id={`home-product-suggestion-${product.id}`} role="option" aria-selected={index === activeSuggestionIndex} className={`flex items-center gap-2 px-3 py-2.5 transition-colors ${index === activeSuggestionIndex ? "bg-accent text-accent-foreground" : "hover:bg-accent/70"}`}>
-                            <button type="button" className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left text-sm" onMouseDown={(event) => event.preventDefault()} onClick={() => goToSuggestion(product.slug)}>
-                              <SuggestionThumbnail product={product} />
-                              <span className="min-w-0 flex-1 truncate font-medium">{product.name}</span>
-                              <span className="shrink-0 text-right"><span className="block text-xs text-muted-foreground">{product.category}</span><span className="block text-xs font-semibold text-primary">{formatSuggestionPrice(product.price)}</span></span>
-                            </button>
-                            <SuggestionAddToCartButton product={product} isAuthenticated={isAuthenticated} onAdded={() => { setSuggestionsOpen(false); setActiveSuggestionIndex(-1); }} onRequireSignIn={() => { setSuggestionsOpen(false); setActiveSuggestionIndex(-1); window.location.href = getLoginUrl(); }} />
-                          </li>
-                        ))}
-                      </ul>
-                    ) : <p className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.noSuggestions, lang)}</p>}
-                    <button type="submit" className="flex w-full border-t border-border/60 px-3 py-2.5 text-left text-sm font-medium text-primary hover:bg-accent/70">{t(translations.hero.viewAllResults, lang)}</button>
-                  </div>
-                )}
-              </div>
-              <Button type="submit" variant="outline" className="h-12 shrink-0 border-white/30 bg-white/10 text-white hover:bg-white/15 hover:text-white">Search</Button>
-            </form>
-          </div>
-          <div className="mt-14 flex flex-wrap gap-3 text-xs font-medium uppercase tracking-[0.16em] text-white/75">
-            <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">Transdermal wave technology</span>
-            <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">Nature-led formulas</span>
-            <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">Read the instructions</span>
-          </div>
-        </FullWide>
-      </section>
+      {/* ── Hero ── full-width asymmetric layout */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-background via-accent/20 to-background py-8 sm:py-10 flex items-center">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.72_0.12_75/0.08),transparent_60%)]" />
+        {/* decorative large circle */}
+        <div className="absolute right-0 top-0 w-[55vw] h-[55vw] max-w-4xl max-h-4xl rounded-full bg-primary/5 translate-x-1/3 -translate-y-1/4 pointer-events-none" />
+        <div className="absolute right-12 bottom-0 w-[30vw] h-[30vw] max-w-xl max-h-xl rounded-full bg-primary/4 pointer-events-none" />
 
-      {/* ── Brand story: nature + transdermal technology ── */}
-      <section className="bg-[#f4f7f1] py-20 sm:py-28">
-        <FullWide>
-          <div className="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+        <FullWide className="relative py-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: copy */}
             <div>
-              <div className="mb-4 h-1 w-12 bg-[#0b55d8]" />
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#0b55d8]">The MCI One More approach</p>
-              <h2 className="mt-4 max-w-xl font-sans text-4xl font-semibold leading-tight text-[#0c2730] sm:text-5xl">
-                Nature-led wellness, made for modern routines.
-              </h2>
-              <p className="mt-6 max-w-xl text-base leading-8 text-[#45616a]">
-                The brochure brings together botanical ingredients, vitamins, minerals, and transdermal wave technology in a clear, human way. Our storefront now follows that same rhythm: understand your needs, explore the collection, and choose the ritual that fits your day.
+              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-xs font-medium tracking-wide uppercase">
+                {t(translations.hero.badge, lang)}
+              </Badge>
+              <h1 className="font-serif text-5xl lg:text-6xl xl:text-7xl font-light text-foreground leading-tight mb-6">
+                {t(translations.hero.titleLine1, lang)}{" "}
+                <span className="font-semibold text-primary italic">{t(translations.hero.titleHighlight, lang)}</span>{" "}
+                {t(translations.hero.titleLine2, lang)}
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
+                {settings?.siteTagline ?? t(translations.hero.tagline, lang)}
               </p>
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                {["Botanical ingredients", "Transdermal wave technology", "Clear product guidance", "A daily choice for feeling well"].map((item) => (
-                  <div key={item} className="flex items-center gap-3 rounded-xl border border-[#d6e0d3] bg-white/70 px-4 py-3 text-sm font-medium text-[#23434b]">
-                    <CheckCircle className="h-4 w-4 shrink-0 text-[#0b55d8]" />{item}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-8">
+                  <Link href="/survey">
+                    {t(translations.hero.ctaSurvey, lang)}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="gap-2 px-8">
+                  <Link href="/products">{t(translations.hero.ctaProducts, lang)}</Link>
+                </Button>
+              </div>
+              <form
+                role="search"
+                className="mt-5 flex max-w-xl gap-2"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
+                    goToSuggestion(suggestions[activeSuggestionIndex].slug);
+                    return;
+                  }
+                  navigate(buildCatalogSearchPath(productSearch));
+                }}
+              >
+                <label htmlFor="home-product-search" className="sr-only">{t(translations.hero.searchLabel, lang)}</label>
+                <div
+                  ref={searchContainerRef}
+                  className="relative flex-1"
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+                      setSuggestionsOpen(false);
+                      setActiveSuggestionIndex(-1);
+                    }
+                  }}
+                >
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                  <Input
+                    id="home-product-search"
+                    type="search"
+                    value={productSearch}
+                    onChange={(event) => {
+                      setProductSearch(event.target.value);
+                      setSuggestionsOpen(true);
+                      setActiveSuggestionIndex(-1);
+                    }}
+                    onFocus={() => setSuggestionsOpen(true)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape") {
+                        setSuggestionsOpen(false);
+                        setActiveSuggestionIndex(-1);
+                      } else if (suggestionState === "results" && event.key === "ArrowDown") {
+                        event.preventDefault();
+                        setActiveSuggestionIndex((index) => Math.min(index + 1, suggestions.length - 1));
+                      } else if (suggestionState === "results" && event.key === "ArrowUp") {
+                        event.preventDefault();
+                        setActiveSuggestionIndex((index) => Math.max(index - 1, -1));
+                      }
+                    }}
+                    placeholder={t(translations.hero.searchPlaceholder, lang)}
+                    className="h-11 bg-background/90 pl-9 shadow-sm"
+                    aria-autocomplete="list"
+                    aria-expanded={showSuggestions}
+                    aria-controls="home-product-suggestions"
+                    aria-activedescendant={activeSuggestionIndex >= 0 ? `home-product-suggestion-${suggestions[activeSuggestionIndex]?.id}` : undefined}
+                  />
+                  {showSuggestions && (
+                    <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 overflow-hidden rounded-xl border border-border/70 bg-popover text-popover-foreground shadow-lg">
+                      <p className="px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t(translations.hero.suggestionsLabel, lang)}</p>
+                      {suggestionState === "loading" ? (
+                        <p role="status" className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.suggestionsLoading, lang)}</p>
+                      ) : suggestionState === "error" ? (
+                        <p role="alert" className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.suggestionsError, lang)}</p>
+                      ) : suggestionState === "results" ? (
+                        <ul id="home-product-suggestions" role="listbox" className="pb-1">
+                          {suggestions.map((product, index) => (
+                            <li key={product.id} id={`home-product-suggestion-${product.id}`} role="option" aria-selected={index === activeSuggestionIndex} className={`flex items-center gap-2 px-3 py-2.5 transition-colors ${index === activeSuggestionIndex ? "bg-accent text-accent-foreground" : "hover:bg-accent/70"}`}>
+                              <button
+                                type="button"
+                                className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left text-sm"
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => goToSuggestion(product.slug)}
+                              >
+                                <SuggestionThumbnail product={product} />
+                                <span className="min-w-0 flex-1 truncate font-medium">{product.name}</span>
+                                <span className="shrink-0 text-right">
+                                  <span className="block text-xs text-muted-foreground">{product.category}</span>
+                                  <span className="block text-xs font-semibold text-primary">{formatSuggestionPrice(product.price)}</span>
+                                </span>
+                              </button>
+                              <SuggestionAddToCartButton
+                                product={product}
+                                isAuthenticated={isAuthenticated}
+                                onAdded={() => {
+                                  setSuggestionsOpen(false);
+                                  setActiveSuggestionIndex(-1);
+                                }}
+                                onRequireSignIn={() => {
+                                  setSuggestionsOpen(false);
+                                  setActiveSuggestionIndex(-1);
+                                  window.location.href = getLoginUrl();
+                                }}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="px-3 py-3 text-sm text-muted-foreground">{t(translations.hero.noSuggestions, lang)}</p>
+                      )}
+                      <button
+                        type="submit"
+                        className="flex w-full border-t border-border/60 px-3 py-2.5 text-left text-sm font-medium text-primary hover:bg-accent/70"
+                      >
+                        {t(translations.hero.viewAllResults, lang)}
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <Button type="submit" variant="outline" className="h-11 shrink-0">
+                  {t(translations.hero.searchButton, lang)}
+                </Button>
+              </form>
+              <div className="mt-10 flex items-center gap-8">
+                {[
+                  { label: t(translations.hero.stat1Label, lang), value: "10,000+" },
+                  { label: t(translations.hero.stat2Label, lang), value: "200+" },
+                  { label: t(translations.hero.stat3Label, lang), value: "98%" },
+                ].map((stat) => (
+                  <div key={stat.label} className="text-center">
+                    <p className="font-serif text-2xl font-semibold text-foreground">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="relative overflow-hidden rounded-[2rem] bg-[#0b55d8] shadow-2xl">
-              <img src="/manus-storage/transdermal_5b18ecbe.jpg" alt="MCI One More transdermal wave technology brochure visual" className="h-full min-h-[28rem] w-full object-cover object-center mix-blend-screen opacity-90" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#062b7b]/70 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-7 text-white sm:p-9">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/70">Transdermal wave technology</p>
-                <p className="mt-2 max-w-md font-serif text-3xl leading-tight sm:text-4xl">A more considered way to bring wellness into your routine.</p>
+
+            {/* Right: decorative card stack */}
+            <div className="hidden lg:flex flex-col gap-4 items-end">
+              <div className="w-full max-w-sm bg-card border border-border/60 rounded-2xl p-6 shadow-lg">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Heart className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">{t(translations.hero.cardTitle, lang)}</p>
+                    <p className="text-xs text-muted-foreground">{t(translations.hero.cardSub, lang)}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {heroCardItems.map((item) => (
+                    <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="w-full max-w-xs bg-primary text-primary-foreground rounded-2xl p-5 shadow-lg">
+                <p className="font-serif text-lg font-light mb-1">{t(translations.hero.scoreLabel, lang)}</p>
+                <p className="font-serif text-4xl font-semibold">94<span className="text-xl font-light">/100</span></p>
+                <p className="text-sm text-primary-foreground/70 mt-1">{t(translations.hero.scoreDesc, lang)}</p>
+              </div>
+              <div className="w-full max-w-sm bg-card border border-border/60 rounded-2xl p-5 shadow-md flex items-center gap-4">
+                <div className="flex gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-[oklch(0.72_0.12_75)] text-[oklch(0.72_0.12_75)]" />
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground">"Life-changing products!"</p>
               </div>
             </div>
+          </div>
+        </FullWide>
+      </section>
+
+      {/* ── Features ── 4-column on desktop */}
+      <section className="py-24 bg-background">
+        <FullWide>
+          <div className="text-center mb-16">
+            <div className="gold-line mx-auto mb-4" />
+            <h2 className="font-serif text-3xl lg:text-5xl font-light text-foreground mb-3">
+              {t(translations.features.sectionTitle, lang)}
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto text-base">
+              {t(translations.features.sectionSub, lang)}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, i) => (
+              <div
+                key={feature.title}
+                className="group p-8 rounded-2xl border border-border/60 bg-card card-hover"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                  <feature.icon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2 text-base">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
           </div>
         </FullWide>
       </section>
@@ -336,26 +470,6 @@ export default function Home() {
           </FullWide>
         </section>
       )}
-
-      {/* ── Slimstyle story from the brochure ── */}
-      <section className="overflow-hidden bg-[#fff9dc] py-20 sm:py-28">
-        <FullWide>
-          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
-            <div className="order-2 lg:order-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#7b9d15]">Slimstyle by MCI One More</p>
-              <h2 className="mt-4 max-w-xl font-sans text-4xl font-semibold leading-tight text-[#243321] sm:text-5xl">Ready to live lighter, one choice at a time?</h2>
-              <p className="mt-6 max-w-xl text-base leading-8 text-[#556340]">The brochure introduces Slimstyle through a simple promise: a plant-forward routine supported by transdermal technology. Start with your goals, then let the survey guide you to the products that belong in your everyday rhythm.</p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg" className="bg-[#7b9d15] text-white hover:bg-[#698811]"><Link href="/survey">Start the wellness survey <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
-                <Button asChild size="lg" variant="outline" className="border-[#7b9d15]/40 text-[#526b11] hover:bg-[#7b9d15]/10"><Link href="/products?category=Transdermal%20Patch">Browse transdermal patches</Link></Button>
-              </div>
-            </div>
-            <div className="order-1 mx-auto w-full max-w-md overflow-hidden rounded-[2rem] shadow-xl lg:order-2">
-              <img src="/manus-storage/slimstyle_9cef89df.jpg" alt="Slimstyle by MCI One More brochure product visual" className="aspect-[0.705] w-full object-cover object-center" />
-            </div>
-          </div>
-        </FullWide>
-      </section>
 
       {/* ── How It Works ── */}
       <section className="py-24 bg-background">
@@ -438,31 +552,6 @@ export default function Home() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </FullWide>
-      </section>
-
-      {/* ── Trust and product guidance ── */}
-      <section className="bg-[#f7f9fc] py-20 sm:py-24">
-        <FullWide>
-          <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-            <div>
-              <div className="mb-4 h-1 w-12 bg-[#0b55d8]" />
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#0b55d8]">Before using the product</p>
-              <h2 className="mt-4 font-sans text-4xl font-semibold leading-tight text-[#122d67] sm:text-5xl">Read the instructions.</h2>
-              <p className="mt-5 text-base leading-8 text-[#52627b]">Every product page is designed to make the next step clear. Follow the label, use products only as directed, and contact a qualified professional when you need personal advice.</p>
-              <ul className="mt-7 space-y-3 text-sm text-[#253d61]">
-                {["For external use only where indicated", "Apply only as directed on clean, dry skin", "Avoid injured or sensitive areas", "Review the product instructions before use"].map((item) => (
-                  <li key={item} className="flex items-start gap-3"><span className="mt-1 h-2 w-2 shrink-0 bg-[#0b55d8]" />{item}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="overflow-hidden rounded-2xl border border-[#dbe2ef] bg-white shadow-sm">
-              <img src="/manus-storage/certificates_5d20144b.jpg" alt="MCI One More certification collage from the brochure" className="max-h-[32rem] w-full object-cover object-top" />
-              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e4e9f1] px-5 py-4 text-xs font-medium uppercase tracking-[0.16em] text-[#62708a]">
-                <span>Quality and documentation</span><span>Explore products with confidence</span>
-              </div>
             </div>
           </div>
         </FullWide>
