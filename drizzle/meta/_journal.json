@@ -85,6 +85,13 @@
       "when": 1789802720341,
       "tag": "0011_hard_garia",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1792646851711,
+      "tag": "0012_great_jackpot",
+      "breakpoints": true
     }
   ]
 }

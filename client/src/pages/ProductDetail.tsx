@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
-import { ArrowLeft, Check, Loader2, Minus, Plus, Search, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Minus, Play, Plus, Search, ShoppingBag, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -19,6 +19,7 @@ import { addComparedProductToCart, buildAlternativeCheckoutPath, buildMultiProdu
 import { buildProductCanonicalUrl, buildProductMetadata } from "@/lib/productMetadata";
 import { buildProductJsonLd, serializeProductJsonLd } from "@/lib/productSchema";
 import { buildProductPath } from "@shared/slug";
+import { getYouTubeEmbedUrl } from "@shared/youtube";
 
 function getStoredCart(): number[] {
   try {
@@ -79,6 +80,7 @@ export default function ProductDetail() {
   const filteredRecommendations = !inStock
     ? filterAlternativesByText(filterAlternativesByNeed(recommendations, alternativeNeed), alternativeSearch)
     : recommendations;
+  const videoEmbedUrl = product?.videoUrl ? getYouTubeEmbedUrl(product.videoUrl) : null;
   const comparisonProducts = comparedAlternativeIds
     .map((id) => availableAlternatives.find((item) => item.id === id))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
@@ -309,6 +311,26 @@ export default function ProductDetail() {
               </div>
             </div>
           </section>
+
+          {videoEmbedUrl && (
+            <section className="mt-12 border-t border-border/60 pt-10" aria-labelledby="product-video-heading">
+              <div className="gold-line mb-3" />
+              <h2 id="product-video-heading" className="mb-5 flex items-center gap-2 font-serif text-3xl font-light text-foreground">
+                <Play className="h-5 w-5 fill-primary text-primary" aria-hidden="true" />
+                {t(detail.productVideo, lang)}
+              </h2>
+              <div className="mx-auto aspect-video w-full max-w-4xl overflow-hidden rounded-2xl border border-border/60 bg-muted shadow-sm">
+                <iframe
+                  className="h-full w-full"
+                  src={videoEmbedUrl}
+                  title={`${product.name} - ${t(detail.productVideo, lang)}`}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </section>
+          )}
 
           {recommendations.length > 0 && (
             <section className="mt-16 border-t border-border/60 pt-10">

@@ -13,6 +13,12 @@ import {
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
 import { createProductSlug, PRODUCT_SLUG_PATTERN, slugify } from "@shared/slug";
+import { isYouTubeUrl } from "@shared/youtube";
+
+const youtubeUrlSchema = z.string().trim().max(500).refine(
+  (value) => value === "" || isYouTubeUrl(value),
+  "Video URL must be a valid YouTube link",
+).optional();
 
 export const productsRouter = router({
   // Public: list products filtered by user segment
@@ -100,6 +106,7 @@ export const productsRouter = router({
         imageUrl: z.string().optional(),
         imageKey: z.string().optional(),
         images: z.array(z.object({ url: z.string(), key: z.string() })).optional(),
+        videoUrl: youtubeUrlSchema,
         targetSegment: z.enum(["all", "standard", "premium", "vip"]).default("all"),
         stock: z.number().int().default(0),
         isActive: z.boolean().default(true),
@@ -129,6 +136,7 @@ export const productsRouter = router({
         imageUrl: z.string().optional(),
         imageKey: z.string().optional(),
         images: z.array(z.object({ url: z.string(), key: z.string() })).optional(),
+        videoUrl: youtubeUrlSchema,
         targetSegment: z.enum(["all", "standard", "premium", "vip"]).optional(),
         stock: z.number().int().optional(),
         isActive: z.boolean().optional(),

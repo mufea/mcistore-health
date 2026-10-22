@@ -413,6 +413,7 @@ export const translations = {
     inStock:         { en: "In Stock",                ar: "متوفر",                   zh: "有货",               es: "En Stock",                  hi: "स्टॉक में",             id: "Tersedia" },
     outOfStock:      { en: "Out of Stock",            ar: "نفذ المخزون",             zh: "缺货",               es: "Agotado",                   hi: "स्टॉक से बाहर",          id: "Habis" },
     productDetails:  { en: "Product Details",         ar: "تفاصيل المنتج",           zh: "产品详情",           es: "Detalles del Producto",     hi: "उत्पाद विवरण",           id: "Detail Produk" },
+    productVideo:    { en: "Product Video",            ar: "فيديو المنتج",             zh: "产品视频",           es: "Vídeo del Producto",        hi: "उत्पाद वीडियो",           id: "Video Produk" },
     tags:            { en: "Tags",                    ar: "الوسوم",                  zh: "标签",               es: "Etiquetas",                 hi: "टैग",                    id: "Tag" },
     relatedProducts: { en: "Related Products",        ar: "منتجات ذات صلة",          zh: "相关产品",           es: "Productos Relacionados",    hi: "संबंधित उत्पाद",         id: "Produk Terkait" },
     availableAlternatives: { en: "Available Alternatives", ar: "بدائل متاحة",       zh: "可选替代产品",       es: "Alternativas Disponibles",  hi: "उपलब्ध विकल्प",          id: "Alternatif yang Tersedia" },

@@ -265,6 +265,17 @@ describe("products admin procedures", () => {
     })).rejects.toThrow("Slug must use lowercase letters");
   });
 
+  it("rejects non-YouTube video URLs before creating a product", async () => {
+    const caller = appRouter.createCaller(makeAdminCtx());
+    await expect(caller.products.create({
+      name: "Video Product",
+      slug: "video-product",
+      price: "299000",
+      category: "Supplement",
+      videoUrl: "https://vimeo.com/123456789",
+    })).rejects.toThrow("Video URL must be a valid YouTube link");
+  });
+
   it("reports slug availability and allows the current product to keep its slug", async () => {
     vi.mocked(getProductBySlug).mockResolvedValueOnce({ id: 22 } as any);
     const caller = appRouter.createCaller(makeAdminCtx());

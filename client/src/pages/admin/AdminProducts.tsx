@@ -16,6 +16,7 @@ import AdminProductEditButton from "@/components/AdminProductEditButton";
 import AdminProductStatusToggle from "@/components/AdminProductStatusToggle";
 import { filterAdminProducts, type ProductStatusFilter } from "@/lib/adminProductFilters";
 import { buildProductPath, createProductSlug, isValidProductSlug, slugify } from "@shared/slug";
+import { isYouTubeUrl } from "@shared/youtube";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Transdermal Patch", "Bioglass", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
@@ -44,6 +45,7 @@ export default function AdminProducts() {
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
   const [description, setDescription] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("Supplement");
   const [targetSegment, setTargetSegment] = useState("all");
@@ -76,6 +78,9 @@ export default function AdminProducts() {
       : slugCheck?.available === false
         ? "This slug is already used by another product"
         : null;
+  const videoUrlError = videoUrl.trim() && !isYouTubeUrl(videoUrl)
+    ? "Enter a valid YouTube URL"
+    : null;
 
   const createMutation = trpc.products.create.useMutation({
     onSuccess: () => { utils.products.adminList.invalidate(); setDialog(false); toast.success("Product created"); },
@@ -103,7 +108,7 @@ export default function AdminProducts() {
 
   const openNew = () => {
     setEditing(null);
-    setName(""); setSlug(""); setSlugTouched(false); setDescription(""); setPrice(""); setCategory("Supplement");
+    setName(""); setSlug(""); setSlugTouched(false); setDescription(""); setVideoUrl(""); setPrice(""); setCategory("Supplement");
     setTargetSegment("all"); setStock("100"); setIsFeatured(false); setIsActive(true);
     setImages([]);
     setDialog(true);
@@ -111,7 +116,7 @@ export default function AdminProducts() {
 
   const openEdit = (p: any) => {
     setEditing(p);
-    setName(p.name); setSlug(p.slug ?? createProductSlug(p.name, p.id)); setSlugTouched(true); setDescription(p.description ?? ""); setPrice(String(p.price));
+    setName(p.name); setSlug(p.slug ?? createProductSlug(p.name, p.id)); setSlugTouched(true); setDescription(p.description ?? ""); setVideoUrl(p.videoUrl ?? ""); setPrice(String(p.price));
     setCategory(CATEGORIES.includes(p.category) ? p.category : "Other"); setTargetSegment(p.targetSegment); setStock(String(p.stock));
     setIsFeatured(p.isFeatured); setIsActive(p.isActive);
     // Load existing images: prefer images array, fall back to single imageUrl
@@ -194,13 +199,14 @@ export default function AdminProducts() {
 
   const save = () => {
     if (!name.trim() || !price) return toast.error("Name and price are required");
+    if (videoUrlError) return toast.error(videoUrlError);
     if (slugError || isCheckingSlug || !slugCheck?.available) {
       return toast.error(slugError ?? "Please wait for slug validation to finish");
     }
     const readyImages = images.filter((i) => !i.isUploading && i.url);
     const primaryImage = readyImages[0];
     const data = {
-      name, slug: normalizedSlug, description, price, category,
+      name, slug: normalizedSlug, description, videoUrl: videoUrl.trim(), price, category,
       targetSegment: targetSegment as any,
       stock: parseInt(stock),
       imageUrl: primaryImage?.url,
@@ -435,6 +441,27 @@ export default function AdminProducts() {
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Description</Label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Product description..." rows={3} />
+            </div>
+            <div>
+              <Label htmlFor="admin-product-video-url" className="text-sm font-medium mb-1.5 block">YouTube Video URL <span className="font-normal text-muted-foreground">(optional)</span></Label>
+              <Input
+                id="admin-product-video-url"
+                type="url"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+                aria-invalid={Boolean(videoUrlError)}
+                aria-describedby="admin-product-video-url-help"
+                className={videoUrlError ? "border-destructive focus-visible:ring-destructive" : ""}
+              />
+              <p id="admin-product-video-url-help" className={`mt-1 text-xs ${videoUrlError ? "text-destructive" : "text-muted-foreground"}`}>
+                {videoUrlError ?? "Use a YouTube watch, Shorts, youtu.be, or embed link."}
+              </p>
+              {videoUrl.trim() && !videoUrlError && (
+                <a href={videoUrl.trim()} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-primary underline-offset-2 hover:underline">
+                  Open YouTube video
+                </a>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
