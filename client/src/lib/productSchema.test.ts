@@ -17,7 +17,7 @@ describe("buildProductJsonLd", () => {
     expect(schema).toMatchObject({
       "@type": "Product",
       name: "Calm Night Formula",
-      url: "https://mci-store.com/products/18",
+      url: "https://mcionemore.com/products/18",
       image: ["/manus-storage/calm.jpg", "/manus-storage/calm-detail.jpg"],
       offers: { price: "990000", priceCurrency: "IDR", availability: "https://schema.org/InStock" },
     });

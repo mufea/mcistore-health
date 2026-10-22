@@ -3,7 +3,7 @@
 Contoh berikut dapat digunakan pada halaman detail produk seperti:
 
 ```text
-https://mci-store.com/products/77
+https://mcionemore.com/products/77
 ```
 
 Implementasi ini menghasilkan metadata dinamis untuk setiap produk:
@@ -24,7 +24,7 @@ Buat atau sesuaikan file `shared/productSeo.ts`:
 
 ```ts
 const SITE_NAME = "MCI Store";
-const SITE_ORIGIN = "https://mci-store.com";
+const SITE_ORIGIN = "https://mcionemore.com";
 const DEFAULT_IMAGE = `${SITE_ORIGIN}/manus-storage/mci-health-mark_0e17589e.png`;
 const MAX_DESCRIPTION_LENGTH = 160;
 
@@ -137,7 +137,7 @@ export function buildProductJsonLd(product: SeoProduct) {
       seller: {
         "@type": "Organization",
         name: "MCI Store",
-        url: "https://mci-store.com",
+        url: "https://mcionemore.com",
       },
     },
   };
@@ -154,13 +154,13 @@ export function buildBreadcrumbJsonLd(product: SeoProduct) {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://mci-store.com/",
+        item: "https://mcionemore.com/",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Products",
-        item: "https://mci-store.com/products",
+        item: "https://mcionemore.com/products",
       },
       {
         "@type": "ListItem",
@@ -419,7 +419,7 @@ Untuk produk contoh dengan ID `77`, Google dan social crawler akan menerima meta
 />
 <link
   rel="canonical"
-  href="https://mci-store.com/products/77"
+  href="https://mcionemore.com/products/77"
 />
 
 <meta property="og:type" content="product" />
@@ -429,8 +429,8 @@ Untuk produk contoh dengan ID `77`, Google dan social crawler akan menerima meta
   property="og:description"
   content="Vitamin C 500 mg untuk dukungan kesehatan harian dari MCI Store."
 />
-<meta property="og:url" content="https://mci-store.com/products/77" />
-<meta property="og:image" content="https://mci-store.com/manus-storage/vitamin-c.jpg" />
+<meta property="og:url" content="https://mcionemore.com/products/77" />
+<meta property="og:image" content="https://mcionemore.com/manus-storage/vitamin-c.jpg" />
 <meta property="og:image:alt" content="Vitamin C 500 mg" />
 <meta property="og:locale" content="id_ID" />
 
@@ -440,18 +440,18 @@ Untuk produk contoh dengan ID `77`, Google dan social crawler akan menerima meta
   name="twitter:description"
   content="Vitamin C 500 mg untuk dukungan kesehatan harian dari MCI Store."
 />
-<meta name="twitter:image" content="https://mci-store.com/manus-storage/vitamin-c.jpg" />
+<meta name="twitter:image" content="https://mcionemore.com/manus-storage/vitamin-c.jpg" />
 <meta name="twitter:image:alt" content="Vitamin C 500 mg" />
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Product",
-  "@id": "https://mci-store.com/products/77#product",
+  "@id": "https://mcionemore.com/products/77#product",
   "name": "Vitamin C 500 mg",
   "description": "Vitamin C 500 mg untuk dukungan kesehatan harian dari MCI Store.",
-  "url": "https://mci-store.com/products/77",
-  "image": ["https://mci-store.com/manus-storage/vitamin-c.jpg"],
+  "url": "https://mcionemore.com/products/77",
+  "image": ["https://mcionemore.com/manus-storage/vitamin-c.jpg"],
   "category": "Vitamins",
   "brand": {
     "@type": "Brand",
@@ -459,7 +459,7 @@ Untuk produk contoh dengan ID `77`, Google dan social crawler akan menerima meta
   },
   "offers": {
     "@type": "Offer",
-    "url": "https://mci-store.com/products/77",
+    "url": "https://mcionemore.com/products/77",
     "price": "125000",
     "priceCurrency": "IDR",
     "availability": "https://schema.org/InStock",
@@ -467,7 +467,7 @@ Untuk produk contoh dengan ID `77`, Google dan social crawler akan menerima meta
     "seller": {
       "@type": "Organization",
       "name": "MCI Store",
-      "url": "https://mci-store.com"
+      "url": "https://mcionemore.com"
     }
   }
 }
@@ -482,19 +482,19 @@ Untuk produk contoh dengan ID `77`, Google dan social crawler akan menerima meta
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://mci-store.com/"
+      "item": "https://mcionemore.com/"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Products",
-      "item": "https://mci-store.com/products"
+      "item": "https://mcionemore.com/products"
     },
     {
       "@type": "ListItem",
       "position": 3,
       "name": "Vitamin C 500 mg",
-      "item": "https://mci-store.com/products/77"
+      "item": "https://mcionemore.com/products/77"
     }
   ]
 }
@@ -507,7 +507,7 @@ Untuk produk contoh dengan ID `77`, Google dan social crawler akan menerima meta
 2. Pastikan gambar utama minimal memiliki ukuran yang baik untuk social preview, misalnya 1200 × 630 piksel untuk gambar OG khusus.
 3. Jangan menambahkan `aggregateRating` atau `review` tanpa review nyata.
 4. Jangan menambahkan klaim medis yang tidak didukung pada `description`.
-5. Pertahankan domain canonical, sitemap, Open Graph, dan Product schema pada domain utama `https://mci-store.com`.
+5. Pertahankan domain canonical, sitemap, Open Graph, dan Product schema pada domain utama `https://mcionemore.com`.
 6. Untuk SEO Google yang lebih kuat, metadata produk sebaiknya juga disisipkan server-side sebelum React hydration. Dynamic client-side metadata tetap berguna untuk browser, tetapi server-rendered HTML lebih aman untuk crawler.
 7. Validasi hasil menggunakan [Google Rich Results Test](https://search.google.com/test/rich-results) dan [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/).
 
@@ -520,7 +520,7 @@ Untuk produk contoh dengan ID `77`, Google dan social crawler akan menerima meta
   "name": "Vitamin C 500 mg",
   "description": "Vitamin C 500 mg untuk dukungan kesehatan harian dari MCI Store.",
   "image": [
-    "https://mci-store.com/manus-storage/vitamin-c.jpg"
+    "https://mcionemore.com/manus-storage/vitamin-c.jpg"
   ],
   "offers": {
     "@type": "Offer",

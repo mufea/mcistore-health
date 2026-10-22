@@ -1,5 +1,5 @@
 const SITE_NAME = "MCI One More";
-const CANONICAL_ORIGIN = "https://mci-store.com";
+const CANONICAL_ORIGIN = "https://mcionemore.com";
 const MAX_DESCRIPTION_LENGTH = 160;
 
 export type ProductMetadataSource = {

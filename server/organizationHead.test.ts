@@ -6,7 +6,7 @@ describe("Organization schema injection", () => {
     const page = injectOrganizationSchema("<html><head><title>MCI One More</title></head><body></body></html>");
     expect(page).toContain('data-organization-schema="true"');
     expect(page).toContain('"@type":"Organization"');
-    expect(page).toContain('"url":"https://mci-store.com"');
+    expect(page).toContain('"url":"https://mcionemore.com"');
     expect((page.match(/data-organization-schema="true"/g) ?? [])).toHaveLength(1);
   });
 
@@ -21,7 +21,7 @@ describe("Organization schema injection", () => {
     expect(page).toContain('data-website-schema="true"');
     expect(page).toContain('"@type":"WebSite"');
     expect(page).toContain('"@type":"SearchAction"');
-    expect(page).toContain('https://mci-store.com/products?search={search_term_string}');
+    expect(page).toContain('https://mcionemore.com/products?search={search_term_string}');
     expect((page.match(/data-website-schema="true"/g) ?? [])).toHaveLength(1);
   });
 });

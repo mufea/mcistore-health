@@ -1,6 +1,6 @@
 import { MCI_BRAND_MARK_URL } from "./brand";
 
-const CANONICAL_ORIGIN = "https://mci-store.com";
+const CANONICAL_ORIGIN = "https://mcionemore.com";
 
 export function buildOrganizationJsonLd() {
   return {

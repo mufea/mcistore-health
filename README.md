@@ -1042,4 +1042,4 @@ const inviteUrl = `${input.origin}/events/${eventId}/join?token=${token}`;
 
 ## SEO Indexing
 
-`/robots.txt` is served from `client/public/robots.txt` and directs crawlers to the canonical sitemap at `https://mci-store.com/sitemap.xml`. The sitemap is generated dynamically by the server rather than stored as a static XML file, so it includes the current public storefront routes and every active product detail URL. Private account, checkout, order, and admin routes are excluded from crawling.
+`/robots.txt` is served from `client/public/robots.txt` and directs crawlers to the canonical sitemap at `https://mcionemore.com/sitemap.xml`. The sitemap is generated dynamically by the server rather than stored as a static XML file, so it includes the current public storefront routes and every active product detail URL. Private account, checkout, order, and admin routes are excluded from crawling.

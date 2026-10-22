@@ -17,6 +17,6 @@ describe("buildProductMetadata", () => {
   });
 
   it("uses the preferred storefront domain for a product canonical URL", () => {
-    expect(buildProductCanonicalUrl(42)).toBe("https://mci-store.com/products/42");
+    expect(buildProductCanonicalUrl(42)).toBe("https://mcionemore.com/products/42");
   });
 });

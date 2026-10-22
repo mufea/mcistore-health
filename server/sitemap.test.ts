@@ -8,9 +8,9 @@ describe("buildSitemapXml", () => {
       { id: 29, slug: "vitamin-c-500-mg", updatedAt: new Date("2026-08-19T08:00:00.000Z") },
     ], new Date("2026-08-20T08:00:00.000Z"));
 
-    expect(sitemap).toContain("https://mci-store.com/products/omega-balance");
-    expect(sitemap).toContain("https://mci-store.com/products/vitamin-c-500-mg");
-    expect(sitemap).toContain("https://mci-store.com/survey");
+    expect(sitemap).toContain("https://mcionemore.com/products/omega-balance");
+    expect(sitemap).toContain("https://mcionemore.com/products/vitamin-c-500-mg");
+    expect(sitemap).toContain("https://mcionemore.com/survey");
     expect(sitemap).not.toContain("track-order");
   });
 });

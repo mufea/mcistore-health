@@ -60,7 +60,7 @@ export default function AdminProducts() {
 
   const normalizedSlug = slug.trim();
   const slugFormatValid = isValidProductSlug(normalizedSlug);
-  const productPreviewUrl = slugFormatValid ? `https://mci-store.com${buildProductPath(normalizedSlug)}` : null;
+  const productPreviewUrl = slugFormatValid ? `https://mcionemore.com${buildProductPath(normalizedSlug)}` : null;
   const slugCheckInput = useMemo(
     () => ({ slug: normalizedSlug, excludeId: editing?.id }),
     [normalizedSlug, editing?.id],

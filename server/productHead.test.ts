@@ -22,7 +22,7 @@ describe("injectProductHeadMetadata", () => {
     await expect(getProductHeadMetadata("/products/14?campaign=search")).resolves.toMatchObject({
       title: "Daily Omega | MCI One More",
       description: "Support for daily wellness.",
-      canonicalUrl: "https://mci-store.com/products/14",
+      canonicalUrl: "https://mcionemore.com/products/14",
       productSchema: { "@type": "Product", offers: { availability: "https://schema.org/InStock" } },
     });
   });
@@ -41,8 +41,8 @@ describe("injectProductHeadMetadata", () => {
         targetSegment: "all",
       } as any)),
     ).resolves.toMatchObject({
-      canonicalUrl: "https://mci-store.com/products/omega-balance",
-      productSchema: { url: "https://mci-store.com/products/omega-balance" },
+      canonicalUrl: "https://mcionemore.com/products/omega-balance",
+      productSchema: { url: "https://mcionemore.com/products/omega-balance" },
     });
   });
 
@@ -50,14 +50,14 @@ describe("injectProductHeadMetadata", () => {
     const page = injectProductHeadMetadata(
       '<head><title>MCI One More - Trusted Health Partner</title><meta name="description" content="Generic" /></head>',
       {
-        title: 'Vitamin "C" | MCI One More', description: "Wellness & immune support", canonicalUrl: "https://mci-store.com/products/9",
+        title: 'Vitamin "C" | MCI One More', description: "Wellness & immune support", canonicalUrl: "https://mcionemore.com/products/9",
         productSchema: buildProductJsonLd({ id: 9, name: 'Vitamin "C"', description: "Wellness & immune support", category: "Wellness", price: 50000, stock: 3 }),
       }
     );
 
     expect(page).toContain("<title>Vitamin &quot;C&quot; | MCI One More</title>");
     expect(page).toContain('content="Wellness &amp; immune support"');
-    expect(page).toContain('<link rel="canonical" href="https://mci-store.com/products/9" />');
+    expect(page).toContain('<link rel="canonical" href="https://mcionemore.com/products/9" />');
     expect(page).toContain('data-product-schema="true"');
     expect(page).not.toContain("Trusted Health Partner");
   });
@@ -80,7 +80,7 @@ describe("injectProductHeadMetadata", () => {
 
     expect(rawHtml).toContain("<title>Calm Night Formula | MCI One More</title>");
     expect(rawHtml).toContain('content="Night-time wellness support."');
-    expect(rawHtml).toContain('<link rel="canonical" href="https://mci-store.com/products/55" />');
+    expect(rawHtml).toContain('<link rel="canonical" href="https://mcionemore.com/products/55" />');
     expect(rawHtml).toContain('"availability":"https://schema.org/OutOfStock"');
   });
 });

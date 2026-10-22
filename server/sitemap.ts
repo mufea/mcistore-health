@@ -1,4 +1,4 @@
-const SITE_URL = "https://mci-store.com";
+const SITE_URL = "https://mcionemore.com";
 
 type SitemapProduct = { id: number; slug: string; updatedAt: Date };
 

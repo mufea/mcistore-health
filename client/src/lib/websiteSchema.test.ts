@@ -5,10 +5,10 @@ describe("buildWebsiteJsonLd", () => {
   it("declares the actual catalog search endpoint", () => {
     expect(buildWebsiteJsonLd()).toMatchObject({
       "@type": "WebSite",
-      url: "https://mci-store.com",
+      url: "https://mcionemore.com",
       potentialAction: {
         "@type": "SearchAction",
-        target: { urlTemplate: "https://mci-store.com/products?search={search_term_string}" },
+        target: { urlTemplate: "https://mcionemore.com/products?search={search_term_string}" },
         "query-input": "required name=search_term_string",
       },
     });

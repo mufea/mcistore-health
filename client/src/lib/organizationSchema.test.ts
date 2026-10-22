@@ -8,8 +8,8 @@ describe("buildOrganizationJsonLd", () => {
       "@type": "Organization",
       name: "MCI One More",
       alternateName: "MCI One More - Trusted Health Partner",
-      url: "https://mci-store.com",
-      logo: "https://mci-store.com/manus-storage/mci-health-mark_0e17589e.png",
+      url: "https://mcionemore.com",
+      logo: "https://mcionemore.com/manus-storage/mci-health-mark_0e17589e.png",
       description: "Your journey to optimal health starts here. Discover personalized health products tailored to your unique needs.",
     });
   });

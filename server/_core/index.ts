@@ -40,6 +40,16 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+  // Preserve SEO equity and existing bookmarks after the domain migration.
+  // Preview/local hosts are intentionally unaffected.
+  app.use((req, res, next) => {
+    if (req.hostname === "mci-store.com" || req.hostname === "www.mci-store.com") {
+      res.redirect(301, `https://mcionemore.com${req.originalUrl}`);
+      return;
+    }
+    next();
+  });
+
   registerStorageProxy(app);
   registerOAuthRoutes(app);
 

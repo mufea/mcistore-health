@@ -1,4 +1,4 @@
-const CANONICAL_ORIGIN = "https://mci-store.com";
+const CANONICAL_ORIGIN = "https://mcionemore.com";
 
 export function buildWebsiteJsonLd() {
   return {
