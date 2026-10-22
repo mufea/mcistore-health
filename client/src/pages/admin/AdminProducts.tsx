@@ -444,16 +444,31 @@ export default function AdminProducts() {
             </div>
             <div>
               <Label htmlFor="admin-product-video-url" className="text-sm font-medium mb-1.5 block">YouTube Video URL <span className="font-normal text-muted-foreground">(optional)</span></Label>
-              <Input
-                id="admin-product-video-url"
-                type="url"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
-                aria-invalid={Boolean(videoUrlError)}
-                aria-describedby="admin-product-video-url-help"
-                className={videoUrlError ? "border-destructive focus-visible:ring-destructive" : ""}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="admin-product-video-url"
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  aria-invalid={Boolean(videoUrlError)}
+                  aria-describedby="admin-product-video-url-help"
+                  className={videoUrlError ? "border-destructive focus-visible:ring-destructive" : ""}
+                />
+                {editing && videoUrl.trim() && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => setVideoUrl("")}
+                    title="Remove product video"
+                    aria-label="Remove product video"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
               <p id="admin-product-video-url-help" className={`mt-1 text-xs ${videoUrlError ? "text-destructive" : "text-muted-foreground"}`}>
                 {videoUrlError ?? "Use a YouTube watch, Shorts, youtu.be, or embed link."}
               </p>
