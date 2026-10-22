@@ -6,6 +6,7 @@ import MainLayout from "@/components/MainLayout";
 import FullWide from "@/components/FullWide";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import { buildAboutPageJsonLd, serializePageJsonLd } from "@shared/pageSchema";
 
 const statCards = [
   { value: "100+", key: "statCountries", icon: Globe2 },
@@ -20,6 +21,32 @@ export default function AboutMciOneMore() {
 
   useEffect(() => {
     document.title = `${t(copy.eyebrow, lang)} | ${t(copy.title, lang)}`;
+  }, [copy, lang]);
+
+  useEffect(() => {
+    const existingSchema = document.querySelector<HTMLScriptElement>('script[data-about-page-schema="true"]');
+    const previousSchema = existingSchema?.textContent;
+    const schemaElement = existingSchema ?? document.createElement("script");
+    const createdSchema = !existingSchema;
+
+    if (createdSchema) {
+      schemaElement.type = "application/ld+json";
+      schemaElement.dataset.aboutPageSchema = "true";
+      document.head.appendChild(schemaElement);
+    }
+
+    schemaElement.textContent = serializePageJsonLd(buildAboutPageJsonLd({
+      name: `${t(copy.eyebrow, lang)} | ${t(copy.title, lang)}`,
+      description: t(copy.lead, lang),
+      urlPath: "/about",
+      imagePath: "/manus-storage/cover_9c4157a9.jpg",
+      inLanguage: lang,
+    }));
+
+    return () => {
+      if (createdSchema) schemaElement.remove();
+      else schemaElement.textContent = previousSchema ?? "";
+    };
   }, [copy, lang]);
 
   return (

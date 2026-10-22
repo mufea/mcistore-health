@@ -1,4 +1,5 @@
 import { brandPageTranslations } from "./brandPages";
+import { faqPageTranslations } from "./faqTranslations";
 
 // ─── Supported Languages ──────────────────────────────────────────────────────
 export type Language = "en" | "ar" | "zh" | "es" | "hi" | "id";
@@ -15,11 +16,13 @@ export const LANGUAGES: { code: Language; label: string; nativeLabel: string; di
 // ─── Translation Dictionary ───────────────────────────────────────────────────
 export const translations = {
   ...brandPageTranslations,
+  ...faqPageTranslations,
   // ── Navbar ──
   nav: {
     home:          { en: "Home",         ar: "الرئيسية",    zh: "首页",   es: "Inicio",    hi: "होम", id: "Beranda" },
     about:         { en: "About",        ar: "من نحن",       zh: "关于我们", es: "Nosotros", hi: "हमारे बारे में", id: "Tentang Kami" },
     technology:    { en: "Technology",   ar: "التقنية",      zh: "技术",   es: "Tecnología", hi: "तकनीक", id: "Teknologi" },
+    faq:           { en: "Patch FAQ",    ar: "أسئلة اللاصقة", zh: "贴片常见问题", es: "Preguntas sobre parches", hi: "पैच FAQ", id: "FAQ Patch" },
     healthSurvey:  { en: "Health Survey",ar: "استبيان الصحة",zh: "健康调查",es: "Encuesta de Salud", hi: "स्वास्थ्य सर्वेक्षण", id: "Survei Kesehatan" },
     products:      { en: "Products",     ar: "المنتجات",    zh: "产品",   es: "Productos", hi: "उत्पाद", id: "Produk" },
     myOrders:      { en: "My Orders",    ar: "طلباتي",      zh: "我的订单",es: "Mis Pedidos",hi: "मेरे आदेश", id: "Pesanan Saya" },

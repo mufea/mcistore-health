@@ -21,6 +21,7 @@ import TrackOrder from "./pages/TrackOrder";
 import Profile from "./pages/Profile";
 import AboutMciOneMore from "./pages/AboutMciOneMore";
 import TransdermalTechnology from "./pages/TransdermalTechnology";
+import TransdermalPatchFaq from "./pages/TransdermalPatchFaq";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/about" component={AboutMciOneMore} />
       <Route path="/technology" component={TransdermalTechnology} />
+      <Route path="/faq-transdermal" component={TransdermalPatchFaq} />
       <Route path="/survey" component={Survey} />
       <Route path="/recommendations" component={Recommendations} />
       <Route path="/products" component={Products} />

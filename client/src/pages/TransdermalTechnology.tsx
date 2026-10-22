@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, CheckCircle2, ExternalLink, ShieldCheck } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -6,13 +6,51 @@ import MainLayout from "@/components/MainLayout";
 import FullWide from "@/components/FullWide";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t, translations } from "@/lib/i18n";
+import { buildTechArticleJsonLd, serializePageJsonLd } from "@shared/pageSchema";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function TransdermalTechnology() {
   const { lang } = useLanguage();
   const copy = translations.technologyPage;
+  const [selectedImage, setSelectedImage] = useState<{
+    src: string;
+    alt: Parameters<typeof t>[0];
+  } | null>(null);
 
   useEffect(() => {
     document.title = `${t(copy.eyebrow, lang)} | MCI One More`;
+  }, [copy, lang]);
+
+  useEffect(() => {
+    const existingSchema = document.querySelector<HTMLScriptElement>('script[data-tech-article-schema="true"]');
+    const previousSchema = existingSchema?.textContent;
+    const schemaElement = existingSchema ?? document.createElement("script");
+    const createdSchema = !existingSchema;
+
+    if (createdSchema) {
+      schemaElement.type = "application/ld+json";
+      schemaElement.dataset.techArticleSchema = "true";
+      document.head.appendChild(schemaElement);
+    }
+
+    schemaElement.textContent = serializePageJsonLd(buildTechArticleJsonLd({
+      name: t(copy.title, lang),
+      description: t(copy.lead, lang),
+      urlPath: "/technology",
+      imagePath: "/manus-storage/transdermal_5b18ecbe.jpg",
+      inLanguage: lang,
+      keywords: ["transdermal technology", "transdermal patch", "MCI One More", "wellness products"],
+    }));
+
+    return () => {
+      if (createdSchema) schemaElement.remove();
+      else schemaElement.textContent = previousSchema ?? "";
+    };
   }, [copy, lang]);
 
   const routes = [
@@ -78,7 +116,9 @@ export default function TransdermalTechnology() {
           <div className="mt-12 grid gap-5 md:grid-cols-3">
             {gallery.map((item) => (
               <figure key={item.src} className="group overflow-hidden rounded-2xl border border-[#d6e0d3] bg-white shadow-sm">
-                <img src={item.src} alt={t(item.alt, lang)} className="aspect-[0.9] w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <button type="button" className="block w-full cursor-zoom-in text-left" onClick={() => setSelectedImage(item)} aria-label={t(copy.viewImage, lang)}>
+                  <img src={item.src} alt={t(item.alt, lang)} className="aspect-[0.9] w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                </button>
                 <figcaption className="flex items-center justify-between gap-3 px-5 py-4 text-sm font-medium text-[#243321]">
                   <span>{t(item.alt, lang)}</span><ExternalLink className="h-4 w-4 shrink-0 text-[#0b55d8]" aria-hidden="true" />
                 </figcaption>
@@ -87,6 +127,16 @@ export default function TransdermalTechnology() {
           </div>
         </FullWide>
       </section>
+
+      <Dialog open={Boolean(selectedImage)} onOpenChange={(open) => !open && setSelectedImage(null)}>
+        <DialogContent className="max-w-5xl border-white/10 bg-[#071f24] p-3 text-white sm:p-5">
+          <DialogTitle className="sr-only">{selectedImage ? t(selectedImage.alt, lang) : t(copy.certificatesHeading, lang)}</DialogTitle>
+          <DialogDescription className="sr-only">{t(copy.viewImage, lang)}</DialogDescription>
+          {selectedImage && (
+            <img src={selectedImage.src} alt={t(selectedImage.alt, lang)} className="max-h-[78vh] w-full rounded-xl object-contain" />
+          )}
+        </DialogContent>
+      </Dialog>
 
       <section className="bg-[#0b55d8] py-20 text-white sm:py-24">
         <FullWide>
