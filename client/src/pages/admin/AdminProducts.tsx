@@ -17,7 +17,7 @@ import AdminProductStatusToggle from "@/components/AdminProductStatusToggle";
 import { filterAdminProducts, type ProductStatusFilter } from "@/lib/adminProductFilters";
 import { buildProductPath, createProductSlug, isValidProductSlug, slugify } from "@shared/slug";
 
-const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Transdermal Patch", "Other"];
+const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Transdermal Patch", "Bioglass", "Other"];
 const SEGMENTS = ["all", "standard", "premium", "vip"];
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 const MAX_IMAGES = 6;
