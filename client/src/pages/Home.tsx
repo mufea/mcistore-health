@@ -72,6 +72,8 @@ export default function Home() {
   const [selectedTransdermalImage, setSelectedTransdermalImage] = useState<TransdermalGalleryImage | null>(null);
   const [promotionSlideIndex, setPromotionSlideIndex] = useState(0);
   const [promotionPaused, setPromotionPaused] = useState(false);
+  const promotionSwipeStartRef = useRef<{ x: number; y: number; pointerId: number } | null>(null);
+  const suppressPromotionClickRef = useRef(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const existingSchema = document.querySelector<HTMLScriptElement>('script[data-organization-schema="true"]');
@@ -146,6 +148,40 @@ export default function Home() {
 
   const showNextPromotionSlide = () => {
     setPromotionSlideIndex((index) => (index + 1) % promotionSlides.length);
+  };
+
+  const handlePromotionPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch") return;
+    promotionSwipeStartRef.current = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+    setPromotionPaused(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handlePromotionPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const start = promotionSwipeStartRef.current;
+    if (!start || start.pointerId !== event.pointerId) return;
+    promotionSwipeStartRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+
+    const deltaX = event.clientX - start.x;
+    const deltaY = event.clientY - start.y;
+    const isHorizontalSwipe = Math.abs(deltaX) >= 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+    if (isHorizontalSwipe) {
+      suppressPromotionClickRef.current = true;
+      if (deltaX < 0) showNextPromotionSlide();
+      else showPreviousPromotionSlide();
+      window.setTimeout(() => { suppressPromotionClickRef.current = false; }, 0);
+    }
+    setPromotionPaused(false);
+  };
+
+  const handlePromotionImageClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (suppressPromotionClickRef.current) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    setSelectedTransdermalImage({ src: promotionSlides[promotionSlideIndex].full, alt: translations.promotionHome.slideAlt });
   };
 
   const goToSuggestion = (slug: string) => {
@@ -435,12 +471,21 @@ export default function Home() {
               if (!event.currentTarget.contains(event.relatedTarget as Node)) setPromotionPaused(false);
             }}
           >
-            <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl" role="region" aria-roledescription="carousel" aria-label={t(translations.promotionHome.title, lang)}>
+            <div
+              className="relative touch-pan-y select-none overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl"
+              style={{ touchAction: "pan-y" }}
+              onPointerDown={handlePromotionPointerDown}
+              onPointerUp={handlePromotionPointerUp}
+              onPointerCancel={() => { promotionSwipeStartRef.current = null; setPromotionPaused(false); }}
+              role="region"
+              aria-roledescription="carousel"
+              aria-label={t(translations.promotionHome.title, lang)}
+            >
               <div aria-live="polite" aria-atomic="true">
                 <button
                   type="button"
                   className="block w-full cursor-zoom-in text-left"
-                  onClick={() => setSelectedTransdermalImage({ src: promotionSlides[promotionSlideIndex].full, alt: translations.promotionHome.slideAlt })}
+                  onClick={handlePromotionImageClick}
                   aria-label={`${t(translations.transdermalHome.openImage, lang)} — ${t(translations.promotionHome.slideStatus, lang).replace("{current}", String(promotionSlideIndex + 1)).replace("{total}", String(promotionSlides.length))}`}
                 >
                   <img
