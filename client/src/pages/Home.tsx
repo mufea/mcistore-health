@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
-import { AlertTriangle, ArrowRight, CheckCircle, Heart, ImageOff, Leaf, Search, Shield, Sparkles, Star, ZoomIn } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle, ChevronLeft, ChevronRight, Heart, ImageOff, Leaf, Pause, Play, Search, Shield, Sparkles, Star, ZoomIn } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -20,6 +20,22 @@ import SuggestionAddToCartButton from "@/components/SuggestionAddToCartButton";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 
 type TransdermalGalleryImage = { src: string; alt: Record<Language, string> };
+
+const promotionSlides = [
+  ["1000672755-full_d1cbf96b.webp", "1000672755-480w_ef04786f.webp"],
+  ["1000672756-full_5d029cb6.webp", "1000672756-480w_5601f87f.webp"],
+  ["1000672757-full_f8944d64.webp", "1000672757-480w_b810b9e7.webp"],
+  ["1000672758-full_3d4f0299.webp", "1000672758-480w_7d724a81.webp"],
+  ["1000672759-full_f75bb41f.webp", "1000672759-480w_0a3657dd.webp"],
+  ["1000672760-full_61699dfe.webp", "1000672760-480w_03c2f8ce.webp"],
+  ["1000672761-full_53511608.webp", "1000672761-480w_362a597b.webp"],
+  ["1000672762-full_8f45646f.webp", "1000672762-480w_fa7b0d20.webp"],
+  ["1000672763-full_70fc4506.webp", "1000672763-480w_8a3eef46.webp"],
+  ["1000672764-full_a11b531e.webp", "1000672764-480w_8b732ad0.webp"],
+].map(([full, mobile]) => ({
+  full: `/manus-storage/${full}`,
+  mobile: `/manus-storage/${mobile}`,
+}));
 
 /** Full-width inner wrapper — no max-width cap, generous horizontal padding */
 function FullWide({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -54,6 +70,8 @@ export default function Home() {
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [selectedTransdermalImage, setSelectedTransdermalImage] = useState<TransdermalGalleryImage | null>(null);
+  const [promotionSlideIndex, setPromotionSlideIndex] = useState(0);
+  const [promotionPaused, setPromotionPaused] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const existingSchema = document.querySelector<HTMLScriptElement>('script[data-organization-schema="true"]');
@@ -113,6 +131,22 @@ export default function Home() {
     document.addEventListener("pointerdown", closeOnOutsidePointer);
     return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
   }, [suggestionsOpen]);
+
+  useEffect(() => {
+    if (promotionPaused) return;
+    const timer = window.setInterval(() => {
+      setPromotionSlideIndex((index) => (index + 1) % promotionSlides.length);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [promotionPaused]);
+
+  const showPreviousPromotionSlide = () => {
+    setPromotionSlideIndex((index) => (index - 1 + promotionSlides.length) % promotionSlides.length);
+  };
+
+  const showNextPromotionSlide = () => {
+    setPromotionSlideIndex((index) => (index + 1) % promotionSlides.length);
+  };
 
   const goToSuggestion = (slug: string) => {
     setSuggestionsOpen(false);
@@ -377,6 +411,65 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground">"Life-changing products!"</p>
+              </div>
+            </div>
+          </div>
+        </FullWide>
+      </section>
+
+      {/* ── Promotional opportunity carousel ── */}
+      <section className="bg-[#071f24] py-16 text-white sm:py-20" aria-labelledby="promotion-carousel-title">
+        <FullWide>
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#c6e36c]">{t(translations.promotionHome.eyebrow, lang)}</p>
+            <h2 id="promotion-carousel-title" className="mt-4 font-serif text-3xl font-light leading-tight sm:text-5xl">{t(translations.promotionHome.title, lang)}</h2>
+            <p className="mt-4 text-base leading-7 text-white/70">{t(translations.promotionHome.description, lang)}</p>
+          </div>
+
+          <div
+            className="mx-auto mt-10 max-w-[34rem]"
+            onMouseEnter={() => setPromotionPaused(true)}
+            onMouseLeave={() => setPromotionPaused(false)}
+            onFocus={() => setPromotionPaused(true)}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node)) setPromotionPaused(false);
+            }}
+          >
+            <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl" role="region" aria-roledescription="carousel" aria-label={t(translations.promotionHome.title, lang)}>
+              <div aria-live="polite" aria-atomic="true">
+                <button
+                  type="button"
+                  className="block w-full cursor-zoom-in text-left"
+                  onClick={() => setSelectedTransdermalImage({ src: promotionSlides[promotionSlideIndex].full, alt: translations.promotionHome.slideAlt })}
+                  aria-label={`${t(translations.transdermalHome.openImage, lang)} — ${t(translations.promotionHome.slideStatus, lang).replace("{current}", String(promotionSlideIndex + 1)).replace("{total}", String(promotionSlides.length))}`}
+                >
+                  <img
+                    src={promotionSlides[promotionSlideIndex].full}
+                    srcSet={`${promotionSlides[promotionSlideIndex].mobile} 480w, ${promotionSlides[promotionSlideIndex].full} 911w`}
+                    sizes="(max-width: 640px) calc(100vw - 2rem), 520px"
+                    alt={`${t(translations.promotionHome.slideAlt, lang)} ${promotionSlideIndex + 1}`}
+                    width="911"
+                    height="1620"
+                    loading={promotionSlideIndex === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    className="aspect-[911/1620] w-full object-cover"
+                  />
+                </button>
+              </div>
+              <button type="button" onClick={showPreviousPromotionSlide} aria-label={t(translations.promotionHome.previous, lang)} className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-[#071f24]/80 p-2.5 text-white shadow-lg transition hover:bg-[#071f24] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
+                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <button type="button" onClick={showNextPromotionSlide} aria-label={t(translations.promotionHome.next, lang)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-[#071f24]/80 p-2.5 text-white shadow-lg transition hover:bg-[#071f24] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
+                <ChevronRight className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#071f24]/85 px-3 py-2 shadow-lg">
+                <span className="sr-only">{t(translations.promotionHome.slideStatus, lang).replace("{current}", String(promotionSlideIndex + 1)).replace("{total}", String(promotionSlides.length))}</span>
+                {promotionSlides.map((_, index) => (
+                  <button key={index} type="button" onClick={() => setPromotionSlideIndex(index)} aria-label={`${t(translations.promotionHome.slideStatus, lang).replace("{current}", String(index + 1)).replace("{total}", String(promotionSlides.length))}`} aria-current={index === promotionSlideIndex} className={`h-2 rounded-full transition-all ${index === promotionSlideIndex ? "w-6 bg-[#c6e36c]" : "w-2 bg-white/50 hover:bg-white"}`} />
+                ))}
+                <button type="button" onClick={() => setPromotionPaused((paused) => !paused)} aria-label={t(promotionPaused ? translations.promotionHome.play : translations.promotionHome.pause, lang)} className="ml-1 rounded-full p-1 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
+                  {promotionPaused ? <Play className="h-3.5 w-3.5" aria-hidden="true" /> : <Pause className="h-3.5 w-3.5" aria-hidden="true" />}
+                </button>
               </div>
             </div>
           </div>

@@ -108,6 +108,19 @@ export const translations = {
     pageCta: { en: "Explore products", ar: "استكشف المنتجات", zh: "探索产品", es: "Explorar productos", hi: "उत्पाद देखें", id: "Jelajahi produk" },
   },
 
+  // ── Promotional Carousel ──
+  promotionHome: {
+    eyebrow: { en: "MCI One More opportunity", ar: "فرصة MCI One More", zh: "MCI One More 机会", es: "Oportunidad MCI One More", hi: "MCI One More अवसर", id: "Peluang MCI One More" },
+    title: { en: "Discover the MCI One More business opportunity", ar: "اكتشف فرصة الأعمال من MCI One More", zh: "探索 MCI One More 商业机会", es: "Descubre la oportunidad de negocio de MCI One More", hi: "MCI One More व्यवसाय अवसर जानें", id: "Temukan peluang bisnis MCI One More" },
+    description: { en: "Swipe through the program highlights, rewards, and member benefits.", ar: "تصفح أبرز البرامج والمكافآت ومزايا الأعضاء.", zh: "浏览项目亮点、奖励与会员权益。", es: "Desliza para conocer los beneficios, recompensas y aspectos destacados del programa.", hi: "कार्यक्रम की मुख्य बातों, पुरस्कारों और सदस्य लाभों को देखें।", id: "Geser untuk melihat keunggulan program, reward, dan manfaat anggota." },
+    slideAlt: { en: "MCI One More business opportunity promotional slide", ar: "شريحة ترويجية لفرصة أعمال MCI One More", zh: "MCI One More 商业机会宣传幻灯片", es: "Diapositiva promocional de la oportunidad de negocio MCI One More", hi: "MCI One More व्यवसाय अवसर प्रचार स्लाइड", id: "Slide promosi peluang bisnis MCI One More" },
+    previous: { en: "Previous slide", ar: "الشريحة السابقة", zh: "上一张", es: "Diapositiva anterior", hi: "पिछली स्लाइड", id: "Slide sebelumnya" },
+    next: { en: "Next slide", ar: "الشريحة التالية", zh: "下一张", es: "Diapositiva siguiente", hi: "अगली स्लाइड", id: "Slide berikutnya" },
+    pause: { en: "Pause slideshow", ar: "إيقاف العرض", zh: "暂停播放", es: "Pausar presentación", hi: "स्लाइड शो रोकें", id: "Jeda slideshow" },
+    play: { en: "Play slideshow", ar: "تشغيل العرض", zh: "播放幻灯片", es: "Reproducir presentación", hi: "स्लाइड शो चलाएं", id: "Putar slideshow" },
+    slideStatus: { en: "Slide {current} of {total}", ar: "الشريحة {current} من {total}", zh: "第 {current} 张，共 {total} 张", es: "Diapositiva {current} de {total}", hi: "स्लाइड {current} / {total}", id: "Slide {current} dari {total}" },
+  },
+
   // ── Features Section ──
   features: {
     sectionTitle: { en: "Why Choose MCI One More",       ar: "لماذا تختار MCI One More",    zh: "为什么选择MCI One More",    es: "Por Qué Elegir MCI One More",    hi: "MCI One More क्यों चुनें", id: "Mengapa Memilih MCI One More" },
