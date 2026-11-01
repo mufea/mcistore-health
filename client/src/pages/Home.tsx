@@ -489,6 +489,7 @@ export default function Home() {
                   aria-label={`${t(translations.transdermalHome.openImage, lang)} — ${t(translations.promotionHome.slideStatus, lang).replace("{current}", String(promotionSlideIndex + 1)).replace("{total}", String(promotionSlides.length))}`}
                 >
                   <img
+                    key={promotionSlideIndex}
                     src={promotionSlides[promotionSlideIndex].full}
                     srcSet={`${promotionSlides[promotionSlideIndex].mobile} 480w, ${promotionSlides[promotionSlideIndex].full} 911w`}
                     sizes="(max-width: 640px) calc(100vw - 2rem), 520px"
@@ -497,7 +498,7 @@ export default function Home() {
                     height="1620"
                     loading={promotionSlideIndex === 0 ? "eager" : "lazy"}
                     decoding="async"
-                    className="aspect-[911/1620] w-full object-cover"
+                    className="animate-fade-in aspect-[911/1620] w-full object-cover"
                   />
                 </button>
               </div>
