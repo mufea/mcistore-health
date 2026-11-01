@@ -87,6 +87,20 @@ export const translations = {
     cta: { en: "Browse transdermal products", ar: "تصفح المنتجات عبر الجلد", zh: "浏览经皮产品", es: "Ver productos transdérmicos", hi: "ट्रांसडर्मल उत्पाद देखें", id: "Lihat produk transdermal" },
   },
 
+  // ── Quality & Certifications Section ──
+  qualityHome: {
+    eyebrow: { en: "Quality you can see", ar: "جودة يمكنك رؤيتها", zh: "看得见的品质", es: "Calidad que puedes ver", hi: "वह गुणवत्ता जिसे आप देख सकते हैं", id: "Kualitas yang dapat Anda lihat" },
+    title: { en: "Built around safety, quality, and trust", ar: "مصممة حول السلامة والجودة والثقة", zh: "以安全、品质与信任为核心", es: "Creado alrededor de la seguridad, la calidad y la confianza", hi: "सुरक्षा, गुणवत्ता और भरोसे पर आधारित", id: "Dibangun di atas keamanan, kualitas, dan kepercayaan" },
+    description: { en: "Explore the production standards and certification stories shared in our product education materials.", ar: "استكشف معايير الإنتاج وقصص الشهادات التي نشاركها في مواد التثقيف حول منتجاتنا.", zh: "了解我们产品教育材料中介绍的生产标准与认证信息。", es: "Explora los estándares de producción y las certificaciones que compartimos en nuestros materiales educativos.", hi: "हमारी उत्पाद शिक्षा सामग्री में साझा किए गए उत्पादन मानकों और प्रमाणन को जानें।", id: "Jelajahi standar produksi dan sertifikasi yang kami bagikan dalam materi edukasi produk." },
+    image1Alt: { en: "Product safety, production standards, and athlete-safe certification infographic", ar: "رسم توضيحي لسلامة المنتج ومعايير الإنتاج وشهادة الأمان للرياضيين", zh: "产品安全、生产标准与运动员安全认证信息图", es: "Infografía sobre seguridad del producto, estándares de producción y certificación para atletas", hi: "उत्पाद सुरक्षा, उत्पादन मानकों और एथलीट-सुरक्षित प्रमाणन का चित्र", id: "Infografik keamanan produk, standar produksi, dan sertifikasi aman untuk atlet" },
+    image2Alt: { en: "Transdermal product ISO quality management certifications infographic", ar: "رسم توضيحي لشهادات إدارة جودة ISO لمنتجات عبر الجلد", zh: "经皮产品 ISO 质量管理认证信息图", es: "Infografía de certificaciones ISO de gestión de calidad para productos transdérmicos", hi: "ट्रांसडर्मल उत्पादों के ISO गुणवत्ता प्रबंधन प्रमाणन का चित्र", id: "Infografik sertifikasi manajemen kualitas ISO untuk produk transdermal" },
+    image3Alt: { en: "Product certifications and quality assurance document showcase", ar: "عرض لوثائق شهادات المنتج وضمان الجودة", zh: "产品认证与质量保证文件展示", es: "Muestra de certificaciones de producto y documentos de garantía de calidad", hi: "उत्पाद प्रमाणन और गुणवत्ता आश्वासन दस्तावेज़ प्रदर्शन", id: "Tampilan sertifikasi produk dan dokumen jaminan kualitas" },
+    card1: { en: "Production standards", ar: "معايير الإنتاج", zh: "生产标准", es: "Estándares de producción", hi: "उत्पादन मानक", id: "Standar produksi" },
+    card2: { en: "Quality management", ar: "إدارة الجودة", zh: "质量管理", es: "Gestión de calidad", hi: "गुणवत्ता प्रबंधन", id: "Manajemen kualitas" },
+    card3: { en: "Certification evidence", ar: "أدلة الشهادات", zh: "认证依据", es: "Evidencia de certificación", hi: "प्रमाणन प्रमाण", id: "Bukti sertifikasi" },
+    note: { en: "Always review the product label and official documentation for the most current certification details.", ar: "راجع دائماً ملصق المنتج والوثائق الرسمية للحصول على أحدث تفاصيل الشهادات.", zh: "有关最新认证详情，请务必查看产品标签和官方文件。", es: "Consulta siempre la etiqueta del producto y la documentación oficial para conocer los detalles de certificación más actuales.", hi: "सबसे नवीन प्रमाणन विवरण के लिए उत्पाद लेबल और आधिकारिक दस्तावेज़ देखें।", id: "Selalu periksa label produk dan dokumen resmi untuk detail sertifikasi terbaru." },
+  },
+
   // ── Features Section ──
   features: {
     sectionTitle: { en: "Why Choose MCI One More",       ar: "لماذا تختار MCI One More",    zh: "为什么选择MCI One More",    es: "Por Qué Elegir MCI One More",    hi: "MCI One More क्यों चुनें", id: "Mengapa Memilih MCI One More" },

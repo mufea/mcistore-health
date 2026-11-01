@@ -467,6 +467,51 @@ export default function Home() {
         </FullWide>
       </section>
 
+      {/* ── Quality & Certifications ── */}
+      <section className="bg-background py-20 sm:py-24">
+        <FullWide>
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="gold-line mx-auto mb-4" />
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t(translations.qualityHome.eyebrow, lang)}</p>
+            <h2 className="mt-4 font-serif text-3xl font-light leading-tight text-foreground sm:text-5xl">{t(translations.qualityHome.title, lang)}</h2>
+            <p className="mt-5 text-base leading-8 text-muted-foreground">{t(translations.qualityHome.description, lang)}</p>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                label: translations.qualityHome.card1,
+                alt: translations.qualityHome.image1Alt,
+                src: "/manus-storage/1000672753-full_fc1933da.webp",
+                srcSet: "/manus-storage/1000672753-480w_be635796.webp 480w, /manus-storage/1000672753-full_fc1933da.webp 911w",
+              },
+              {
+                label: translations.qualityHome.card2,
+                alt: translations.qualityHome.image2Alt,
+                src: "/manus-storage/1000672752-full_f0e8e555.webp",
+                srcSet: "/manus-storage/1000672752-480w_f7eb7328.webp 480w, /manus-storage/1000672752-full_f0e8e555.webp 911w",
+              },
+              {
+                label: translations.qualityHome.card3,
+                alt: translations.qualityHome.image3Alt,
+                src: "/manus-storage/1000672754-full_76127a46.webp",
+                srcSet: "/manus-storage/1000672754-480w_d0c77436.webp 480w, /manus-storage/1000672754-full_76127a46.webp 911w",
+              },
+            ].map((image) => (
+              <figure key={image.src} className="group overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm transition-shadow hover:shadow-lg">
+                <button type="button" className="relative block w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: image.src, alt: image.alt })} aria-label={t(translations.transdermalHome.openImage, lang)}>
+                  <img src={image.src} srcSet={image.srcSet} sizes="(max-width: 767px) 100vw, 33vw" alt={t(image.alt, lang)} loading="lazy" decoding="async" className="aspect-[9/16] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />
+                  <span className="absolute bottom-4 right-4 rounded-full bg-[#071f24]/85 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                    {t(image.label, lang)}
+                  </span>
+                </button>
+                <figcaption className="p-5 text-center font-semibold text-foreground">{t(image.label, lang)}</figcaption>
+              </figure>
+            ))}
+          </div>
+          <p className="mx-auto mt-8 max-w-3xl text-center text-xs leading-6 text-muted-foreground">{t(translations.qualityHome.note, lang)}</p>
+        </FullWide>
+      </section>
+
       <Dialog open={Boolean(selectedTransdermalImage)} onOpenChange={(open) => !open && setSelectedTransdermalImage(null)}>
         <DialogContent className="max-w-5xl border-white/10 bg-[#071f24] p-3 text-white sm:p-5">
           <DialogTitle className="sr-only">{selectedTransdermalImage ? t(selectedTransdermalImage.alt, lang) : t(translations.transdermalHome.openImage, lang)}</DialogTitle>
