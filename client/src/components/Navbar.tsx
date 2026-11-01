@@ -126,6 +126,7 @@ export default function Navbar() {
     { label: t(translations.nav.home, lang),         href: "/" },
     { label: t(translations.nav.healthSurvey, lang), href: "/survey" },
     { label: t(translations.nav.products, lang),     href: "/products" },
+    { label: t(translations.nav.quality, lang),      href: "/quality-certifications" },
     ...(isAuthenticated ? [{ label: t(translations.nav.myOrders, lang), href: "/my-orders" }] : []),
   ];
 

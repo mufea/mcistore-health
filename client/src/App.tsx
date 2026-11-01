@@ -19,6 +19,7 @@ import OrderDetail from "./pages/OrderDetail";
 import MyOrders from "./pages/MyOrders";
 import TrackOrder from "./pages/TrackOrder";
 import Profile from "./pages/Profile";
+import QualityCertifications from "./pages/QualityCertifications";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -49,6 +50,7 @@ function Router() {
       <Route path="/my-orders" component={MyOrders} />
       <Route path="/track-order" component={TrackOrder} />
       <Route path="/profile" component={Profile} />
+      <Route path="/quality-certifications" component={QualityCertifications} />
 
       {/* Admin Routes */}
       <Route path="/admin" component={AdminDashboard} />

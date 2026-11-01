@@ -480,18 +480,21 @@ export default function Home() {
             {[
               {
                 label: translations.qualityHome.card1,
+                detail: translations.qualityHome.card1Detail,
                 alt: translations.qualityHome.image1Alt,
                 src: "/manus-storage/1000672753-full_fc1933da.webp",
                 srcSet: "/manus-storage/1000672753-480w_be635796.webp 480w, /manus-storage/1000672753-full_fc1933da.webp 911w",
               },
               {
                 label: translations.qualityHome.card2,
+                detail: translations.qualityHome.card2Detail,
                 alt: translations.qualityHome.image2Alt,
                 src: "/manus-storage/1000672752-full_f0e8e555.webp",
                 srcSet: "/manus-storage/1000672752-480w_f7eb7328.webp 480w, /manus-storage/1000672752-full_f0e8e555.webp 911w",
               },
               {
                 label: translations.qualityHome.card3,
+                detail: translations.qualityHome.card3Detail,
                 alt: translations.qualityHome.image3Alt,
                 src: "/manus-storage/1000672754-full_76127a46.webp",
                 srcSet: "/manus-storage/1000672754-480w_d0c77436.webp 480w, /manus-storage/1000672754-full_76127a46.webp 911w",
@@ -504,11 +507,19 @@ export default function Home() {
                     {t(image.label, lang)}
                   </span>
                 </button>
-                <figcaption className="p-5 text-center font-semibold text-foreground">{t(image.label, lang)}</figcaption>
+                <figcaption className="p-5 text-center">
+                  <h3 className="font-semibold text-foreground">{t(image.label, lang)}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{t(image.detail, lang)}</p>
+                </figcaption>
               </figure>
             ))}
           </div>
           <p className="mx-auto mt-8 max-w-3xl text-center text-xs leading-6 text-muted-foreground">{t(translations.qualityHome.note, lang)}</p>
+          <div className="mt-7 text-center">
+            <Button asChild variant="outline" className="gap-2">
+              <Link href="/quality-certifications">{t(translations.qualityHome.pageCta, lang)} <ArrowRight className="h-4 w-4" /></Link>
+            </Button>
+          </div>
         </FullWide>
       </section>
 
