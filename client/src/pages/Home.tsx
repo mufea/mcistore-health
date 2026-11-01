@@ -409,6 +409,51 @@ export default function Home() {
         </FullWide>
       </section>
 
+      {/* ── Transdermal Education ── */}
+      <section className="overflow-hidden bg-[#eef7f7] py-20 sm:py-24">
+        <FullWide>
+          <div className="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+            <div>
+              <div className="gold-line mb-4" />
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t(translations.transdermalHome.eyebrow, lang)}</p>
+              <h2 className="mt-4 font-serif text-3xl font-light leading-tight text-foreground sm:text-5xl">{t(translations.transdermalHome.title, lang)}</h2>
+              <p className="mt-5 max-w-xl text-base leading-8 text-muted-foreground">{t(translations.transdermalHome.description, lang)}</p>
+              <div className="mt-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                {[
+                  [translations.transdermalHome.card1Title, translations.transdermalHome.card1Body],
+                  [translations.transdermalHome.card2Title, translations.transdermalHome.card2Body],
+                  [translations.transdermalHome.card3Title, translations.transdermalHome.card3Body],
+                ].map(([title, description], index) => (
+                  <div key={t(title, lang)} className="rounded-2xl border border-[#cfe3e3] bg-white/80 p-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 font-serif text-sm font-semibold text-primary">0{index + 1}</span>
+                      <div>
+                        <h3 className="font-semibold text-foreground">{t(title, lang)}</h3>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{t(description, lang)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button asChild className="mt-8 gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link href="/products?category=Transdermal%20Patch">{t(translations.transdermalHome.cta, lang)} <ArrowRight className="h-4 w-4" /></Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <figure className="col-span-2 overflow-hidden rounded-3xl border border-[#cfe3e3] bg-white shadow-lg">
+                <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-001_9c341c2b.png" alt={t(translations.transdermalHome.image1Alt, lang)} className="h-auto max-h-[32rem] w-full object-cover object-top transition-transform duration-500 hover:scale-[1.02]" />
+              </figure>
+              <figure className="overflow-hidden rounded-3xl border border-[#cfe3e3] bg-white shadow-md">
+                <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-002_9b0534fb.png" alt={t(translations.transdermalHome.image2Alt, lang)} className="h-full w-full object-cover object-top" />
+              </figure>
+              <figure className="overflow-hidden rounded-3xl border border-[#cfe3e3] bg-white shadow-md">
+                <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-003_6cb4309d.png" alt={t(translations.transdermalHome.image3Alt, lang)} className="h-full w-full object-cover object-top" />
+              </figure>
+            </div>
+          </div>
+        </FullWide>
+      </section>
+
       {/* ── Featured Products ── */}
       {featured.length > 0 && (
         <section className="py-24 bg-muted/30">
