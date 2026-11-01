@@ -445,20 +445,20 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <figure className="group relative col-span-2 overflow-hidden rounded-3xl border border-[#cfe3e3] bg-white shadow-lg">
-                <button type="button" className="block w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: "/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-001_9c341c2b.png", alt: translations.transdermalHome.image1Alt })} aria-label={t(translations.transdermalHome.openImage, lang)}>
-                  <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-001_9c341c2b.png" alt={t(translations.transdermalHome.image1Alt, lang)} className="h-auto max-h-[32rem] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />
+                <button type="button" className="block w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: "/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-001-full_644f9941.webp", alt: translations.transdermalHome.image1Alt })} aria-label={t(translations.transdermalHome.openImage, lang)}>
+                  <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-001-full_644f9941.webp" srcSet="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-001-480w_d5973cbe.webp 480w, /manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-001-full_644f9941.webp 911w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 55vw" alt={t(translations.transdermalHome.image1Alt, lang)} loading="lazy" decoding="async" className="h-auto max-h-[32rem] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />
                   <span className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-[#071f24]/85 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"><ZoomIn className="h-4 w-4" />{t(translations.transdermalHome.openImage, lang)}</span>
                 </button>
               </figure>
               <figure className="group relative overflow-hidden rounded-3xl border border-[#cfe3e3] bg-white shadow-md">
-                <button type="button" className="block h-full w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: "/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-002_9b0534fb.png", alt: translations.transdermalHome.image2Alt })} aria-label={t(translations.transdermalHome.openImage, lang)}>
-                  <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-002_9b0534fb.png" alt={t(translations.transdermalHome.image2Alt, lang)} className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />
+                <button type="button" className="block h-full w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: "/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-002-full_e91f74d9.webp", alt: translations.transdermalHome.image2Alt })} aria-label={t(translations.transdermalHome.openImage, lang)}>
+                  <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-002-full_e91f74d9.webp" srcSet="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-002-480w_def7b291.webp 480w, /manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-002-full_e91f74d9.webp 911w" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 35vw, 28vw" alt={t(translations.transdermalHome.image2Alt, lang)} loading="lazy" decoding="async" className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />
                   <span className="absolute bottom-3 right-3 rounded-full bg-[#071f24]/85 p-2 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"><ZoomIn className="h-4 w-4" aria-hidden="true" /></span>
                 </button>
               </figure>
               <figure className="group relative overflow-hidden rounded-3xl border border-[#cfe3e3] bg-white shadow-md">
-                <button type="button" className="block h-full w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: "/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-003_6cb4309d.png", alt: translations.transdermalHome.image3Alt })} aria-label={t(translations.transdermalHome.openImage, lang)}>
-                  <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-003_6cb4309d.png" alt={t(translations.transdermalHome.image3Alt, lang)} className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />
+                <button type="button" className="block h-full w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: "/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-003-full_f5204d68.webp", alt: translations.transdermalHome.image3Alt })} aria-label={t(translations.transdermalHome.openImage, lang)}>
+                  <img src="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-003-full_f5204d68.webp" srcSet="/manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-003-480w_a523af4b.webp 480w, /manus-storage/PeluangBisnisSuplemenTempelPertamadiIndonesia-page-003-full_f5204d68.webp 911w" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 35vw, 28vw" alt={t(translations.transdermalHome.image3Alt, lang)} loading="lazy" decoding="async" className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />
                   <span className="absolute bottom-3 right-3 rounded-full bg-[#071f24]/85 p-2 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"><ZoomIn className="h-4 w-4" aria-hidden="true" /></span>
                 </button>
               </figure>
@@ -472,7 +472,7 @@ export default function Home() {
           <DialogTitle className="sr-only">{selectedTransdermalImage ? t(selectedTransdermalImage.alt, lang) : t(translations.transdermalHome.openImage, lang)}</DialogTitle>
           <DialogDescription className="sr-only">{t(translations.transdermalHome.openImage, lang)}</DialogDescription>
           {selectedTransdermalImage && (
-            <img src={selectedTransdermalImage.src} alt={t(selectedTransdermalImage.alt, lang)} className="max-h-[82vh] w-full rounded-xl object-contain" />
+            <img src={selectedTransdermalImage.src} alt={t(selectedTransdermalImage.alt, lang)} decoding="async" className="max-h-[82vh] w-full rounded-xl object-contain" />
           )}
         </DialogContent>
       </Dialog>
