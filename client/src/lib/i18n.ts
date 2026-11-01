@@ -83,6 +83,7 @@ export const translations = {
     image1Alt: { en: "Transdermal patch applied to the arm with a bloodstream illustration", ar: "لاصقة عبر الجلد على الذراع مع رسم توضيحي لمجرى الدم", zh: "贴在手臂上的经皮贴片及血液循环示意图", es: "Parche transdérmico en el brazo con ilustración del torrente sanguíneo", hi: "手臂上的经皮贴片和血液循环示意图", id: "Patch transdermal pada lengan dengan ilustrasi aliran darah" },
     image2Alt: { en: "Illustration explaining how transdermal nutrients pass through skin layers", ar: "رسم يشرح مرور العناصر عبر طبقات الجلد", zh: "解释营养成分通过皮肤层的示意图", es: "Ilustración de cómo los nutrientes transdérmicos atraviesan las capas de la piel", hi: "त्वचा की परतों से ट्रांसडर्मल पोषक तत्वों के गुजरने का चित्र", id: "Ilustrasi cara nutrisi transdermal melewati lapisan kulit" },
     image3Alt: { en: "Transdermal patch lifestyle and absorption illustration", ar: "رسم توضيحي لنمط الحياة وامتصاص اللاصقة عبر الجلد", zh: "经皮贴片生活方式与吸收示意图", es: "Ilustración de estilo de vida y absorción del parche transdérmico", hi: "ट्रांसडर्मल पैच जीवनशैली और अवशोषण चित्र", id: "Ilustrasi gaya hidup dan penyerapan patch transdermal" },
+    openImage: { en: "Open image for a closer look", ar: "فتح الصورة لإلقاء نظرة أقرب", zh: "打开图片查看细节", es: "Abrir imagen para verla de cerca", hi: "विस्तृत दृश्य के लिए चित्र खोलें", id: "Buka gambar untuk melihat detail" },
     cta: { en: "Browse transdermal products", ar: "تصفح المنتجات عبر الجلد", zh: "浏览经皮产品", es: "Ver productos transdérmicos", hi: "ट्रांसडर्मल उत्पाद देखें", id: "Lihat produk transdermal" },
   },
 
