@@ -53,6 +53,14 @@ export default function ProductImageGallery({
     setLightboxImage(allImages[current]);
   };
 
+  const lightboxIndex = lightboxImage ? allImages.indexOf(lightboxImage) : current;
+  const showPreviousLightboxImage = () => {
+    setLightboxImage(allImages[lightboxIndex === 0 ? allImages.length - 1 : lightboxIndex - 1]);
+  };
+  const showNextLightboxImage = () => {
+    setLightboxImage(allImages[lightboxIndex === allImages.length - 1 ? 0 : lightboxIndex + 1]);
+  };
+
   const prev = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -129,7 +137,21 @@ export default function ProductImageGallery({
         <DialogContent className="!w-[calc(100vw-1rem)] !max-w-none border-white/10 bg-[#071f24] p-2 text-white sm:!w-[calc(100vw-2rem)] sm:p-5">
           <DialogTitle className="sr-only">{productName}</DialogTitle>
           <DialogDescription className="sr-only">Enlarged product image</DialogDescription>
-          {lightboxImage && <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />}
+          {lightboxImage && (
+            <div className="relative flex items-center justify-center">
+              {allImages.length > 1 && (
+                <button type="button" onClick={showPreviousLightboxImage} aria-label="Previous product image" className="absolute left-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4">
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                </button>
+              )}
+              <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />
+              {allImages.length > 1 && (
+                <button type="button" onClick={showNextLightboxImage} aria-label="Next product image" className="absolute right-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-4">
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
       </>
@@ -198,7 +220,21 @@ export default function ProductImageGallery({
         <DialogContent className="!w-[calc(100vw-1rem)] !max-w-none border-white/10 bg-[#071f24] p-2 text-white sm:!w-[calc(100vw-2rem)] sm:p-5">
           <DialogTitle className="sr-only">{productName}</DialogTitle>
           <DialogDescription className="sr-only">Enlarged product image</DialogDescription>
-          {lightboxImage && <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />}
+          {lightboxImage && (
+            <div className="relative flex items-center justify-center">
+              {allImages.length > 1 && (
+                <button type="button" onClick={showPreviousLightboxImage} aria-label="Previous product image" className="absolute left-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4">
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                </button>
+              )}
+              <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />
+              {allImages.length > 1 && (
+                <button type="button" onClick={showNextLightboxImage} aria-label="Next product image" className="absolute right-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-4">
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
