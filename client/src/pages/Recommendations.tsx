@@ -162,14 +162,6 @@ export default function Recommendations() {
                             <Leaf className="h-7 w-7 text-primary/40" />
                           </div>
                         )}
-                        {product.targetSegment !== "all" && (
-                          <div className="absolute top-2 right-2">
-                            <Badge className="text-xs bg-amber-500 text-white border-0">
-                              <Crown className="h-3 w-3 mr-1" />
-                              {product.targetSegment}
-                            </Badge>
-                          </div>
-                        )}
                         {product.isFeatured && (
                           <div className="absolute top-2 left-2">
                             <Badge variant="secondary" className="text-xs">{t(r.featured, lang)}</Badge>

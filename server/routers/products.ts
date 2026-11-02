@@ -21,7 +21,7 @@ const youtubeUrlSchema = z.string().trim().max(500).refine(
 ).optional();
 
 export const productsRouter = router({
-  // Public: list products filtered by user segment
+  // Public: list active products
   list: publicProcedure
     .input(
       z.object({
@@ -30,7 +30,7 @@ export const productsRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const items = await getProducts(input.segment);
+      const items = await getProducts();
       if (input.category) {
         return items.filter((p) => p.category === input.category);
       }
@@ -40,19 +40,9 @@ export const productsRouter = router({
   // Public: get single product
   getById: publicProcedure
     .input(z.object({ id: z.number().int() }))
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input }) => {
       const product = await getProductById(input.id);
       if (!product || !product.isActive) return null;
-
-      // Enforce segment restriction
-      const userSegment = ctx.user?.segment ?? "standard";
-      const segmentOrder = { all: 0, standard: 1, premium: 2, vip: 3 };
-      const userLevel = segmentOrder[userSegment] ?? 1;
-      const productLevel = segmentOrder[product.targetSegment] ?? 0;
-
-      if (product.targetSegment !== "all" && productLevel > userLevel) {
-        return null; // Restricted
-      }
 
       return { ...product, stock: Math.max(0, product.stock - product.reservedStock) };
     }),
@@ -60,18 +50,9 @@ export const productsRouter = router({
   // Public: get a single product by its stable SEO slug
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string().min(1).max(255) }))
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input }) => {
       const product = await getProductBySlug(input.slug);
       if (!product || !product.isActive) return null;
-
-      const userSegment = ctx.user?.segment ?? "standard";
-      const segmentOrder = { all: 0, standard: 1, premium: 2, vip: 3 };
-      const userLevel = segmentOrder[userSegment] ?? 1;
-      const productLevel = segmentOrder[product.targetSegment] ?? 0;
-
-      if (product.targetSegment !== "all" && productLevel > userLevel) {
-        return null;
-      }
 
       return { ...product, stock: Math.max(0, product.stock - product.reservedStock) };
     }),

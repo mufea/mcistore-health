@@ -19,7 +19,6 @@ import { buildProductPath, createProductSlug, isValidProductSlug, slugify } from
 import { getYouTubeThumbnailUrl, isYouTubeUrl } from "@shared/youtube";
 
 const CATEGORIES = ["Supplement", "Necklace", "Bracelet", "Watch", "Skincare", "Essential Oil", "Transdermal Patch", "Bioglass", "Other"];
-const SEGMENTS = ["all", "standard", "premium", "vip"];
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 const MAX_IMAGES = 6;
 
@@ -48,7 +47,6 @@ export default function AdminProducts() {
   const [videoUrl, setVideoUrl] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("Supplement");
-  const [targetSegment, setTargetSegment] = useState("all");
   const [stock, setStock] = useState("100");
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
@@ -110,7 +108,7 @@ export default function AdminProducts() {
   const openNew = () => {
     setEditing(null);
     setName(""); setSlug(""); setSlugTouched(false); setDescription(""); setVideoUrl(""); setPrice(""); setCategory("Supplement");
-    setTargetSegment("all"); setStock("100"); setIsFeatured(false); setIsActive(true);
+    setStock("100"); setIsFeatured(false); setIsActive(true);
     setImages([]);
     setDialog(true);
   };
@@ -118,7 +116,7 @@ export default function AdminProducts() {
   const openEdit = (p: any) => {
     setEditing(p);
     setName(p.name); setSlug(p.slug ?? createProductSlug(p.name, p.id)); setSlugTouched(true); setDescription(p.description ?? ""); setVideoUrl(p.videoUrl ?? ""); setPrice(String(p.price));
-    setCategory(CATEGORIES.includes(p.category) ? p.category : "Other"); setTargetSegment(p.targetSegment); setStock(String(p.stock));
+    setCategory(CATEGORIES.includes(p.category) ? p.category : "Other"); setStock(String(p.stock));
     setIsFeatured(p.isFeatured); setIsActive(p.isActive);
     // Load existing images: prefer images array, fall back to single imageUrl
     if (p.images && p.images.length > 0) {
@@ -208,7 +206,6 @@ export default function AdminProducts() {
     const primaryImage = readyImages[0];
     const data = {
       name, slug: normalizedSlug, description, videoUrl: videoUrl.trim(), price, category,
-      targetSegment: targetSegment as any,
       stock: parseInt(stock),
       imageUrl: primaryImage?.url,
       imageKey: primaryImage?.key,
@@ -233,13 +230,6 @@ export default function AdminProducts() {
   };
 
   const filtered = filterAdminProducts(products ?? [], search, statusFilter);
-
-  const segmentColor: Record<string, string> = {
-    all: "bg-green-100 text-green-700",
-    standard: "bg-blue-100 text-blue-700",
-    premium: "bg-amber-100 text-amber-700",
-    vip: "bg-purple-100 text-purple-700",
-  };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
@@ -304,7 +294,6 @@ export default function AdminProducts() {
               <tr className="border-b border-border/60 bg-muted/30">
                 <th className="min-w-[250px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Product</th>
                 <th className="min-w-[170px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Category</th>
-                <th className="min-w-[130px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Segment</th>
                 <th className="min-w-[160px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Price</th>
                 <th className="min-w-[110px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Stock</th>
                 <th className="min-w-[130px] p-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
@@ -338,11 +327,6 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="p-4"><span className="text-sm text-muted-foreground">{product.category}</span></td>
-                    <td className="p-4">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${segmentColor[product.targetSegment] ?? ""}`}>
-                        {product.targetSegment}
-                      </span>
-                    </td>
                     <td className="p-4"><span className="text-sm font-medium">IDR {Number(product.price).toLocaleString("id-ID")}</span></td>
                     <td className="p-4">
                       <span className={`text-sm ${product.stock === 0 ? "text-destructive" : "text-foreground"}`}>{product.stock}</span>
@@ -507,15 +491,6 @@ export default function AdminProducts() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-sm font-medium mb-1.5 block">Target Segment</Label>
-                <Select value={targetSegment} onValueChange={setTargetSegment}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {SEGMENTS.map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>

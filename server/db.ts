@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertOrder,
@@ -222,22 +222,16 @@ export async function getSurveyResponseById(id: number) {
 
 // ─── Products ─────────────────────────────────────────────────────────────────
 
-export async function getProducts(segment?: "standard" | "premium" | "vip") {
+export async function getProducts() {
   const db = await getDb();
   if (!db) return [];
-
-  const allowedSegments: string[] = ["all"];
-  if (segment === "standard") allowedSegments.push("standard");
-  if (segment === "premium") allowedSegments.push("standard", "premium");
-  if (segment === "vip") allowedSegments.push("standard", "premium", "vip");
 
   return getCustomerProducts(expireStockReservations, () => db
       .select()
       .from(products)
       .where(
         and(
-          eq(products.isActive, true),
-          inArray(products.targetSegment, allowedSegments as ("all" | "standard" | "premium" | "vip")[])
+          eq(products.isActive, true)
         )
       )
       .orderBy(desc(products.isFeatured), products.name));
