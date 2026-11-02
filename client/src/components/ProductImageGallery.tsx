@@ -39,11 +39,17 @@ export default function ProductImageGallery({
 
   const [current, setCurrent] = useState(0);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [lightboxScale, setLightboxScale] = useState(1);
   const lightboxPointerStartX = useRef<number | null>(null);
+  const lightboxPointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinchStartDistance = useRef<number | null>(null);
+  const pinchStartScale = useRef(1);
+  const lightboxIsPinching = useRef(false);
 
   const openLightbox = (event: React.MouseEvent<HTMLImageElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    setLightboxScale(1);
     setLightboxImage(allImages[current]);
   };
 
@@ -51,23 +57,57 @@ export default function ProductImageGallery({
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
     event.stopPropagation();
+    setLightboxScale(1);
     setLightboxImage(allImages[current]);
   };
 
   const lightboxIndex = lightboxImage ? allImages.indexOf(lightboxImage) : current;
   const showPreviousLightboxImage = () => {
+    setLightboxScale(1);
     setLightboxImage(allImages[lightboxIndex === 0 ? allImages.length - 1 : lightboxIndex - 1]);
   };
   const showNextLightboxImage = () => {
+    setLightboxScale(1);
     setLightboxImage(allImages[lightboxIndex === allImages.length - 1 ? 0 : lightboxIndex + 1]);
   };
 
   const handleLightboxPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.pointerType !== "touch" && event.pointerType !== "pen") return;
+    lightboxPointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (lightboxPointers.current.size >= 2) {
+      const [first, second] = Array.from(lightboxPointers.current.values());
+      pinchStartDistance.current = Math.hypot(second.x - first.x, second.y - first.y);
+      pinchStartScale.current = lightboxScale;
+      lightboxIsPinching.current = true;
+      lightboxPointerStartX.current = null;
+      return;
+    }
     lightboxPointerStartX.current = event.clientX;
   };
 
+  const handleLightboxPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const pointer = lightboxPointers.current.get(event.pointerId);
+    if (!pointer) return;
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+
+    if (lightboxPointers.current.size < 2 || pinchStartDistance.current === null) return;
+    const [first, second] = Array.from(lightboxPointers.current.values());
+    const distance = Math.hypot(second.x - first.x, second.y - first.y);
+    const nextScale = pinchStartScale.current * (distance / pinchStartDistance.current);
+    setLightboxScale(Math.min(3, Math.max(1, nextScale)));
+  };
+
   const handleLightboxPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    lightboxPointers.current.delete(event.pointerId);
+    if (lightboxIsPinching.current) {
+      if (lightboxPointers.current.size < 2) {
+        pinchStartDistance.current = null;
+        lightboxIsPinching.current = false;
+      }
+      lightboxPointerStartX.current = null;
+      return;
+    }
     const startX = lightboxPointerStartX.current;
     lightboxPointerStartX.current = null;
     if (startX === null || allImages.length < 2) return;
@@ -76,6 +116,13 @@ export default function ProductImageGallery({
     if (Math.abs(distance) < 48) return;
     if (distance < 0) showNextLightboxImage();
     else showPreviousLightboxImage();
+  };
+
+  const handleLightboxPointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
+    lightboxPointers.current.delete(event.pointerId);
+    lightboxPointerStartX.current = null;
+    pinchStartDistance.current = null;
+    lightboxIsPinching.current = false;
   };
 
   const prev = (e: React.MouseEvent) => {
@@ -150,7 +197,7 @@ export default function ProductImageGallery({
           </>
         )}
       </div>
-      <Dialog open={Boolean(lightboxImage)} onOpenChange={(open) => !open && setLightboxImage(null)}>
+      <Dialog open={Boolean(lightboxImage)} onOpenChange={(open) => { if (!open) { setLightboxScale(1); setLightboxImage(null); } }}>
         <DialogContent className="!w-[calc(100vw-1rem)] !max-w-none border-white/10 bg-[#071f24] p-2 text-white sm:!w-[calc(100vw-2rem)] sm:p-5">
           <DialogTitle className="sr-only">{productName}</DialogTitle>
           <DialogDescription className="sr-only">Enlarged product image</DialogDescription>
@@ -158,15 +205,16 @@ export default function ProductImageGallery({
             <div
               className="relative flex touch-pan-y items-center justify-center"
               onPointerDown={handleLightboxPointerDown}
+              onPointerMove={handleLightboxPointerMove}
               onPointerUp={handleLightboxPointerUp}
-              onPointerCancel={() => { lightboxPointerStartX.current = null; }}
+              onPointerCancel={handleLightboxPointerCancel}
             >
               {allImages.length > 1 && (
                 <button type="button" onClick={showPreviousLightboxImage} aria-label="Previous product image" className="absolute left-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4">
                   <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                 </button>
               )}
-              <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />
+              <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full origin-center rounded-xl object-contain transition-transform duration-100" style={{ transform: `scale(${lightboxScale})` }} />
               {allImages.length > 1 && (
                 <button type="button" onClick={showNextLightboxImage} aria-label="Next product image" className="absolute right-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-4">
                   <ChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -238,7 +286,7 @@ export default function ProductImageGallery({
           ))}
         </div>
       )}
-      <Dialog open={Boolean(lightboxImage)} onOpenChange={(open) => !open && setLightboxImage(null)}>
+      <Dialog open={Boolean(lightboxImage)} onOpenChange={(open) => { if (!open) { setLightboxScale(1); setLightboxImage(null); } }}>
         <DialogContent className="!w-[calc(100vw-1rem)] !max-w-none border-white/10 bg-[#071f24] p-2 text-white sm:!w-[calc(100vw-2rem)] sm:p-5">
           <DialogTitle className="sr-only">{productName}</DialogTitle>
           <DialogDescription className="sr-only">Enlarged product image</DialogDescription>
@@ -246,15 +294,16 @@ export default function ProductImageGallery({
             <div
               className="relative flex touch-pan-y items-center justify-center"
               onPointerDown={handleLightboxPointerDown}
+              onPointerMove={handleLightboxPointerMove}
               onPointerUp={handleLightboxPointerUp}
-              onPointerCancel={() => { lightboxPointerStartX.current = null; }}
+              onPointerCancel={handleLightboxPointerCancel}
             >
               {allImages.length > 1 && (
                 <button type="button" onClick={showPreviousLightboxImage} aria-label="Previous product image" className="absolute left-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4">
                   <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                 </button>
               )}
-              <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />
+              <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full origin-center rounded-xl object-contain transition-transform duration-100" style={{ transform: `scale(${lightboxScale})` }} />
               {allImages.length > 1 && (
                 <button type="button" onClick={showNextLightboxImage} aria-label="Next product image" className="absolute right-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-4">
                   <ChevronRight className="h-5 w-5" aria-hidden="true" />
