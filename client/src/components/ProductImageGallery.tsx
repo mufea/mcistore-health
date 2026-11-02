@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Leaf } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 
 interface ImageItem {
   url: string;
@@ -37,6 +38,20 @@ export default function ProductImageGallery({
   })();
 
   const [current, setCurrent] = useState(0);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+
+  const openLightbox = (event: React.MouseEvent<HTMLImageElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setLightboxImage(allImages[current]);
+  };
+
+  const openLightboxWithKeyboard = (event: React.KeyboardEvent<HTMLImageElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    event.stopPropagation();
+    setLightboxImage(allImages[current]);
+  };
 
   const prev = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -62,12 +77,18 @@ export default function ProductImageGallery({
 
   if (mode === "card") {
     return (
+      <>
       <div className={`relative overflow-hidden bg-muted/30 group/gallery ${className}`}>
         {/* Main image */}
         <img
           src={allImages[current]}
           alt={`${productName} ${current + 1}`}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          onClick={openLightbox}
+          onKeyDown={openLightboxWithKeyboard}
+          role="button"
+          tabIndex={0}
+          aria-label={`Enlarge ${productName} image ${current + 1}`}
+          className="w-full h-full cursor-zoom-in object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
         {/* Prev/Next arrows — only show when multiple images */}
@@ -104,6 +125,14 @@ export default function ProductImageGallery({
           </>
         )}
       </div>
+      <Dialog open={Boolean(lightboxImage)} onOpenChange={(open) => !open && setLightboxImage(null)}>
+        <DialogContent className="!w-[calc(100vw-1rem)] !max-w-none border-white/10 bg-[#071f24] p-2 text-white sm:!w-[calc(100vw-2rem)] sm:p-5">
+          <DialogTitle className="sr-only">{productName}</DialogTitle>
+          <DialogDescription className="sr-only">Enlarged product image</DialogDescription>
+          {lightboxImage && <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />}
+        </DialogContent>
+      </Dialog>
+      </>
     );
   }
 
@@ -115,7 +144,12 @@ export default function ProductImageGallery({
         <img
           src={allImages[current]}
           alt={`${productName} ${current + 1}`}
-          className="w-full h-full object-cover transition-opacity duration-200"
+          onClick={openLightbox}
+          onKeyDown={openLightboxWithKeyboard}
+          role="button"
+          tabIndex={0}
+          aria-label={`Enlarge ${productName} image ${current + 1}`}
+          className="w-full h-full cursor-zoom-in object-cover transition-opacity duration-200"
         />
         {allImages.length > 1 && (
           <>
@@ -160,6 +194,13 @@ export default function ProductImageGallery({
           ))}
         </div>
       )}
+      <Dialog open={Boolean(lightboxImage)} onOpenChange={(open) => !open && setLightboxImage(null)}>
+        <DialogContent className="!w-[calc(100vw-1rem)] !max-w-none border-white/10 bg-[#071f24] p-2 text-white sm:!w-[calc(100vw-2rem)] sm:p-5">
+          <DialogTitle className="sr-only">{productName}</DialogTitle>
+          <DialogDescription className="sr-only">Enlarged product image</DialogDescription>
+          {lightboxImage && <img src={lightboxImage} alt={productName} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
