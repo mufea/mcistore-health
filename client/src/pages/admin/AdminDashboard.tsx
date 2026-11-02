@@ -78,10 +78,11 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
           <Link href="/">
             <div className="flex cursor-pointer items-center justify-center gap-2 sm:justify-start">
               <BrandMark size="md" className="ring-sidebar-primary/25" />
-              <div className="hidden overflow-hidden sm:block">
-                <span className="font-bold text-sm text-sidebar-foreground tracking-tight whitespace-nowrap">MCI One More</span>
-                <p className="text-[10px] text-sidebar-foreground/50 leading-none mt-0.5 whitespace-nowrap">Admin Dashboard</p>
-              </div>
+                <div className="hidden overflow-hidden sm:block">
+                  <span className="font-bold text-sm text-sidebar-foreground tracking-tight whitespace-nowrap">MCI One More</span>
+                  <p className="text-[9px] text-sidebar-foreground/60 leading-none mt-0.5 whitespace-nowrap">By Stokis Asri Rosa</p>
+                  <p className="text-[10px] text-sidebar-foreground/50 leading-none mt-0.5 whitespace-nowrap">Admin Dashboard</p>
+                </div>
             </div>
           </Link>
         </div>

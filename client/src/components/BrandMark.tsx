@@ -16,11 +16,11 @@ const sizeClasses = {
 
 export default function BrandMark({ size = "md", className = "" }: BrandMarkProps) {
   return (
-    <span className={`inline-flex shrink-0 overflow-hidden rounded-[0.72rem] bg-primary/10 shadow-sm ring-1 ring-primary/15 ${sizeClasses[size]} ${className}`}>
+    <span className={`inline-flex shrink-0 overflow-hidden rounded-[0.72rem] bg-primary/5 shadow-sm ring-1 ring-primary/15 ${sizeClasses[size]} ${className}`}>
       <img
         src={MCI_BRAND_MARK_URL}
         alt="MCI One More logo"
-        className="h-full w-full scale-[1.32] object-cover"
+        className="h-full w-full object-contain"
       />
     </span>
   );

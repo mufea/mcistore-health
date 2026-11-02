@@ -141,8 +141,11 @@ export default function Navbar() {
               size="md"
               className="motion-safe:translate-y-0 motion-safe:scale-100 motion-safe:transition-[transform,box-shadow] motion-safe:duration-200 motion-safe:ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:scale-[1.06] motion-safe:group-hover:shadow-md"
             />
-            <span className="font-serif text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-              {siteName}
+            <span className="flex flex-col leading-tight">
+              <span className="font-serif text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+                {siteName}
+              </span>
+              <span className="text-[9px] font-medium tracking-wide text-muted-foreground">By Stokis Asri Rosa</span>
             </span>
           </div>
         </Link>
@@ -249,7 +252,10 @@ export default function Navbar() {
               <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
                 <div className="flex items-center gap-2">
                   <BrandMark size="sm" />
-                  <span className="font-serif text-base font-semibold text-foreground">{siteName}</span>
+                  <span className="flex flex-col leading-tight">
+                    <span className="font-serif text-base font-semibold text-foreground">{siteName}</span>
+                    <span className="text-[8px] font-medium tracking-wide text-muted-foreground">By Stokis Asri Rosa</span>
+                  </span>
                 </div>
               </div>
 

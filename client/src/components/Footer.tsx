@@ -13,7 +13,10 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
               <BrandMark size="sm" />
-              <span className="font-serif text-lg font-semibold">{settings?.siteName ?? "MCI One More"}</span>
+              <span className="flex flex-col leading-tight">
+                <span className="font-serif text-lg font-semibold">{settings?.siteName ?? "MCI One More"}</span>
+                <span className="text-[9px] font-medium tracking-wide text-muted-foreground">By Stokis Asri Rosa</span>
+              </span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               {settings?.siteTagline ?? "Your journey to optimal health starts here. Discover personalized health products tailored to your unique needs."}

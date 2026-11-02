@@ -9,7 +9,7 @@ describe("buildOrganizationJsonLd", () => {
       name: "MCI One More",
       alternateName: "MCI One More - Trusted Health Partner",
       url: "https://mcionemore.com",
-      logo: "https://mcionemore.com/manus-storage/mci-health-mark_0e17589e.png",
+      logo: "https://mcionemore.com/manus-storage/mci-one-more-logo_04d5053f.png",
       description: "Your journey to optimal health starts here. Discover personalized health products tailored to your unique needs.",
     });
   });
@@ -17,6 +17,6 @@ describe("buildOrganizationJsonLd", () => {
   it("serializes a safe JSON-LD payload", () => {
     const schema = JSON.parse(serializeOrganizationJsonLd());
     expect(schema).toMatchObject({ "@type": "Organization", name: "MCI One More" });
-    expect(schema.logo).toContain("mci-health-mark_0e17589e.png");
+    expect(schema.logo).toContain("mci-one-more-logo_04d5053f.png");
   });
 });
