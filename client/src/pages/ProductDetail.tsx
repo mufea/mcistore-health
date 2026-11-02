@@ -262,7 +262,6 @@ export default function ProductDetail() {
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 <Badge variant="outline" className="font-medium">{product.category}</Badge>
                 {product.isFeatured && <Badge className="border-0 bg-amber-500 text-white"><Sparkles className="mr-1 h-3 w-3" />{t(detail.featured, lang)}</Badge>}
-                {product.targetSegment !== "all" && <Badge className="border-0 bg-primary text-primary-foreground">{t(detail.exclusive, lang)} · {product.targetSegment}</Badge>}
               </div>
 
               <h1 className="font-serif text-3xl font-light leading-tight text-foreground sm:text-4xl">{product.name}</h1>

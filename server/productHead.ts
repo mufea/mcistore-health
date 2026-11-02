@@ -30,7 +30,7 @@ export async function getProductHeadMetadata(requestUrl: string, getProduct?: Pr
     : slugMatch
       ? await getProductBySlug(lookupKey as string)
       : await getProductById(lookupKey as number);
-  if (!product || !product.isActive || !["all", "standard"].includes(product.targetSegment)) return null;
+  if (!product || !product.isActive) return null;
   const canonicalValue = product.slug || lookupKey;
   return {
     ...buildProductMetadata(product),

@@ -26,7 +26,6 @@ describe("product-detail HTTP metadata", () => {
           description: "Targeted nutritional support for daily cardiovascular wellness.",
           category: "Supplement",
           isActive: true,
-          targetSegment: "all",
         } as any)
     ));
 

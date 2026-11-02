@@ -92,6 +92,13 @@
       "when": 1792646851711,
       "tag": "0012_great_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1793617943057,
+      "tag": "0013_lazy_turbo",
+      "breakpoints": true
     }
   ]
 }

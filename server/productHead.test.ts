@@ -16,7 +16,6 @@ describe("injectProductHeadMetadata", () => {
       price: "150000.00",
       stock: 3,
       isActive: true,
-      targetSegment: "all",
     } as any);
 
     await expect(getProductHeadMetadata("/products/14?campaign=search")).resolves.toMatchObject({
@@ -38,7 +37,6 @@ describe("injectProductHeadMetadata", () => {
         price: "150000.00",
         stock: 4,
         isActive: true,
-        targetSegment: "all",
       } as any)),
     ).resolves.toMatchObject({
       canonicalUrl: "https://mcionemore.com/products/omega-balance",
@@ -74,7 +72,6 @@ describe("injectProductHeadMetadata", () => {
         price: "85000.00",
         stock: 0,
         isActive: true,
-        targetSegment: "standard",
       } as any)
     );
 

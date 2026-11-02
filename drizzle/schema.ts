@@ -91,7 +91,6 @@ export const products = mysqlTable("products", {
   imageKey: text("imageKey"),
   images: json("images").$type<{ url: string; key: string }[]>(),
   videoUrl: text("videoUrl"),
-  targetSegment: mysqlEnum("targetSegment", ["all", "standard", "premium", "vip"]).default("all").notNull(),
   stock: int("stock").default(0).notNull(),
   reservedStock: int("reservedStock").default(0).notNull(),
   isActive: boolean("isActive").default(true).notNull(),

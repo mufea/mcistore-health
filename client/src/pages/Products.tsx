@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { AlertTriangle, Crown, Loader2, Search } from "lucide-react";
+import { AlertTriangle, Loader2, Search } from "lucide-react";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import { useEffect, useState } from "react";
 import { Link, useSearch } from "wouter";
@@ -125,14 +125,6 @@ export default function Products() {
                         mode="card"
                         className="w-full h-full"
                       />
-                      {product.targetSegment !== "all" && (
-                        <div className="absolute top-2 right-2 z-10">
-                          <Badge className="text-xs bg-amber-500 text-white border-0">
-                            <Crown className="h-3 w-3 mr-1" />
-                            {product.targetSegment}
-                          </Badge>
-                        </div>
-                      )}
                       {isOutOfStock(product.stock) && (
                         <div className="absolute bottom-2 left-2 z-10">
                           <Badge className="border-0 bg-red-700 text-xs text-white shadow-sm" aria-label={t(p.outOfStock, lang)}>

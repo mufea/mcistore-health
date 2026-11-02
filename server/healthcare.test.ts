@@ -247,7 +247,6 @@ describe("products admin procedures", () => {
       name: "Premium Supplement",
       price: "299000",
       category: "Supplement",
-      targetSegment: "premium",
       isActive: true,
       isFeatured: false,
       stock: 100,
