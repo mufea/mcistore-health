@@ -392,18 +392,6 @@ export default function Home() {
                   {t(translations.hero.searchButton, lang)}
                 </Button>
               </form>
-              <div className="mt-10 flex items-center gap-8">
-                {[
-                  { label: t(translations.hero.stat1Label, lang), value: "10,000+" },
-                  { label: t(translations.hero.stat2Label, lang), value: "200+" },
-                  { label: t(translations.hero.stat3Label, lang), value: "98%" },
-                ].map((stat) => (
-                  <div key={stat.label} className="text-center">
-                    <p className="font-serif text-2xl font-semibold text-foreground">{stat.value}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Right: decorative card stack */}
