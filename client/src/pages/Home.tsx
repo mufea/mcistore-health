@@ -453,75 +453,6 @@ export default function Home() {
         </FullWide>
       </section>
 
-      {/* ── Promotional opportunity carousel ── */}
-      <section className="bg-[#071f24] py-16 text-white sm:py-20" aria-labelledby="promotion-carousel-title">
-        <FullWide>
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#c6e36c]">{t(translations.promotionHome.eyebrow, lang)}</p>
-            <h2 id="promotion-carousel-title" className="mt-4 font-serif text-3xl font-light leading-tight sm:text-5xl">{t(translations.promotionHome.title, lang)}</h2>
-            <p className="mt-4 text-base leading-7 text-white/70">{t(translations.promotionHome.description, lang)}</p>
-          </div>
-
-          <div
-            className="mx-auto mt-10 max-w-[34rem]"
-            onMouseEnter={() => setPromotionPaused(true)}
-            onMouseLeave={() => setPromotionPaused(false)}
-            onFocus={() => setPromotionPaused(true)}
-            onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget as Node)) setPromotionPaused(false);
-            }}
-          >
-            <div
-              className="relative touch-pan-y select-none overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl"
-              style={{ touchAction: "pan-y" }}
-              onPointerDown={handlePromotionPointerDown}
-              onPointerUp={handlePromotionPointerUp}
-              onPointerCancel={() => { promotionSwipeStartRef.current = null; setPromotionPaused(false); }}
-              role="region"
-              aria-roledescription="carousel"
-              aria-label={t(translations.promotionHome.title, lang)}
-            >
-              <div aria-live="polite" aria-atomic="true">
-                <button
-                  type="button"
-                  className="block w-full cursor-zoom-in text-left"
-                  onClick={handlePromotionImageClick}
-                  aria-label={`${t(translations.transdermalHome.openImage, lang)} — ${t(translations.promotionHome.slideStatus, lang).replace("{current}", String(promotionSlideIndex + 1)).replace("{total}", String(promotionSlides.length))}`}
-                >
-                  <img
-                    key={promotionSlideIndex}
-                    src={promotionSlides[promotionSlideIndex].full}
-                    srcSet={`${promotionSlides[promotionSlideIndex].mobile} 480w, ${promotionSlides[promotionSlideIndex].full} 911w`}
-                    sizes="(max-width: 640px) calc(100vw - 2rem), 520px"
-                    alt={`${t(translations.promotionHome.slideAlt, lang)} ${promotionSlideIndex + 1}`}
-                    width="911"
-                    height="1620"
-                    loading={promotionSlideIndex === 0 ? "eager" : "lazy"}
-                    decoding="async"
-                    className="animate-fade-in aspect-[911/1620] w-full object-cover"
-                  />
-                </button>
-              </div>
-              <button type="button" onClick={showPreviousPromotionSlide} aria-label={t(translations.promotionHome.previous, lang)} className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-[#071f24]/80 p-2.5 text-white shadow-lg transition hover:bg-[#071f24] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
-                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <button type="button" onClick={showNextPromotionSlide} aria-label={t(translations.promotionHome.next, lang)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-[#071f24]/80 p-2.5 text-white shadow-lg transition hover:bg-[#071f24] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
-                <ChevronRight className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#071f24]/85 px-3 py-2 shadow-lg">
-                <span className="sr-only">{t(translations.promotionHome.slideStatus, lang).replace("{current}", String(promotionSlideIndex + 1)).replace("{total}", String(promotionSlides.length))}</span>
-                {promotionSlides.map((_, index) => (
-                  <button key={index} type="button" onClick={() => setPromotionSlideIndex(index)} aria-label={`${t(translations.promotionHome.slideStatus, lang).replace("{current}", String(index + 1)).replace("{total}", String(promotionSlides.length))}`} aria-current={index === promotionSlideIndex} className={`h-2 rounded-full transition-all ${index === promotionSlideIndex ? "w-6 bg-[#c6e36c]" : "w-2 bg-white/50 hover:bg-white"}`} />
-                ))}
-                <button type="button" onClick={() => setPromotionPaused((paused) => !paused)} aria-label={t(promotionPaused ? translations.promotionHome.play : translations.promotionHome.pause, lang)} className="ml-1 rounded-full p-1 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
-                  {promotionPaused ? <Play className="h-3.5 w-3.5" aria-hidden="true" /> : <Pause className="h-3.5 w-3.5" aria-hidden="true" />}
-                </button>
-              </div>
-            </div>
-          </div>
-        </FullWide>
-      </section>
-
       {/* ── Features ── 4-column on desktop */}
       <section className="py-24 bg-background">
         <FullWide>
@@ -671,6 +602,76 @@ export default function Home() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* ── Promotional opportunity carousel ── */}
+      <section className="bg-[#071f24] py-16 text-white sm:py-20" aria-labelledby="promotion-carousel-title">
+        <FullWide>
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#c6e36c]">{t(translations.promotionHome.eyebrow, lang)}</p>
+            <h2 id="promotion-carousel-title" className="mt-4 font-serif text-3xl font-light leading-tight sm:text-5xl">{t(translations.promotionHome.title, lang)}</h2>
+            <p className="mt-4 text-base leading-7 text-white/70">{t(translations.promotionHome.description, lang)}</p>
+          </div>
+
+          <div
+            className="mx-auto mt-10 max-w-[34rem]"
+            onMouseEnter={() => setPromotionPaused(true)}
+            onMouseLeave={() => setPromotionPaused(false)}
+            onFocus={() => setPromotionPaused(true)}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node)) setPromotionPaused(false);
+            }}
+          >
+            <div
+              className="relative touch-pan-y select-none overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl"
+              style={{ touchAction: "pan-y" }}
+              onPointerDown={handlePromotionPointerDown}
+              onPointerUp={handlePromotionPointerUp}
+              onPointerCancel={() => { promotionSwipeStartRef.current = null; setPromotionPaused(false); }}
+              role="region"
+              aria-roledescription="carousel"
+              aria-label={t(translations.promotionHome.title, lang)}
+            >
+              <div aria-live="polite" aria-atomic="true">
+                <button
+                  type="button"
+                  className="block w-full cursor-zoom-in text-left"
+                  onClick={handlePromotionImageClick}
+                  aria-label={`${t(translations.transdermalHome.openImage, lang)} — ${t(translations.promotionHome.slideStatus, lang).replace("{current}", String(promotionSlideIndex + 1)).replace("{total}", String(promotionSlides.length))}`}
+                >
+                  <img
+                    key={promotionSlideIndex}
+                    src={promotionSlides[promotionSlideIndex].full}
+                    srcSet={`${promotionSlides[promotionSlideIndex].mobile} 480w, ${promotionSlides[promotionSlideIndex].full} 911w`}
+                    sizes="(max-width: 640px) calc(100vw - 2rem), 520px"
+                    alt={`${t(translations.promotionHome.slideAlt, lang)} ${promotionSlideIndex + 1}`}
+                    width="911"
+                    height="1620"
+                    loading={promotionSlideIndex === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    className="animate-fade-in aspect-[911/1620] w-full object-cover"
+                  />
+                </button>
+              </div>
+              <button type="button" onClick={showPreviousPromotionSlide} aria-label={t(translations.promotionHome.previous, lang)} className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-[#071f24]/80 p-2.5 text-white shadow-lg transition hover:bg-[#071f24] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
+                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <button type="button" onClick={showNextPromotionSlide} aria-label={t(translations.promotionHome.next, lang)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-[#071f24]/80 p-2.5 text-white shadow-lg transition hover:bg-[#071f24] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
+                <ChevronRight className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#071f24]/85 px-3 py-2 shadow-lg">
+                <span className="sr-only">{t(translations.promotionHome.slideStatus, lang).replace("{current}", String(promotionSlideIndex + 1)).replace("{total}", String(promotionSlides.length))}</span>
+                {promotionSlides.map((_, index) => (
+                  <button key={index} type="button" onClick={() => setPromotionSlideIndex(index)} aria-label={`${t(translations.promotionHome.slideStatus, lang).replace("{current}", String(index + 1)).replace("{total}", String(promotionSlides.length))}`} aria-current={index === promotionSlideIndex} className={`h-2 rounded-full transition-all ${index === promotionSlideIndex ? "w-6 bg-[#c6e36c]" : "w-2 bg-white/50 hover:bg-white"}`} />
+                ))}
+                <button type="button" onClick={() => setPromotionPaused((paused) => !paused)} aria-label={t(promotionPaused ? translations.promotionHome.play : translations.promotionHome.pause, lang)} className="ml-1 rounded-full p-1 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6e36c]">
+                  {promotionPaused ? <Play className="h-3.5 w-3.5" aria-hidden="true" /> : <Pause className="h-3.5 w-3.5" aria-hidden="true" />}
+                </button>
+              </div>
+            </div>
+          </div>
+        </FullWide>
+      </section>
+
 
       {/* ── Featured Products ── */}
       {featured.length > 0 && (
