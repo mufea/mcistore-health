@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { ENV } from "./env";
+import { MCI_BRAND_MARK_URL } from "@shared/brand";
 
 export type NotificationPayload = {
   title: string;
@@ -8,6 +9,12 @@ export type NotificationPayload = {
 
 const TITLE_MAX_LENGTH = 1200;
 const CONTENT_MAX_LENGTH = 20000;
+
+const BRAND_NOTIFICATION_HEADER = [
+  `![MCI One More logo](${MCI_BRAND_MARK_URL})`,
+  "**MCI One More**",
+  "By Stokis Asri Rosa",
+].join("\n");
 
 const trimValue = (value: string): string => value.trim();
 const isNonEmptyString = (value: unknown): value is string =>
@@ -66,7 +73,10 @@ const validatePayload = (input: NotificationPayload): NotificationPayload => {
 export async function notifyOwner(
   payload: NotificationPayload
 ): Promise<boolean> {
-  const { title, content } = validatePayload(payload);
+  const { title, content } = validatePayload({
+    ...payload,
+    content: `${BRAND_NOTIFICATION_HEADER}\n\n${payload.content.trim()}`,
+  });
 
   if (!ENV.forgeApiUrl) {
     throw new TRPCError({
