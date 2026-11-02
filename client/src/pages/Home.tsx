@@ -594,11 +594,11 @@ export default function Home() {
       </section>
 
       <Dialog open={Boolean(selectedTransdermalImage)} onOpenChange={(open) => !open && setSelectedTransdermalImage(null)}>
-        <DialogContent className="max-w-5xl border-white/10 bg-[#071f24] p-3 text-white sm:p-5">
+        <DialogContent className="!w-[calc(100vw-1rem)] !max-w-none border-white/10 bg-[#071f24] p-2 text-white sm:!w-[calc(100vw-2rem)] sm:p-5">
           <DialogTitle className="sr-only">{selectedTransdermalImage ? t(selectedTransdermalImage.alt, lang) : t(translations.transdermalHome.openImage, lang)}</DialogTitle>
           <DialogDescription className="sr-only">{t(translations.transdermalHome.openImage, lang)}</DialogDescription>
           {selectedTransdermalImage && (
-            <img src={selectedTransdermalImage.src} alt={t(selectedTransdermalImage.alt, lang)} decoding="async" className="max-h-[82vh] w-full rounded-xl object-contain" />
+            <img src={selectedTransdermalImage.src} alt={t(selectedTransdermalImage.alt, lang)} decoding="async" className="max-h-[90vh] w-full rounded-xl object-contain" />
           )}
         </DialogContent>
       </Dialog>
