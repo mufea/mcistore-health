@@ -9,14 +9,14 @@ type BrandMarkProps = {
 };
 
 const sizeClasses = {
-  sm: "h-7 w-7",
-  md: "h-8 w-8",
-  lg: "h-9 w-9",
+  sm: "h-8 w-8",
+  md: "h-9 w-9",
+  lg: "h-10 w-10",
 };
 
 export default function BrandMark({ size = "md", className = "" }: BrandMarkProps) {
   return (
-    <span className={`inline-flex shrink-0 overflow-hidden rounded-[0.72rem] bg-primary/5 shadow-sm ring-1 ring-primary/15 ${sizeClasses[size]} ${className}`}>
+    <span className={`inline-flex shrink-0 overflow-hidden rounded-[0.72rem] bg-[#123b68] shadow-sm ring-1 ring-[#123b68]/40 ${sizeClasses[size]} ${className}`}>
       <img
         src={MCI_BRAND_MARK_URL}
         alt="MCI One More logo"
