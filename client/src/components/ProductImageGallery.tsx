@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Leaf } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 
@@ -39,6 +39,7 @@ export default function ProductImageGallery({
 
   const [current, setCurrent] = useState(0);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const lightboxPointerStartX = useRef<number | null>(null);
 
   const openLightbox = (event: React.MouseEvent<HTMLImageElement>) => {
     event.preventDefault();
@@ -59,6 +60,22 @@ export default function ProductImageGallery({
   };
   const showNextLightboxImage = () => {
     setLightboxImage(allImages[lightboxIndex === allImages.length - 1 ? 0 : lightboxIndex + 1]);
+  };
+
+  const handleLightboxPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch" && event.pointerType !== "pen") return;
+    lightboxPointerStartX.current = event.clientX;
+  };
+
+  const handleLightboxPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const startX = lightboxPointerStartX.current;
+    lightboxPointerStartX.current = null;
+    if (startX === null || allImages.length < 2) return;
+
+    const distance = event.clientX - startX;
+    if (Math.abs(distance) < 48) return;
+    if (distance < 0) showNextLightboxImage();
+    else showPreviousLightboxImage();
   };
 
   const prev = (e: React.MouseEvent) => {
@@ -138,7 +155,12 @@ export default function ProductImageGallery({
           <DialogTitle className="sr-only">{productName}</DialogTitle>
           <DialogDescription className="sr-only">Enlarged product image</DialogDescription>
           {lightboxImage && (
-            <div className="relative flex items-center justify-center">
+            <div
+              className="relative flex touch-pan-y items-center justify-center"
+              onPointerDown={handleLightboxPointerDown}
+              onPointerUp={handleLightboxPointerUp}
+              onPointerCancel={() => { lightboxPointerStartX.current = null; }}
+            >
               {allImages.length > 1 && (
                 <button type="button" onClick={showPreviousLightboxImage} aria-label="Previous product image" className="absolute left-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4">
                   <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -221,7 +243,12 @@ export default function ProductImageGallery({
           <DialogTitle className="sr-only">{productName}</DialogTitle>
           <DialogDescription className="sr-only">Enlarged product image</DialogDescription>
           {lightboxImage && (
-            <div className="relative flex items-center justify-center">
+            <div
+              className="relative flex touch-pan-y items-center justify-center"
+              onPointerDown={handleLightboxPointerDown}
+              onPointerUp={handleLightboxPointerUp}
+              onPointerCancel={() => { lightboxPointerStartX.current = null; }}
+            >
               {allImages.length > 1 && (
                 <button type="button" onClick={showPreviousLightboxImage} aria-label="Previous product image" className="absolute left-2 z-10 rounded-full bg-black/65 p-3 text-white shadow-lg transition hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4">
                   <ChevronLeft className="h-5 w-5" aria-hidden="true" />
