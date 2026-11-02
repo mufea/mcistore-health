@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
-import { AlertTriangle, ArrowRight, CheckCircle, ChevronLeft, ChevronRight, Heart, ImageOff, Leaf, Pause, Play, Search, Shield, Sparkles, Star, ZoomIn } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle, ChevronLeft, ChevronRight, Heart, ImageOff, Leaf, MessageCircle, Pause, Play, Search, Shield, Sparkles, Star, ZoomIn } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import MainLayout from "@/components/MainLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -251,25 +251,25 @@ export default function Home() {
   return (
     <MainLayout>
       {/* ── Hero ── full-width asymmetric layout */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-accent/20 to-background py-8 sm:py-10 flex items-center">
+      <section className="relative overflow-hidden bg-gradient-to-br from-background via-accent/20 to-background py-6 sm:py-8 flex items-center">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.72_0.12_75/0.08),transparent_60%)]" />
         {/* decorative large circle */}
         <div className="absolute right-0 top-0 w-[55vw] h-[55vw] max-w-4xl max-h-4xl rounded-full bg-primary/5 translate-x-1/3 -translate-y-1/4 pointer-events-none" />
         <div className="absolute right-12 bottom-0 w-[30vw] h-[30vw] max-w-xl max-h-xl rounded-full bg-primary/4 pointer-events-none" />
 
-        <FullWide className="relative py-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <FullWide className="relative py-2 sm:py-3">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             {/* Left: copy */}
             <div>
-              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-xs font-medium tracking-wide uppercase">
+              <Badge variant="secondary" className="mb-4 px-4 py-1.5 text-xs font-medium tracking-wide uppercase">
                 {t(translations.hero.badge, lang)}
               </Badge>
-              <h1 className="font-serif text-5xl lg:text-6xl xl:text-7xl font-light text-foreground leading-tight mb-6">
+              <h1 className="font-serif text-5xl lg:text-6xl xl:text-7xl font-light text-foreground leading-tight mb-4">
                 {t(translations.hero.titleLine1, lang)}{" "}
                 <span className="font-semibold text-primary italic">{t(translations.hero.titleHighlight, lang)}</span>{" "}
                 {t(translations.hero.titleLine2, lang)}
               </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
+              <p className="text-lg text-muted-foreground leading-relaxed mb-7 max-w-xl">
                 {settings?.siteTagline ?? t(translations.hero.tagline, lang)}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -282,10 +282,14 @@ export default function Home() {
                 <Button asChild size="lg" variant="outline" className="gap-2 px-8">
                   <Link href="/products">{t(translations.hero.ctaProducts, lang)}</Link>
                 </Button>
+                <Button type="button" size="lg" variant="ghost" className="gap-2 px-4 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => window.dispatchEvent(new Event("mci:open-chatbot"))}>
+                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                  {t(translations.chatbot.quickBookMeeting, lang)}
+                </Button>
               </div>
               <form
                 role="search"
-                className="mt-5 flex max-w-xl gap-2"
+                className="mt-4 flex max-w-xl gap-2"
                 onSubmit={(event) => {
                   event.preventDefault();
                   if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
@@ -395,7 +399,7 @@ export default function Home() {
             </div>
 
             {/* Right: decorative card stack */}
-            <div className="hidden lg:flex flex-col gap-4 items-end">
+            <div className="hidden lg:flex flex-col gap-3 items-end">
               <div className="w-full max-w-sm bg-card border border-border/60 rounded-2xl p-6 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">

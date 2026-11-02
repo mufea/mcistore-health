@@ -74,6 +74,15 @@ export default function ChatbotWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    const openFromHero = () => {
+      setIsOpen(true);
+      setIsMinimized(false);
+    };
+    window.addEventListener("mci:open-chatbot", openFromHero);
+    return () => window.removeEventListener("mci:open-chatbot", openFromHero);
+  }, []);
+
   // Quick actions derived from current language
   const QUICK_ACTIONS = [
     { label: t(translations.chatbot.quickTrackOrder, lang), icon: Package,  message: translations.chatbot.quickTrackMsg[lang] },
