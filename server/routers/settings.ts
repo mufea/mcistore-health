@@ -1,6 +1,17 @@
 import { z } from "zod";
 import { getAllSettings, getSetting, upsertSetting } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
+import { isYouTubeUrl } from "@shared/youtube";
+import { isValidBusinessOpportunitySlides } from "@shared/businessPromotion";
+
+function validateSettingValue(key: string, value: string) {
+  if (key === "promotion_video_url" && value.trim() && !isYouTubeUrl(value)) {
+    throw new Error("Promotion video URL must be a valid YouTube link");
+  }
+  if (key === "business_opportunity_slides" && !isValidBusinessOpportunitySlides(value)) {
+    throw new Error("Business Opportunity carousel data is invalid");
+  }
+}
 
 export const settingsRouter = router({
   // Public: get public settings (shipping costs, site name)
@@ -16,6 +27,8 @@ export const settingsRouter = router({
       bankTransferAccountNumber: all["bank_transfer_account_number"] ?? "",
       midtransClientKey: all["midtrans_client_key"] ?? "",
       midtransIsProduction: all["midtrans_is_production"] === "true",
+      businessOpportunitySlides: all["business_opportunity_slides"] ?? "",
+      promotionVideoUrl: all["promotion_video_url"] ?? "",
     };
   }),
 
@@ -33,6 +46,7 @@ export const settingsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      validateSettingValue(input.key, input.value);
       await upsertSetting(input.key, input.value);
       return { success: true };
     }),
@@ -46,6 +60,7 @@ export const settingsRouter = router({
     )
     .mutation(async ({ input }) => {
       for (const [key, value] of Object.entries(input.settings)) {
+        validateSettingValue(key, value);
         await upsertSetting(key, value);
       }
       return { success: true };

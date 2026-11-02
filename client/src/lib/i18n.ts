@@ -119,6 +119,10 @@ export const translations = {
     pause: { en: "Pause slideshow", ar: "إيقاف العرض", zh: "暂停播放", es: "Pausar presentación", hi: "स्लाइड शो रोकें", id: "Jeda slideshow" },
     play: { en: "Play slideshow", ar: "تشغيل العرض", zh: "播放幻灯片", es: "Reproducir presentación", hi: "स्लाइड शो चलाएं", id: "Putar slideshow" },
     slideStatus: { en: "Slide {current} of {total}", ar: "الشريحة {current} من {total}", zh: "第 {current} 张，共 {total} 张", es: "Diapositiva {current} de {total}", hi: "स्लाइड {current} / {total}", id: "Slide {current} dari {total}" },
+    videoEyebrow: { en: "See it in action", ar: "شاهدها أثناء العمل", zh: "观看实际演示", es: "Míralo en acción", hi: "इसे काम करते देखें", id: "Lihat cara kerjanya" },
+    videoTitle: { en: "Explore the MCI One More story", ar: "اكتشف قصة MCI One More", zh: "探索 MCI One More 的故事", es: "Conoce la historia de MCI One More", hi: "MCI One More की कहानी जानें", id: "Kenali kisah MCI One More" },
+    videoDescription: { en: "Watch our latest promotional video and learn how the products and opportunity fit into your wellness journey.", ar: "شاهد أحدث فيديو ترويجي لدينا وتعرّف على كيفية اندماج المنتجات والفرصة في رحلتك نحو العافية.", zh: "观看最新宣传视频，了解产品和机会如何融入您的健康之旅。", es: "Mira nuestro video promocional más reciente y descubre cómo los productos y la oportunidad acompañan tu bienestar.", hi: "हमारा नवीनतम प्रचार वीडियो देखें और जानें कि उत्पाद और अवसर आपकी वेलनेस यात्रा में कैसे फिट होते हैं।", id: "Tonton video promosi terbaru kami dan pelajari bagaimana produk serta peluang ini mendukung perjalanan kesehatan Anda." },
+    videoUnavailable: { en: "Promotion video coming soon", ar: "الفيديو الترويجي قريباً", zh: "宣传视频即将推出", es: "Video promocional próximamente", hi: "प्रचार वीडियो जल्द आ रहा है", id: "Video promosi segera hadir" },
   },
 
   // ── Features Section ──

@@ -18,24 +18,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import SuggestionAddToCartButton from "@/components/SuggestionAddToCartButton";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { getYouTubeEmbedUrl } from "@shared/youtube";
+import { parseBusinessOpportunitySlides } from "@shared/businessPromotion";
 
 type TransdermalGalleryImage = { src: string; alt: Record<Language, string> };
-
-const promotionSlides = [
-  ["1000672755-full_d1cbf96b.webp", "1000672755-480w_ef04786f.webp"],
-  ["1000672756-full_5d029cb6.webp", "1000672756-480w_5601f87f.webp"],
-  ["1000672757-full_f8944d64.webp", "1000672757-480w_b810b9e7.webp"],
-  ["1000672758-full_3d4f0299.webp", "1000672758-480w_7d724a81.webp"],
-  ["1000672759-full_f75bb41f.webp", "1000672759-480w_0a3657dd.webp"],
-  ["1000672760-full_61699dfe.webp", "1000672760-480w_03c2f8ce.webp"],
-  ["1000672761-full_53511608.webp", "1000672761-480w_362a597b.webp"],
-  ["1000672762-full_8f45646f.webp", "1000672762-480w_fa7b0d20.webp"],
-  ["1000672763-full_70fc4506.webp", "1000672763-480w_8a3eef46.webp"],
-  ["1000672764-full_a11b531e.webp", "1000672764-480w_8b732ad0.webp"],
-].map(([full, mobile]) => ({
-  full: `/manus-storage/${full}`,
-  mobile: `/manus-storage/${mobile}`,
-}));
 
 /** Full-width inner wrapper — no max-width cap, generous horizontal padding */
 function FullWide({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -116,6 +102,8 @@ export default function Home() {
   const { lang } = useLanguage();
   const { data: settings } = trpc.settings.getPublic.useQuery();
   const { data: featuredProducts, isLoading: productsLoading, isError: productsError } = trpc.products.list.useQuery({ segment: "standard" });
+  const promotionSlides = parseBusinessOpportunitySlides(settings?.businessOpportunitySlides);
+  const promotionVideoEmbedUrl = getYouTubeEmbedUrl(settings?.promotionVideoUrl ?? "");
 
   const featured = (featuredProducts ?? []).filter((p) => p.isFeatured).slice(0, 4);
   const suggestions = getProductSuggestions(featuredProducts ?? [], productSearch);
@@ -133,6 +121,10 @@ export default function Home() {
     document.addEventListener("pointerdown", closeOnOutsidePointer);
     return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
   }, [suggestionsOpen]);
+
+  useEffect(() => {
+    setPromotionSlideIndex((index) => Math.min(index, promotionSlides.length - 1));
+  }, [settings?.businessOpportunitySlides, promotionSlides.length]);
 
   useEffect(() => {
     if (promotionPaused) return;
@@ -668,6 +660,36 @@ export default function Home() {
                 </button>
               </div>
             </div>
+          </div>
+        </FullWide>
+      </section>
+
+      {/* ── Promotion video ── */}
+      <section className="bg-background py-20 sm:py-24" aria-labelledby="promotion-video-title">
+        <FullWide>
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="gold-line mx-auto mb-4" />
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t(translations.promotionHome.videoEyebrow, lang)}</p>
+            <h2 id="promotion-video-title" className="mt-4 font-serif text-3xl font-light leading-tight text-foreground sm:text-5xl">{t(translations.promotionHome.videoTitle, lang)}</h2>
+            <p className="mt-5 text-base leading-8 text-muted-foreground">{t(translations.promotionHome.videoDescription, lang)}</p>
+          </div>
+          <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-3xl border border-border/60 bg-muted/30 shadow-xl">
+            {promotionVideoEmbedUrl ? (
+              <div className="aspect-video">
+                <iframe
+                  src={promotionVideoEmbedUrl}
+                  title={t(translations.promotionHome.videoTitle, lang)}
+                  className="h-full w-full"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <div className="flex min-h-56 items-center justify-center px-6 text-center text-muted-foreground">
+                {t(translations.promotionHome.videoUnavailable, lang)}
+              </div>
+            )}
           </div>
         </FullWide>
       </section>

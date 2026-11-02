@@ -5,9 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
-import { Building2, Globe, Loader2, Package, PlugZap, Save, Settings } from "lucide-react";
+import { Building2, Globe, ImagePlus, Loader2, Package, PlugZap, Plus, Save, Settings, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
+import { getYouTubeEmbedUrl, isYouTubeUrl } from "@shared/youtube";
+import { DEFAULT_BUSINESS_OPPORTUNITY_SLIDES, parseBusinessOpportunitySlides, serializeBusinessOpportunitySlides, type BusinessOpportunitySlide } from "@shared/businessPromotion";
 
 export default function AdminSettings() {
   const utils = trpc.useUtils();
@@ -16,6 +18,8 @@ export default function AdminSettings() {
   // Site
   const [siteName, setSiteName] = useState("");
   const [siteTagline, setSiteTagline] = useState("");
+  const [businessSlides, setBusinessSlides] = useState<BusinessOpportunitySlide[]>(DEFAULT_BUSINESS_OPPORTUNITY_SLIDES);
+  const [promotionVideoUrl, setPromotionVideoUrl] = useState("");
 
   // Bank Transfer
   const [bankName, setBankName] = useState("");
@@ -36,6 +40,8 @@ export default function AdminSettings() {
     if (rawSettings) {
       setSiteName(rawSettings["site_name"] ?? "VitaWell Health");
       setSiteTagline(rawSettings["site_tagline"] ?? "");
+      setBusinessSlides(parseBusinessOpportunitySlides(rawSettings["business_opportunity_slides"]));
+      setPromotionVideoUrl(rawSettings["promotion_video_url"] ?? "");
       setBankName(rawSettings["bank_transfer_bank_name"] ?? "");
       setAccountNumber(rawSettings["bank_transfer_account_number"] ?? "");
       setBeneficiary(rawSettings["bank_transfer_beneficiary"] ?? "");
@@ -53,6 +59,37 @@ export default function AdminSettings() {
     onError: (e) => toast.error(e.message),
   });
 
+  const uploadImageMutation = trpc.products.uploadImage.useMutation();
+
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const handlePromotionImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number, field: "full" | "mobile") => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("Image must be 4 MB or smaller");
+      return;
+    }
+    try {
+      const result = await uploadImageMutation.mutateAsync({ base64: await fileToBase64(file), filename: `business-opportunity-${Date.now()}-${field}-${file.name}`, mimeType: file.type });
+      setBusinessSlides((slides) => slides.map((slide, slideIndex) => slideIndex === index ? { ...slide, [field]: result.url } : slide));
+      toast.success("Carousel image uploaded");
+    } catch (error: any) {
+      toast.error(error?.message ?? "Image upload failed");
+    }
+  };
+
   const testMidtransMutation = trpc.payment.testMidtransConnection.useMutation({
     onSuccess: (result) => {
       if (result.success) toast.success(result.message);
@@ -62,6 +99,10 @@ export default function AdminSettings() {
   });
 
   const save = () => {
+    if (promotionVideoUrl.trim() && !isYouTubeUrl(promotionVideoUrl)) {
+      toast.error("Promotion video URL must be a valid YouTube link");
+      return;
+    }
     updateMutation.mutate({
       settings: {
         site_name: siteName,
@@ -75,6 +116,8 @@ export default function AdminSettings() {
         midtrans_server_key: midtransServerKey,
         midtrans_client_key: midtransClientKey,
         midtrans_is_production: String(midtransIsProduction),
+        business_opportunity_slides: serializeBusinessOpportunitySlides(businessSlides),
+        promotion_video_url: promotionVideoUrl.trim(),
       },
     });
   };
@@ -121,6 +164,68 @@ export default function AdminSettings() {
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Site Tagline</Label>
               <Input value={siteTagline} onChange={(e) => setSiteTagline(e.target.value)} placeholder="Your journey to optimal health starts here." />
+            </div>
+          </div>
+        </div>
+
+        {/* Homepage promotions */}
+        <div className="bg-card rounded-xl border border-border/60 p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <ImagePlus className="h-4 w-4 text-primary" />
+            <h2 className="font-semibold text-foreground">Homepage Promotions</h2>
+          </div>
+          <p className="mb-5 text-sm text-muted-foreground">Manage the Business Opportunity carousel images and the promotional video shown on the homepage.</p>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <Label className="text-sm font-medium">Business Opportunity Carousel</Label>
+                <p className="mt-1 text-xs text-muted-foreground">Use a full-size image and optionally a smaller mobile image for each slide.</p>
+              </div>
+              <Button type="button" variant="outline" size="sm" className="shrink-0 gap-1" onClick={() => setBusinessSlides((slides) => [...slides, { full: "" }])}>
+                <Plus className="h-4 w-4" /> Add slide
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {businessSlides.map((slide, index) => (
+                <div key={`${index}-${slide.full}`} className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium">Slide {index + 1}</p>
+                    <Button type="button" variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" disabled={businessSlides.length <= 1} onClick={() => setBusinessSlides((slides) => slides.filter((_, slideIndex) => slideIndex !== index))}>
+                      <Trash2 className="h-4 w-4" /> Remove
+                    </Button>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <Label className="mb-1.5 block text-xs font-medium">Full-size image URL</Label>
+                      <Input value={slide.full} onChange={(event) => setBusinessSlides((slides) => slides.map((item, slideIndex) => slideIndex === index ? { ...item, full: event.target.value } : item))} placeholder="https://... or /manus-storage/..." />
+                      <label className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                        <ImagePlus className="h-3.5 w-3.5" /> Upload full-size image
+                        <input type="file" accept="image/*" className="sr-only" onChange={(event) => handlePromotionImageUpload(event, index, "full")} />
+                      </label>
+                    </div>
+                    <div>
+                      <Label className="mb-1.5 block text-xs font-medium">Mobile image URL (optional)</Label>
+                      <Input value={slide.mobile ?? ""} onChange={(event) => setBusinessSlides((slides) => slides.map((item, slideIndex) => slideIndex === index ? { ...item, mobile: event.target.value || undefined } : item))} placeholder="Optional 480px image URL" />
+                      <label className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                        <ImagePlus className="h-3.5 w-3.5" /> Upload mobile image
+                        <input type="file" accept="image/*" className="sr-only" onChange={(event) => handlePromotionImageUpload(event, index, "mobile")} />
+                      </label>
+                    </div>
+                  </div>
+                  {slide.full && <img src={slide.full} alt={`Business Opportunity slide ${index + 1} preview`} className="mt-3 h-28 w-20 rounded-md border border-border/60 object-cover" onError={(event) => { event.currentTarget.style.display = "none"; }} />}
+                </div>
+              ))}
+            </div>
+
+            <Separator />
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Promotion Video YouTube URL</Label>
+              <Input value={promotionVideoUrl} onChange={(event) => setPromotionVideoUrl(event.target.value)} placeholder="https://www.youtube.com/watch?v=..." />
+              <p className="mt-1 text-xs text-muted-foreground">Leave empty to show a coming-soon message. Only valid YouTube links are accepted.</p>
+              {promotionVideoUrl.trim() && !isYouTubeUrl(promotionVideoUrl) && <p className="mt-1 text-xs text-destructive">Enter a valid YouTube URL.</p>}
+              {getYouTubeEmbedUrl(promotionVideoUrl) && <div className="mt-3 aspect-video overflow-hidden rounded-lg border border-border/60"><iframe src={getYouTubeEmbedUrl(promotionVideoUrl) ?? undefined} title="Promotion video preview" className="h-full w-full" /></div>}
             </div>
           </div>
         </div>
