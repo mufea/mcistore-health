@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
-import { Building2, Globe, ImagePlus, Loader2, Package, PlugZap, Plus, Save, Settings, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Building2, Globe, GripVertical, ImagePlus, Loader2, Package, PlugZap, Plus, Save, Settings, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 import { getYouTubeEmbedUrl, isYouTubeUrl } from "@shared/youtube";
@@ -20,6 +20,7 @@ export default function AdminSettings() {
   const [siteTagline, setSiteTagline] = useState("");
   const [businessSlides, setBusinessSlides] = useState<BusinessOpportunitySlide[]>(DEFAULT_BUSINESS_OPPORTUNITY_SLIDES);
   const [promotionVideoUrl, setPromotionVideoUrl] = useState("");
+  const [draggedSlideIndex, setDraggedSlideIndex] = useState<number | null>(null);
 
   // Bank Transfer
   const [bankName, setBankName] = useState("");
@@ -88,6 +89,30 @@ export default function AdminSettings() {
     } catch (error: any) {
       toast.error(error?.message ?? "Image upload failed");
     }
+  };
+
+  const handleSlideDrop = (targetIndex: number) => {
+    if (draggedSlideIndex === null || draggedSlideIndex === targetIndex) {
+      setDraggedSlideIndex(null);
+      return;
+    }
+    setBusinessSlides((slides) => {
+      const next = [...slides];
+      const [moved] = next.splice(draggedSlideIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      return next;
+    });
+    setDraggedSlideIndex(null);
+  };
+
+  const moveSlide = (index: number, direction: -1 | 1) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= businessSlides.length) return;
+    setBusinessSlides((slides) => {
+      const next = [...slides];
+      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+      return next;
+    });
   };
 
   const testMidtransMutation = trpc.payment.testMidtransConnection.useMutation({
@@ -180,7 +205,7 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <Label className="text-sm font-medium">Business Opportunity Carousel</Label>
-                <p className="mt-1 text-xs text-muted-foreground">Use a full-size image and optionally a smaller mobile image for each slide.</p>
+                <p className="mt-1 text-xs text-muted-foreground">Drag the handle to reorder slides, or use the arrow buttons on touch devices.</p>
               </div>
               <Button type="button" variant="outline" size="sm" className="shrink-0 gap-1" onClick={() => setBusinessSlides((slides) => [...slides, { full: "" }])}>
                 <Plus className="h-4 w-4" /> Add slide
@@ -189,12 +214,21 @@ export default function AdminSettings() {
 
             <div className="space-y-3">
               {businessSlides.map((slide, index) => (
-                <div key={`${index}-${slide.full}`} className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                <div key={`${index}-${slide.full}`} onDragOver={(event) => event.preventDefault()} onDrop={() => handleSlideDrop(index)} className={`rounded-lg border border-border/60 bg-muted/20 p-3 transition-opacity ${draggedSlideIndex === index ? "opacity-50" : ""}`}>
                   <div className="mb-3 flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium">Slide {index + 1}</p>
-                    <Button type="button" variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" disabled={businessSlides.length <= 1} onClick={() => setBusinessSlides((slides) => slides.filter((_, slideIndex) => slideIndex !== index))}>
-                      <Trash2 className="h-4 w-4" /> Remove
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <button type="button" draggable onDragStart={(event) => { event.dataTransfer.effectAllowed = "move"; setDraggedSlideIndex(index); }} onDragEnd={() => setDraggedSlideIndex(null)} className="cursor-grab rounded p-1 text-muted-foreground hover:bg-muted active:cursor-grabbing" aria-label={`Drag slide ${index + 1} to reorder`} title="Drag to reorder">
+                        <GripVertical className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                      <p className="text-sm font-medium">Slide {index + 1}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={index === 0} onClick={() => moveSlide(index, -1)} aria-label={`Move slide ${index + 1} up`}><ArrowUp className="h-4 w-4" /></Button>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={index === businessSlides.length - 1} onClick={() => moveSlide(index, 1)} aria-label={`Move slide ${index + 1} down`}><ArrowDown className="h-4 w-4" /></Button>
+                      <Button type="button" variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" disabled={businessSlides.length <= 1} onClick={() => setBusinessSlides((slides) => slides.filter((_, slideIndex) => slideIndex !== index))}>
+                        <Trash2 className="h-4 w-4" /> Remove
+                      </Button>
+                    </div>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div>
