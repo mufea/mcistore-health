@@ -20,6 +20,7 @@ import SuggestionAddToCartButton from "@/components/SuggestionAddToCartButton";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { getYouTubeEmbedUrl } from "@shared/youtube";
 import { parseBusinessOpportunitySlides } from "@shared/businessPromotion";
+import { parseTransdermalNutrition } from "@shared/transdermalNutrition";
 
 type TransdermalGalleryImage = { src: string; alt: Record<Language, string> };
 
@@ -104,6 +105,7 @@ export default function Home() {
   const { data: featuredProducts, isLoading: productsLoading, isError: productsError } = trpc.products.list.useQuery({ segment: "standard" });
   const promotionSlides = parseBusinessOpportunitySlides(settings?.businessOpportunitySlides);
   const promotionVideoEmbedUrl = getYouTubeEmbedUrl(settings?.promotionVideoUrl ?? "");
+  const nutritionSection = parseTransdermalNutrition(settings?.transdermalNutrition);
 
   const featured = (featuredProducts ?? []).filter((p) => p.isFeatured).slice(0, 4);
   const suggestions = getProductSuggestions(featuredProducts ?? [], productSearch);
@@ -520,6 +522,39 @@ export default function Home() {
           </div>
         </FullWide>
       </section>
+
+      {nutritionSection.enabled && (
+        <section className="bg-[#f7f8f1] py-20 sm:py-24" aria-labelledby="transdermal-nutrition-title">
+          <FullWide>
+            <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+              <div>
+                <div className="gold-line mb-4" />
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t(translations.transdermalNutrition.eyebrow, lang)}</p>
+                <h2 id="transdermal-nutrition-title" className="mt-4 font-serif text-3xl font-light leading-tight text-foreground sm:text-5xl">{t(translations.transdermalNutrition.title, lang)}</h2>
+                <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground">{t(translations.transdermalNutrition.description, lang)}</p>
+                <div className="mt-8 grid gap-4">
+                  {nutritionSection.items.map((item, index) => (
+                    <div key={`${item.title}-${index}`} className="flex gap-4 rounded-2xl border border-[#dfe7d8] bg-white/85 p-4 shadow-sm">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm font-semibold text-primary-foreground">0{index + 1}</span>
+                      <div>
+                        <h3 className="font-semibold text-foreground">{item.title}</h3>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-6 text-xs leading-6 text-muted-foreground">{nutritionSection.note || t(translations.transdermalNutrition.noteFallback, lang)}</p>
+                <Button asChild className="mt-7 gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Link href="/products?category=Transdermal%20Patch">{t(translations.transdermalNutrition.cta, lang)} <ArrowRight className="h-4 w-4" /></Link>
+                </Button>
+              </div>
+              <div className="overflow-hidden rounded-3xl border border-[#dfe7d8] bg-white shadow-lg">
+                <img src={nutritionSection.imageUrl} alt={nutritionSection.imageAlt} loading="lazy" decoding="async" className="max-h-[38rem] w-full object-cover object-top" />
+              </div>
+            </div>
+          </FullWide>
+        </section>
+      )}
 
       {/* ── Quality & Certifications ── */}
       <section className="bg-background py-20 sm:py-24">

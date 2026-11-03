@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 import { getYouTubeEmbedUrl, isYouTubeUrl } from "@shared/youtube";
 import { DEFAULT_BUSINESS_OPPORTUNITY_SLIDES, parseBusinessOpportunitySlides, serializeBusinessOpportunitySlides, type BusinessOpportunitySlide } from "@shared/businessPromotion";
+import { DEFAULT_TRANSDERMAL_NUTRITION, parseTransdermalNutrition, serializeTransdermalNutrition, type TransdermalNutritionContent } from "@shared/transdermalNutrition";
 
 export default function AdminSettings() {
   const utils = trpc.useUtils();
@@ -20,6 +21,7 @@ export default function AdminSettings() {
   const [siteTagline, setSiteTagline] = useState("");
   const [businessSlides, setBusinessSlides] = useState<BusinessOpportunitySlide[]>(DEFAULT_BUSINESS_OPPORTUNITY_SLIDES);
   const [promotionVideoUrl, setPromotionVideoUrl] = useState("");
+  const [transdermalNutrition, setTransdermalNutrition] = useState<TransdermalNutritionContent>(DEFAULT_TRANSDERMAL_NUTRITION);
   const [draggedSlideIndex, setDraggedSlideIndex] = useState<number | null>(null);
 
   // Bank Transfer
@@ -43,6 +45,7 @@ export default function AdminSettings() {
       setSiteTagline(rawSettings["site_tagline"] ?? "");
       setBusinessSlides(parseBusinessOpportunitySlides(rawSettings["business_opportunity_slides"]));
       setPromotionVideoUrl(rawSettings["promotion_video_url"] ?? "");
+      setTransdermalNutrition(parseTransdermalNutrition(rawSettings["transdermal_nutrition"]));
       setBankName(rawSettings["bank_transfer_bank_name"] ?? "");
       setAccountNumber(rawSettings["bank_transfer_account_number"] ?? "");
       setBeneficiary(rawSettings["bank_transfer_beneficiary"] ?? "");
@@ -86,6 +89,21 @@ export default function AdminSettings() {
       const result = await uploadImageMutation.mutateAsync({ base64: await fileToBase64(file), filename: `business-opportunity-${Date.now()}-${field}-${file.name}`, mimeType: file.type });
       setBusinessSlides((slides) => slides.map((slide, slideIndex) => slideIndex === index ? { ...slide, [field]: result.url } : slide));
       toast.success("Carousel image uploaded");
+    } catch (error: any) {
+      toast.error(error?.message ?? "Image upload failed");
+    }
+  };
+
+  const handleNutritionImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 4 * 1024 * 1024) { toast.error("Image must be 4 MB or smaller"); return; }
+    try {
+      const result = await uploadImageMutation.mutateAsync({ base64: await fileToBase64(file), filename: `transdermal-nutrition-${Date.now()}-${file.name}`, mimeType: file.type });
+      setTransdermalNutrition((content) => ({ ...content, imageUrl: result.url }));
+      toast.success("Nutrition section image uploaded");
     } catch (error: any) {
       toast.error(error?.message ?? "Image upload failed");
     }
@@ -143,6 +161,7 @@ export default function AdminSettings() {
         midtrans_is_production: String(midtransIsProduction),
         business_opportunity_slides: serializeBusinessOpportunitySlides(businessSlides),
         promotion_video_url: promotionVideoUrl.trim(),
+        transdermal_nutrition: serializeTransdermalNutrition(transdermalNutrition),
       },
     });
   };
@@ -260,6 +279,46 @@ export default function AdminSettings() {
               <p className="mt-1 text-xs text-muted-foreground">Leave empty to show a coming-soon message. Only valid YouTube links are accepted.</p>
               {promotionVideoUrl.trim() && !isYouTubeUrl(promotionVideoUrl) && <p className="mt-1 text-xs text-destructive">Enter a valid YouTube URL.</p>}
               {getYouTubeEmbedUrl(promotionVideoUrl) && <div className="mt-3 aspect-video overflow-hidden rounded-lg border border-border/60"><iframe src={getYouTubeEmbedUrl(promotionVideoUrl) ?? undefined} title="Promotion video preview" className="h-full w-full" /></div>}
+            </div>
+          </div>
+        </div>
+
+        {/* Transdermal nutrition section */}
+        <div className="bg-card rounded-xl border border-border/60 p-6">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="font-semibold text-foreground">Transdermal Patch Nutrition</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Control the nutrition-use section shown on the homepage.</p>
+            </div>
+            <Switch checked={transdermalNutrition.enabled} onCheckedChange={(enabled) => setTransdermalNutrition((content) => ({ ...content, enabled }))} aria-label="Show transdermal nutrition section" />
+          </div>
+          <div className="mt-5 space-y-4">
+            <div>
+              <Label className="mb-1.5 block text-sm font-medium">Section image URL</Label>
+              <Input value={transdermalNutrition.imageUrl} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, imageUrl: event.target.value }))} placeholder="https://... or /manus-storage/..." />
+              <label className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                <ImagePlus className="h-3.5 w-3.5" /> Upload section image
+                <input type="file" accept="image/*" className="sr-only" onChange={handleNutritionImageUpload} />
+              </label>
+              {transdermalNutrition.imageUrl && <img src={transdermalNutrition.imageUrl} alt={transdermalNutrition.imageAlt} className="mt-3 h-40 w-full rounded-lg border border-border/60 object-cover object-top" onError={(event) => { event.currentTarget.style.display = "none"; }} />}
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-medium">Image alt text</Label>
+              <Input value={transdermalNutrition.imageAlt} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, imageAlt: event.target.value }))} maxLength={180} placeholder="Describe the image for accessibility" />
+            </div>
+            <div className="space-y-3">
+              <Label className="block text-sm font-medium">Three practical uses</Label>
+              {transdermalNutrition.items.map((item, index) => (
+                <div key={index} className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Use {index + 1}</p>
+                  <Input value={item.title} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, items: content.items.map((entry, itemIndex) => itemIndex === index ? { ...entry, title: event.target.value } : entry) as TransdermalNutritionContent["items"] }))} maxLength={100} placeholder="Use title" />
+                  <Input value={item.description} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, items: content.items.map((entry, itemIndex) => itemIndex === index ? { ...entry, description: event.target.value } : entry) as TransdermalNutritionContent["items"] }))} maxLength={300} className="mt-2" placeholder="Explain this use" />
+                </div>
+              ))}
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-medium">Safety note</Label>
+              <Input value={transdermalNutrition.note} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, note: event.target.value }))} maxLength={400} placeholder="Usage and safety note" />
             </div>
           </div>
         </div>

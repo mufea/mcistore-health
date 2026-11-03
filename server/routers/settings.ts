@@ -3,6 +3,7 @@ import { getAllSettings, getSetting, upsertSetting } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { isYouTubeUrl } from "@shared/youtube";
 import { isValidBusinessOpportunitySlides } from "@shared/businessPromotion";
+import { isValidTransdermalNutrition } from "@shared/transdermalNutrition";
 
 function validateSettingValue(key: string, value: string) {
   if (key === "promotion_video_url" && value.trim() && !isYouTubeUrl(value)) {
@@ -10,6 +11,11 @@ function validateSettingValue(key: string, value: string) {
   }
   if (key === "business_opportunity_slides" && !isValidBusinessOpportunitySlides(value)) {
     throw new Error("Business Opportunity carousel data is invalid");
+  }
+  if (key === "transdermal_nutrition" && value.trim()) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(value); } catch { throw new Error("Transdermal nutrition data is invalid"); }
+    if (!isValidTransdermalNutrition(parsed)) throw new Error("Transdermal nutrition data is invalid");
   }
 }
 
@@ -29,6 +35,7 @@ export const settingsRouter = router({
       midtransIsProduction: all["midtrans_is_production"] === "true",
       businessOpportunitySlides: all["business_opportunity_slides"] ?? "",
       promotionVideoUrl: all["promotion_video_url"] ?? "",
+      transdermalNutrition: all["transdermal_nutrition"] ?? "",
     };
   }),
 

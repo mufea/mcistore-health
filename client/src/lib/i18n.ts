@@ -88,6 +88,15 @@ export const translations = {
     cta: { en: "Browse transdermal products", ar: "تصفح المنتجات عبر الجلد", zh: "浏览经皮产品", es: "Ver productos transdérmicos", hi: "ट्रांसडर्मल उत्पाद देखें", id: "Lihat produk transdermal" },
   },
 
+  transdermalNutrition: {
+    eyebrow: { en: "Everyday transdermal nutrition", ar: "التغذية اليومية عبر الجلد", zh: "日常经皮营养", es: "Nutrición transdérmica diaria", hi: "दैनिक ट्रांसडर्मल पोषण", id: "Pemanfaatan nutrisi transdermal" },
+    title: { en: "Make transdermal nutrition part of your routine", ar: "اجعل التغذية عبر الجلد جزءاً من روتينك", zh: "让经皮营养融入您的日常", es: "Integra la nutrición transdérmica en tu rutina", hi: "ट्रांसडर्मल पोषण को अपनी दिनचर्या का हिस्सा बनाएं", id: "Pemanfaatan Nutrisi Transdermal Patch" },
+    description: { en: "Learn how a convenient patch format can support a simple, consistent wellness routine.", ar: "تعرّف على كيفية دعم شكل اللاصقة المريح لروتين عافية بسيط ومتسق.", zh: "了解便捷的贴片形式如何支持简单且持续的健康习惯。", es: "Descubre cómo un formato práctico puede acompañar una rutina de bienestar sencilla y constante.", hi: "जानें कि सुविधाजनक पैच रूप सरल और निरंतर वेलनेस दिनचर्या में कैसे मदद कर सकता है।", id: "Pelajari bagaimana bentuk patch yang praktis dapat mendukung rutinitas kebugaran yang sederhana dan konsisten." },
+    noteFallback: { en: "Use according to the product label. This information does not replace professional medical advice.", ar: "استخدم المنتج وفقاً لملصقه. لا تحل هذه المعلومات محل المشورة الطبية المتخصصة.", zh: "请按照产品标签使用。本信息不能替代专业医疗建议。", es: "Úsalo según la etiqueta del producto. Esta información no sustituye el consejo médico profesional.", hi: "उत्पाद लेबल के अनुसार उपयोग करें। यह जानकारी पेशेवर चिकित्सा सलाह का विकल्प नहीं है।", id: "Gunakan sesuai petunjuk pada label produk. Informasi ini bukan pengganti nasihat medis profesional." },
+    cta: { en: "Explore transdermal products", ar: "استكشف منتجات عبر الجلد", zh: "探索经皮产品", es: "Explorar productos transdérmicos", hi: "ट्रांसडर्मल उत्पाद देखें", id: "Jelajahi produk transdermal" },
+    openImage: { en: "Open nutrition image", ar: "فتح صورة التغذية", zh: "打开营养图片", es: "Abrir imagen de nutrición", hi: "पोषण चित्र खोलें", id: "Buka gambar nutrisi" },
+  },
+
   // ── Quality & Certifications Section ──
   qualityHome: {
     eyebrow: { en: "Quality you can see", ar: "جودة يمكنك رؤيتها", zh: "看得见的品质", es: "Calidad que puedes ver", hi: "वह गुणवत्ता जिसे आप देख सकते हैं", id: "Kualitas yang dapat Anda lihat" },
