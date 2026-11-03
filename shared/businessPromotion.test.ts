@@ -3,6 +3,7 @@ import {
   DEFAULT_BUSINESS_OPPORTUNITY_SLIDES,
   isValidBusinessOpportunitySlides,
   parseBusinessOpportunitySlides,
+  reorderBusinessOpportunitySlides,
   serializeBusinessOpportunitySlides,
 } from "./businessPromotion";
 
@@ -29,5 +30,11 @@ describe("business promotion settings", () => {
   it("round-trips serialized carousel settings", () => {
     const slides = [{ full: "/slide.webp", mobile: "/slide-mobile.webp" }];
     expect(parseBusinessOpportunitySlides(serializeBusinessOpportunitySlides(slides))).toEqual(slides);
+  });
+
+  it("reorders carousel items without mutating the original list", () => {
+    const slides = [{ full: "/one.webp" }, { full: "/two.webp" }, { full: "/three.webp" }];
+    expect(reorderBusinessOpportunitySlides(slides, 0, 2).map((slide) => slide.full)).toEqual(["/two.webp", "/three.webp", "/one.webp"]);
+    expect(slides.map((slide) => slide.full)).toEqual(["/one.webp", "/two.webp", "/three.webp"]);
   });
 });

@@ -67,3 +67,11 @@ export function isValidBusinessOpportunitySlides(value: string): boolean {
 export function serializeBusinessOpportunitySlides(slides: BusinessOpportunitySlide[]): string {
   return JSON.stringify(slides.slice(0, 20));
 }
+
+export function reorderBusinessOpportunitySlides(slides: BusinessOpportunitySlide[], fromIndex: number, toIndex: number): BusinessOpportunitySlide[] {
+  if (fromIndex < 0 || fromIndex >= slides.length || toIndex < 0 || toIndex >= slides.length || fromIndex === toIndex) return slides;
+  const next = [...slides];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return next;
+}

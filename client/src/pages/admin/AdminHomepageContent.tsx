@@ -9,7 +9,7 @@ import { ArrowDown, ArrowUp, ImagePlus, Loader2, GripVertical, Plus, Save, Trash
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 import { getYouTubeEmbedUrl, isYouTubeUrl } from "@shared/youtube";
-import { DEFAULT_BUSINESS_OPPORTUNITY_SLIDES, parseBusinessOpportunitySlides, serializeBusinessOpportunitySlides, type BusinessOpportunitySlide } from "@shared/businessPromotion";
+import { DEFAULT_BUSINESS_OPPORTUNITY_SLIDES, parseBusinessOpportunitySlides, reorderBusinessOpportunitySlides, serializeBusinessOpportunitySlides, type BusinessOpportunitySlide } from "@shared/businessPromotion";
 import { DEFAULT_TRANSDERMAL_NUTRITION, parseTransdermalNutrition, serializeTransdermalNutrition, TRANSDERMAL_LANGUAGES, type TransdermalLanguage, type TransdermalNutritionContent } from "@shared/transdermalNutrition";
 
 export default function AdminHomepageContent() {
@@ -20,6 +20,7 @@ export default function AdminHomepageContent() {
   const [transdermalNutrition, setTransdermalNutrition] = useState<TransdermalNutritionContent>(DEFAULT_TRANSDERMAL_NUTRITION);
   const [nutritionLanguage, setNutritionLanguage] = useState<TransdermalLanguage>("en");
   const [draggedSlideIndex, setDraggedSlideIndex] = useState<number | null>(null);
+  const [dragOverSlideIndex, setDragOverSlideIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (!rawSettings) return;
@@ -71,14 +72,10 @@ export default function AdminHomepageContent() {
   };
 
   const handleSlideDrop = (targetIndex: number) => {
-    if (draggedSlideIndex === null || draggedSlideIndex === targetIndex) { setDraggedSlideIndex(null); return; }
-    setBusinessSlides((slides) => {
-      const next = [...slides];
-      const [moved] = next.splice(draggedSlideIndex, 1);
-      next.splice(targetIndex, 0, moved);
-      return next;
-    });
+    if (draggedSlideIndex === null || draggedSlideIndex === targetIndex) { setDraggedSlideIndex(null); setDragOverSlideIndex(null); return; }
+    setBusinessSlides((slides) => reorderBusinessOpportunitySlides(slides, draggedSlideIndex, targetIndex));
     setDraggedSlideIndex(null);
+    setDragOverSlideIndex(null);
   };
 
   const moveSlide = (index: number, direction: -1 | 1) => {
@@ -125,8 +122,8 @@ export default function AdminHomepageContent() {
             <div className="flex items-center justify-between gap-3"><div><Label className="text-sm font-medium">Business Opportunity Carousel</Label><p className="mt-1 text-xs text-muted-foreground">Drag to reorder slides, or use the arrow buttons on touch devices.</p></div><Button type="button" variant="outline" size="sm" className="shrink-0 gap-1" onClick={() => setBusinessSlides((slides) => [...slides, { full: "" }])}><Plus className="h-4 w-4" /> Add slide</Button></div>
             <div className="space-y-3">
               {businessSlides.map((slide, index) => (
-                <div key={`${index}-${slide.full}`} onDragOver={(event) => event.preventDefault()} onDrop={() => handleSlideDrop(index)} className={`rounded-lg border border-border/60 bg-muted/20 p-3 transition-opacity ${draggedSlideIndex === index ? "opacity-50" : ""}`}>
-                  <div className="mb-3 flex items-center justify-between gap-2"><div className="flex items-center gap-2"><button type="button" draggable onDragStart={(event) => { event.dataTransfer.effectAllowed = "move"; setDraggedSlideIndex(index); }} onDragEnd={() => setDraggedSlideIndex(null)} className="cursor-grab rounded p-1 text-muted-foreground hover:bg-muted active:cursor-grabbing" aria-label={`Drag slide ${index + 1} to reorder`}><GripVertical className="h-5 w-5" /></button><p className="text-sm font-medium">Slide {index + 1}</p></div><div className="flex items-center gap-1"><Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={index === 0} onClick={() => moveSlide(index, -1)} aria-label={`Move slide ${index + 1} up`}><ArrowUp className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={index === businessSlides.length - 1} onClick={() => moveSlide(index, 1)} aria-label={`Move slide ${index + 1} down`}><ArrowDown className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" disabled={businessSlides.length <= 1} onClick={() => setBusinessSlides((slides) => slides.filter((_, slideIndex) => slideIndex !== index))}><Trash2 className="h-4 w-4" /> Remove</Button></div></div>
+                <div key={`${index}-${slide.full}`} onDragOver={(event) => { event.preventDefault(); setDragOverSlideIndex(index); }} onDragEnter={() => setDragOverSlideIndex(index)} onDragLeave={() => setDragOverSlideIndex(null)} onDrop={() => handleSlideDrop(index)} className={`rounded-lg border bg-muted/20 p-3 transition-[opacity,box-shadow,border-color] ${draggedSlideIndex === index ? "opacity-50" : ""} ${dragOverSlideIndex === index && draggedSlideIndex !== index ? "border-primary ring-2 ring-primary/20 shadow-md" : "border-border/60"}`}>
+                  <div className="mb-3 flex items-center justify-between gap-2"><div className="flex items-center gap-2"><button type="button" draggable onDragStart={(event) => { event.dataTransfer.effectAllowed = "move"; setDraggedSlideIndex(index); setDragOverSlideIndex(null); }} onDragEnd={() => { setDraggedSlideIndex(null); setDragOverSlideIndex(null); }} className="cursor-grab rounded p-1 text-muted-foreground hover:bg-muted active:cursor-grabbing" aria-label={`Drag slide ${index + 1} to reorder`} title="Drag to reorder"><GripVertical className="h-5 w-5" /></button><p className="text-sm font-medium">Slide {index + 1}</p><span className="hidden text-xs text-muted-foreground sm:inline">Drag onto another slide to move</span></div><div className="flex items-center gap-1"><Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={index === 0} onClick={() => moveSlide(index, -1)} aria-label={`Move slide ${index + 1} up`}><ArrowUp className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={index === businessSlides.length - 1} onClick={() => moveSlide(index, 1)} aria-label={`Move slide ${index + 1} down`}><ArrowDown className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" disabled={businessSlides.length <= 1} onClick={() => setBusinessSlides((slides) => slides.filter((_, slideIndex) => slideIndex !== index))}><Trash2 className="h-4 w-4" /> Remove</Button></div></div>
                   <div className="grid gap-3 sm:grid-cols-2"><div><Label className="mb-1.5 block text-xs font-medium">Full-size image URL</Label><Input value={slide.full} onChange={(event) => setBusinessSlides((slides) => slides.map((item, slideIndex) => slideIndex === index ? { ...item, full: event.target.value } : item))} placeholder="https://... or /manus-storage/..." /><label className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-primary hover:underline"><ImagePlus className="h-3.5 w-3.5" /> Upload full-size image<input type="file" accept="image/*" className="sr-only" onChange={(event) => handlePromotionImageUpload(event, index, "full")} /></label></div><div><Label className="mb-1.5 block text-xs font-medium">Mobile image URL (optional)</Label><Input value={slide.mobile ?? ""} onChange={(event) => setBusinessSlides((slides) => slides.map((item, slideIndex) => slideIndex === index ? { ...item, mobile: event.target.value || undefined } : item))} placeholder="Optional 480px image URL" /><label className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-primary hover:underline"><ImagePlus className="h-3.5 w-3.5" /> Upload mobile image<input type="file" accept="image/*" className="sr-only" onChange={(event) => handlePromotionImageUpload(event, index, "mobile")} /></label></div></div>
                   {slide.full && <img src={slide.full} alt={`Business Opportunity slide ${index + 1} preview`} className="mt-3 h-28 w-20 rounded-md border border-border/60 object-cover" onError={(event) => { event.currentTarget.style.display = "none"; }} />}
                 </div>
