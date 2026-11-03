@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { AdminLayout } from "./AdminDashboard";
 import { getYouTubeEmbedUrl, isYouTubeUrl } from "@shared/youtube";
 import { DEFAULT_BUSINESS_OPPORTUNITY_SLIDES, parseBusinessOpportunitySlides, serializeBusinessOpportunitySlides, type BusinessOpportunitySlide } from "@shared/businessPromotion";
-import { DEFAULT_TRANSDERMAL_NUTRITION, parseTransdermalNutrition, serializeTransdermalNutrition, type TransdermalNutritionContent } from "@shared/transdermalNutrition";
+import { DEFAULT_TRANSDERMAL_NUTRITION, parseTransdermalNutrition, serializeTransdermalNutrition, TRANSDERMAL_LANGUAGES, type TransdermalLanguage, type TransdermalNutritionContent } from "@shared/transdermalNutrition";
 
 export default function AdminSettings() {
   const utils = trpc.useUtils();
@@ -22,6 +22,7 @@ export default function AdminSettings() {
   const [businessSlides, setBusinessSlides] = useState<BusinessOpportunitySlide[]>(DEFAULT_BUSINESS_OPPORTUNITY_SLIDES);
   const [promotionVideoUrl, setPromotionVideoUrl] = useState("");
   const [transdermalNutrition, setTransdermalNutrition] = useState<TransdermalNutritionContent>(DEFAULT_TRANSDERMAL_NUTRITION);
+  const [nutritionLanguage, setNutritionLanguage] = useState<TransdermalLanguage>("en");
   const [draggedSlideIndex, setDraggedSlideIndex] = useState<number | null>(null);
 
   // Bank Transfer
@@ -102,8 +103,11 @@ export default function AdminSettings() {
     if (file.size > 4 * 1024 * 1024) { toast.error("Image must be 4 MB or smaller"); return; }
     try {
       const result = await uploadImageMutation.mutateAsync({ base64: await fileToBase64(file), filename: `transdermal-nutrition-${Date.now()}-${file.name}`, mimeType: file.type });
-      setTransdermalNutrition((content) => ({ ...content, imageUrl: result.url }));
-      toast.success("Nutrition section image uploaded");
+      setTransdermalNutrition((content) => ({
+        ...content,
+        images: [...content.images, { url: result.url, alt: Object.fromEntries(TRANSDERMAL_LANGUAGES.map((language) => [language, "Transdermal patch nutrition illustration"])) as Record<TransdermalLanguage, string> }].slice(0, 6),
+      }));
+      toast.success("Gallery image uploaded");
     } catch (error: any) {
       toast.error(error?.message ?? "Image upload failed");
     }
@@ -293,32 +297,81 @@ export default function AdminSettings() {
             <Switch checked={transdermalNutrition.enabled} onCheckedChange={(enabled) => setTransdermalNutrition((content) => ({ ...content, enabled }))} aria-label="Show transdermal nutrition section" />
           </div>
           <div className="mt-5 space-y-4">
-            <div>
-              <Label className="mb-1.5 block text-sm font-medium">Section image URL</Label>
-              <Input value={transdermalNutrition.imageUrl} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, imageUrl: event.target.value }))} placeholder="https://... or /manus-storage/..." />
-              <label className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-primary hover:underline">
-                <ImagePlus className="h-3.5 w-3.5" /> Upload section image
-                <input type="file" accept="image/*" className="sr-only" onChange={handleNutritionImageUpload} />
-              </label>
-              {transdermalNutrition.imageUrl && <img src={transdermalNutrition.imageUrl} alt={transdermalNutrition.imageAlt} className="mt-3 h-40 w-full rounded-lg border border-border/60 object-cover object-top" onError={(event) => { event.currentTarget.style.display = "none"; }} />}
+            <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <Label className="text-sm font-medium">Image gallery</Label>
+                  <p className="mt-1 text-xs text-muted-foreground">Add up to six images. The first image is displayed larger on the homepage.</p>
+                </div>
+                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-background px-3 py-2 text-xs font-medium text-primary hover:bg-muted">
+                  <ImagePlus className="h-3.5 w-3.5" /> Upload image
+                  <input type="file" accept="image/*" className="sr-only" onChange={handleNutritionImageUpload} disabled={transdermalNutrition.images.length >= 6} />
+                </label>
+              </div>
+              <div className="mt-3 space-y-3">
+                {transdermalNutrition.images.map((image, index) => (
+                  <div key={`${index}-${image.url}`} className="rounded-lg border border-border/60 bg-background p-3">
+                    <div className="flex items-start gap-3">
+                      <img src={image.url} alt={image.alt[nutritionLanguage] ?? "Gallery preview"} className="h-20 w-16 shrink-0 rounded-md border border-border/60 object-cover" onError={(event) => { event.currentTarget.style.display = "none"; }} />
+                      <div className="min-w-0 flex-1">
+                        <Label className="mb-1.5 block text-xs font-medium">Image {index + 1} URL</Label>
+                        <Input value={image.url} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, images: content.images.map((entry, imageIndex) => imageIndex === index ? { ...entry, url: event.target.value } : entry) }))} placeholder="https://... or /manus-storage/..." />
+                        <Input value={image.alt[nutritionLanguage]} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, images: content.images.map((entry, imageIndex) => imageIndex === index ? { ...entry, alt: { ...entry.alt, [nutritionLanguage]: event.target.value } } : entry) }))} maxLength={180} className="mt-2" placeholder={`Alt text in ${nutritionLanguage}`} />
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" disabled={transdermalNutrition.images.length <= 1} onClick={() => setTransdermalNutrition((content) => ({ ...content, images: content.images.filter((_, imageIndex) => imageIndex !== index) }))} aria-label={`Remove image ${index + 1}`}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">Image alt text is edited for the selected language below.</p>
+            </div>
+            <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+              <Label className="mb-1.5 block text-sm font-medium">Edit language</Label>
+              <select value={nutritionLanguage} onChange={(event) => setNutritionLanguage(event.target.value as TransdermalLanguage)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                {TRANSDERMAL_LANGUAGES.map((language) => <option key={language} value={language}>{language.toUpperCase()}</option>)}
+              </select>
             </div>
             <div>
-              <Label className="mb-1.5 block text-sm font-medium">Image alt text</Label>
-              <Input value={transdermalNutrition.imageAlt} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, imageAlt: event.target.value }))} maxLength={180} placeholder="Describe the image for accessibility" />
+              <Label className="mb-1.5 block text-sm font-medium">Section eyebrow</Label>
+              <Input value={transdermalNutrition.content[nutritionLanguage].eyebrow} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, content: { ...content.content, [nutritionLanguage]: { ...content.content[nutritionLanguage], eyebrow: event.target.value } } }))} maxLength={100} />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-medium">Section title</Label>
+              <Input value={transdermalNutrition.content[nutritionLanguage].title} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, content: { ...content.content, [nutritionLanguage]: { ...content.content[nutritionLanguage], title: event.target.value } } }))} maxLength={180} />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-medium">Description</Label>
+              <textarea value={transdermalNutrition.content[nutritionLanguage].description} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, content: { ...content.content, [nutritionLanguage]: { ...content.content[nutritionLanguage], description: event.target.value } } }))} maxLength={500} rows={3} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
             </div>
             <div className="space-y-3">
               <Label className="block text-sm font-medium">Three practical uses</Label>
-              {transdermalNutrition.items.map((item, index) => (
+              {transdermalNutrition.content[nutritionLanguage].items.map((item, index) => (
                 <div key={index} className="rounded-lg border border-border/60 bg-muted/20 p-3">
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Use {index + 1}</p>
-                  <Input value={item.title} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, items: content.items.map((entry, itemIndex) => itemIndex === index ? { ...entry, title: event.target.value } : entry) as TransdermalNutritionContent["items"] }))} maxLength={100} placeholder="Use title" />
-                  <Input value={item.description} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, items: content.items.map((entry, itemIndex) => itemIndex === index ? { ...entry, description: event.target.value } : entry) as TransdermalNutritionContent["items"] }))} maxLength={300} className="mt-2" placeholder="Explain this use" />
+                  <Input value={item.title} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, content: { ...content.content, [nutritionLanguage]: { ...content.content[nutritionLanguage], items: content.content[nutritionLanguage].items.map((entry, itemIndex) => itemIndex === index ? { ...entry, title: event.target.value } : entry) as TransdermalNutritionContent["content"][TransdermalLanguage]["items"] } } }))} maxLength={100} placeholder="Use title" />
+                  <Input value={item.description} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, content: { ...content.content, [nutritionLanguage]: { ...content.content[nutritionLanguage], items: content.content[nutritionLanguage].items.map((entry, itemIndex) => itemIndex === index ? { ...entry, description: event.target.value } : entry) as TransdermalNutritionContent["content"][TransdermalLanguage]["items"] } } }))} maxLength={300} className="mt-2" placeholder="Explain this use" />
                 </div>
               ))}
             </div>
             <div>
               <Label className="mb-1.5 block text-sm font-medium">Safety note</Label>
-              <Input value={transdermalNutrition.note} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, note: event.target.value }))} maxLength={400} placeholder="Usage and safety note" />
+              <textarea value={transdermalNutrition.content[nutritionLanguage].note} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, content: { ...content.content, [nutritionLanguage]: { ...content.content[nutritionLanguage], note: event.target.value } } }))} maxLength={400} rows={3} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-medium">Product CTA label</Label>
+              <Input value={transdermalNutrition.content[nutritionLanguage].ctaLabel} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, content: { ...content.content, [nutritionLanguage]: { ...content.content[nutritionLanguage], ctaLabel: event.target.value } } }))} maxLength={100} />
+            </div>
+            <Separator />
+            <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <Label className="text-sm font-medium">WhatsApp / consultation CTA</Label>
+                  <p className="mt-1 text-xs text-muted-foreground">Use an https://, tel:, or mailto: link. Leave empty to open the site chatbot for consultation.</p>
+                </div>
+                <Switch checked={transdermalNutrition.contact.enabled} onCheckedChange={(enabled) => setTransdermalNutrition((content) => ({ ...content, contact: { ...content.contact, enabled } }))} aria-label="Show consultation button" />
+              </div>
+              <Input value={transdermalNutrition.contact.url} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, contact: { ...content.contact, url: event.target.value } }))} className="mt-3" placeholder="https://wa.me/628..." />
+              <Input value={transdermalNutrition.contact.label[nutritionLanguage]} onChange={(event) => setTransdermalNutrition((content) => ({ ...content, contact: { ...content.contact, label: { ...content.contact.label, [nutritionLanguage]: event.target.value } } }))} maxLength={100} className="mt-2" placeholder={`Consultation button label in ${nutritionLanguage}`} />
             </div>
           </div>
         </div>
