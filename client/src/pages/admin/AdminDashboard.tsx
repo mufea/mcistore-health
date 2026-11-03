@@ -9,6 +9,7 @@ import {
   ClipboardList,
   DollarSign,
   Home,
+  Image,
   Loader2,
   LogOut,
   MessageCircle,
@@ -22,7 +23,7 @@ import { useCallback } from "react";
 import BackToHome from "@/components/BackToHome";
 import BrandMark from "@/components/BrandMark";
 
-const navItems = [
+export const adminNavItems = [
   { href: "/admin", label: "Overview", icon: BarChart3 },
   { href: "/admin/survey", label: "Survey Manager", icon: ClipboardList },
   { href: "/admin/products", label: "Products", icon: Package },
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/admin/knowledge", label: "Knowledge Base", icon: Brain },
   { href: "/admin/meetings", label: "Meetings", icon: Calendar },
   { href: "/admin/chatbot", label: "Conversations", icon: MessageCircle },
+  { href: "/admin/homepage-content", label: "Homepage Content", icon: Image },
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/users", label: "Users", icon: Users },
 ];
@@ -89,7 +91,7 @@ export function AdminLayout({ children, noPadding }: { children: React.ReactNode
 
         {/* Nav */}
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto min-h-0">
-          {navItems.map((item) => {
+          {adminNavItems.map((item) => {
             const isActive = location === item.href;
             const Icon = item.icon;
             const navBtn = (

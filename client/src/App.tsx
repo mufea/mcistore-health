@@ -27,6 +27,7 @@ import AdminSurvey from "./pages/admin/AdminSurvey";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminHomepageContent from "./pages/admin/AdminHomepageContent";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminKnowledge from "./pages/admin/AdminKnowledge";
 import AdminMeetings from "./pages/admin/AdminMeetings";
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/admin/products" component={AdminProducts} />
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path="/admin/settings" component={AdminSettings} />
+      <Route path="/admin/homepage-content" component={AdminHomepageContent} />
       <Route path="/admin/users" component={AdminUsers} />
       <Route path="/admin/knowledge" component={AdminKnowledge} />
       <Route path="/admin/meetings" component={AdminMeetings} />
