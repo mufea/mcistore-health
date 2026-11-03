@@ -525,61 +525,6 @@ export default function Home() {
         </FullWide>
       </section>
 
-      {nutritionSection.enabled && (
-        <section className="bg-[#f7f8f1] py-20 sm:py-24" aria-labelledby="transdermal-nutrition-title">
-          <FullWide>
-            <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-              <div>
-                <div className="gold-line mb-4" />
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{nutritionCopy.eyebrow}</p>
-                <h2 id="transdermal-nutrition-title" className="mt-4 font-serif text-3xl font-light leading-tight text-foreground sm:text-5xl">{nutritionCopy.title}</h2>
-                <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground">{nutritionCopy.description}</p>
-                <div className="mt-8 grid gap-4">
-                  {nutritionCopy.items.map((item, index) => (
-                    <div key={`${item.title}-${index}`} className="flex gap-4 rounded-2xl border border-[#dfe7d8] bg-white/85 p-4 shadow-sm">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm font-semibold text-primary-foreground">0{index + 1}</span>
-                      <div>
-                        <h3 className="font-semibold text-foreground">{item.title}</h3>
-                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-6 text-xs leading-6 text-muted-foreground">{nutritionCopy.note || t(translations.transdermalNutrition.noteFallback, lang)}</p>
-                <Button asChild className="mt-7 gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Link href="/products?category=Transdermal%20Patch">{nutritionCopy.ctaLabel} <ArrowRight className="h-4 w-4" /></Link>
-                </Button>
-                {nutritionSection.contact.enabled && (
-                  nutritionSection.contact.url.trim() ? (
-                    <Button asChild variant="outline" className="mt-7 ml-2 gap-2 border-primary/40 text-primary hover:bg-primary/10">
-                      <a href={nutritionSection.contact.url} target="_blank" rel="noreferrer">
-                        <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                        {nutritionSection.contact.label[lang] ?? nutritionSection.contact.label.en}
-                      </a>
-                    </Button>
-                  ) : (
-                    <Button type="button" variant="outline" className="mt-7 ml-2 gap-2 border-primary/40 text-primary hover:bg-primary/10" onClick={() => window.dispatchEvent(new Event("mci:open-chatbot"))}>
-                      <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                      {nutritionSection.contact.label[lang] ?? nutritionSection.contact.label.en}
-                    </Button>
-                  )
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {nutritionImages.map((image, index) => (
-                  <figure key={`${image.url}-${index}`} className={`group relative overflow-hidden rounded-3xl border border-[#dfe7d8] bg-white shadow-lg ${index === 0 ? "col-span-2" : ""}`}>
-                    <button type="button" className="block w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: image.url, alt: image.alt })} aria-label={`${t(translations.transdermalHome.openImage, lang)} ${index + 1}`}>
-                      <img src={image.url} alt={image.alt[lang] ?? image.alt.en} loading={index === 0 ? "eager" : "lazy"} decoding="async" className={`${index === 0 ? "max-h-[28rem]" : "h-48 sm:h-56"} w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]`} />
-                      <span className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-[#071f24]/85 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"><ZoomIn className="h-3.5 w-3.5" aria-hidden="true" />{t(translations.transdermalHome.openImage, lang)}</span>
-                    </button>
-                  </figure>
-                ))}
-              </div>
-            </div>
-          </FullWide>
-        </section>
-      )}
-
       {/* ── Quality & Certifications ── */}
       <section className="bg-background py-20 sm:py-24">
         <FullWide>
@@ -912,6 +857,63 @@ export default function Home() {
           </Button>
         </FullWide>
       </section>
+      {/* ── Transdermal Patch Nutrition — immediately before the footer ── */}
+      {nutritionSection.enabled && (
+        <section className="bg-[#f7f8f1] py-20 sm:py-24" aria-labelledby="transdermal-nutrition-title">
+          <FullWide>
+            <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+              <div>
+                <div className="gold-line mb-4" />
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{nutritionCopy.eyebrow}</p>
+                <h2 id="transdermal-nutrition-title" className="mt-4 font-serif text-3xl font-light leading-tight text-foreground sm:text-5xl">{nutritionCopy.title}</h2>
+                <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground">{nutritionCopy.description}</p>
+                <div className="mt-8 grid gap-4">
+                  {nutritionCopy.items.map((item, index) => (
+                    <div key={`${item.title}-${index}`} className="flex gap-4 rounded-2xl border border-[#dfe7d8] bg-white/85 p-4 shadow-sm">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm font-semibold text-primary-foreground">0{index + 1}</span>
+                      <div>
+                        <h3 className="font-semibold text-foreground">{item.title}</h3>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-6 text-xs leading-6 text-muted-foreground">{nutritionCopy.note || t(translations.transdermalNutrition.noteFallback, lang)}</p>
+                <Button asChild className="mt-7 gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Link href="/products?category=Transdermal%20Patch">{nutritionCopy.ctaLabel} <ArrowRight className="h-4 w-4" /></Link>
+                </Button>
+                {nutritionSection.contact.enabled && (
+                  nutritionSection.contact.url.trim() ? (
+                    <Button asChild variant="outline" className="mt-7 ml-2 gap-2 border-primary/40 text-primary hover:bg-primary/10">
+                      <a href={nutritionSection.contact.url} target="_blank" rel="noreferrer">
+                        <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                        {nutritionSection.contact.label[lang] ?? nutritionSection.contact.label.en}
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button type="button" variant="outline" className="mt-7 ml-2 gap-2 border-primary/40 text-primary hover:bg-primary/10" onClick={() => window.dispatchEvent(new Event("mci:open-chatbot"))}>
+                      <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                      {nutritionSection.contact.label[lang] ?? nutritionSection.contact.label.en}
+                    </Button>
+                  )
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {nutritionImages.map((image, index) => (
+                  <figure key={`${image.url}-${index}`} className={`group relative overflow-hidden rounded-3xl border border-[#dfe7d8] bg-white shadow-lg ${index === 0 ? "col-span-2" : ""}`}>
+                    <button type="button" className="block w-full cursor-zoom-in text-left" onClick={() => setSelectedTransdermalImage({ src: image.url, alt: image.alt })} aria-label={`${t(translations.transdermalHome.openImage, lang)} ${index + 1}`}>
+                      <img src={image.url} alt={image.alt[lang] ?? image.alt.en} loading={index === 0 ? "eager" : "lazy"} decoding="async" className={`${index === 0 ? "max-h-[28rem]" : "h-48 sm:h-56"} w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]`} />
+                      <span className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-[#071f24]/85 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"><ZoomIn className="h-3.5 w-3.5" aria-hidden="true" />{t(translations.transdermalHome.openImage, lang)}</span>
+                    </button>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </FullWide>
+        </section>
+      )}
+
+
     </MainLayout>
   );
 }
